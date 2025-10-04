@@ -1,0 +1,15 @@
+{
+  "story_id": "1.1",
+  "story_file": "docs/stories/1.1-user-authentication.md",
+  "status": "done",
+  "assigned_agent": "javascript-developer",
+  "dependencies": [],
+  "tech_stack": ["React", "TypeScript", "Next.js", "PostgreSQL"],
+  "started_at": "2025-10-02T10:30:00Z",
+  "completed_at": "2025-10-02T12:45:00Z",
+  "review_status": "Approved",
+  "review_file": "docs/code_reviews/1.1-code-review.md",
+  "iteration_count": 1,
+  "last_updated": "2025-10-02T12:45:00Z"
+}
+

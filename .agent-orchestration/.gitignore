@@ -1,0 +1,16 @@
+# Agent Orchestration State Files
+# These files are runtime state and should generally not be committed
+# However, you may choose to commit them to track progress across team members
+
+# Uncomment the lines below if you want to ignore state files:
+# progress.json
+# dependency-graph.json
+# tasks/*.json
+
+# Always keep the roadmap for reference
+# !roadmap.md
+
+# Keep example files for documentation
+!README.md
+!examples/
+

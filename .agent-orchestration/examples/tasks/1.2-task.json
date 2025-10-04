@@ -1,0 +1,16 @@
+{
+  "story_id": "1.2",
+  "story_file": "docs/stories/1.2-user-profile.md",
+  "status": "in_review",
+  "assigned_agent": "javascript-developer",
+  "dependencies": ["1.1"],
+  "tech_stack": ["React", "TypeScript", "Next.js"],
+  "started_at": "2025-10-02T13:00:00Z",
+  "completed_at": null,
+  "review_status": null,
+  "review_file": null,
+  "review_started_at": "2025-10-02T14:15:00Z",
+  "iteration_count": 1,
+  "last_updated": "2025-10-02T14:15:00Z"
+}
+
