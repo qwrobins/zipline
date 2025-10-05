@@ -30,6 +30,32 @@ Creates a detailed Product Requirements Document from a product brief.
 
 ---
 
+#### `/create-design-spec [prd-or-brief-path]`
+**Transform a PRD or product brief into a comprehensive frontend design specification**
+
+Creates a detailed frontend design specification with design system, components, and implementation guidelines.
+
+**Usage**:
+```bash
+/create-design-spec docs/prd.md
+/create-design-spec docs/product-brief.md
+```
+
+**What it does**:
+1. Reads the PRD or product brief
+2. Analyzes design requirements and user needs
+3. Researches design best practices and trends
+4. Creates comprehensive design spec at `docs/design/frontend-design-spec.md`
+5. Includes design system, components, accessibility, and implementation guidelines
+
+**When to use**:
+- After creating a PRD
+- Need comprehensive design documentation
+- Want structured design system and component specifications
+- Faster than using the frontend-design agent
+
+---
+
 ### Story Orchestration
 
 ### `/implement-stories [scope]`

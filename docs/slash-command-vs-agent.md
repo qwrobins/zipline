@@ -75,7 +75,8 @@ This document explains when to use **slash commands** vs **agents** in the devel
 ## 📋 Current Slash Commands
 
 ### Planning & Requirements
-- **`/create-prd`** - Create PRD from product brief (NEW!)
+- **`/create-prd`** - Create PRD from product brief
+- **`/create-design-spec`** - Create frontend design specification (NEW!)
 
 ### Story Orchestration
 - **`/implement-stories`** - Full automated workflow
@@ -93,7 +94,7 @@ This document explains when to use **slash commands** vs **agents** in the devel
 - **scrum-master** - Create user stories from PRD
 
 ### Design Agents
-- **frontend-design** - Create design specifications (research-based)
+- ~~**frontend-design**~~ → **Use `/create-design-spec` instead**
 - **v0-frontend-design** - Create design specs with v0.dev
 
 ### Development Agents

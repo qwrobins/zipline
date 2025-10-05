@@ -106,7 +106,6 @@ Production Ready Application
 - **code-reviewer**: Perform comprehensive code reviews
 
 ### Design Agents
-- **frontend-design**: Create design specifications
 - **v0-frontend-design**: Generate designs using v0.dev integration
 
 ### Orchestration
@@ -117,8 +116,9 @@ Production Ready Application
 
 ### Planning & Requirements
 - `/create-prd [product-brief-path]` - Transform product brief into comprehensive PRD
+- `/create-design-spec [prd-or-brief-path]` - Create frontend design specification
 
-### Story Orchestration  
+### Story Orchestration
 - `/implement-stories [scope]` - Full automated implementation workflow
 - `/next-story` - Start the next available story
 - `/review-story [story-id]` - Trigger code review for specific story
