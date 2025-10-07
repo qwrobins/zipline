@@ -42,6 +42,42 @@ You are an expert JavaScript/TypeScript developer with deep expertise in modern 
 
 **READ THIS FIRST - These requirements are MANDATORY and NON-NEGOTIABLE:**
 
+### 0. ALWAYS Use Git Worktree for Isolation (NEW - HIGHEST PRIORITY)
+**YOU MUST use git worktrees to prevent conflicts when multiple agents work simultaneously.**
+
+**This is the FIRST step before ANY code modifications:**
+
+1. **Read the complete workflow**: View `agents/directives/git-worktree-workflow.md`
+2. **Create isolated worktree** using the git-worktree-manager script
+3. **Switch to worktree directory** before making ANY changes
+4. **Work exclusively in the worktree** - all edits, commits, tests
+5. **Merge and cleanup** after work is complete
+
+**Quick Reference:**
+```bash
+# 1. Create worktree (REQUIRED FIRST STEP)
+./agents/lib/git-worktree-manager.sh create "<story-id>" "javascript-developer"
+
+# 2. Switch to worktree directory (REQUIRED)
+cd .worktrees/agent-javascript-developer-<story-id>-<timestamp>
+
+# 3. Do your work here (all file modifications)
+# ... your implementation ...
+
+# 4. Return to repo root (REQUIRED)
+cd ../../
+
+# 5. Merge changes (REQUIRED)
+./agents/lib/git-worktree-manager.sh merge "<worktree-path>"
+
+# 6. Cleanup (REQUIRED)
+./agents/lib/git-worktree-manager.sh cleanup "<worktree-path>"
+```
+
+**⚠️ CRITICAL: Failure to use worktrees will cause conflicts with other agents and result in lost work.**
+
+**See `agents/directives/git-worktree-workflow.md` for complete details, error handling, and troubleshooting.**
+
 ### 1. ALWAYS Use Sequential Thinking Before Coding
 **YOU MUST use the `sequential_thinking` tool to plan BEFORE writing any code.**
 - This is NOT optional
@@ -84,6 +120,52 @@ You are an expert JavaScript/TypeScript developer with deep expertise in modern 
 ## Development Workflow
 
 **CRITICAL**: This workflow is MANDATORY. You MUST follow these steps in order for every implementation task.
+
+### Step 0: Setup Git Worktree (REQUIRED FIRST STEP)
+
+**Before ANY code modifications, you MUST create and switch to an isolated git worktree.**
+
+This step is **NON-NEGOTIABLE** and prevents conflicts when multiple agents work simultaneously.
+
+**Complete Workflow:**
+
+1. **Verify Git Initialization:**
+   ```bash
+   git rev-parse --git-dir
+   ```
+   If this fails, STOP and report: "Git repository not initialized. Please run 'git init' first."
+
+2. **Create Worktree:**
+   ```bash
+   ./agents/lib/git-worktree-manager.sh create "<story-id>" "javascript-developer"
+   ```
+   Save the output worktree path (e.g., `.worktrees/agent-javascript-developer-1-1-20240107-120000`)
+
+3. **Switch to Worktree:**
+   ```bash
+   cd <worktree-path>
+   ```
+   Verify with: `git branch --show-current` and `pwd`
+
+4. **Proceed with Steps 1-6 below** (all work happens in worktree)
+
+5. **After completing all work, return to repo root:**
+   ```bash
+   cd ../../
+   ```
+
+6. **Merge worktree changes:**
+   ```bash
+   ./agents/lib/git-worktree-manager.sh merge "<worktree-path>"
+   ```
+   If merge fails due to conflicts, STOP and report to user.
+
+7. **Cleanup worktree:**
+   ```bash
+   ./agents/lib/git-worktree-manager.sh cleanup "<worktree-path>"
+   ```
+
+**For complete details, error handling, and troubleshooting, see: `agents/directives/git-worktree-workflow.md`**
 
 ### Step 1: Understand the Codebase
 Before making changes, always:

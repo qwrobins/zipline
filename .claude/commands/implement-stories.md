@@ -77,12 +77,44 @@ Implements all stories matching the pattern (e.g., all stories starting with "1.
 
 ## CRITICAL REQUIREMENTS
 
-1. **ALWAYS use sequential_thinking** for complex planning and dependency resolution
-2. **ALWAYS use context7** when uncertain about algorithms or best practices
-3. **ALWAYS update state files** in `.agent-orchestration/` to track progress
-4. **NEVER skip dependency checks** - stories must wait for dependencies to be approved
-5. **ALWAYS verify test results** before marking stories as complete
-6. **ALWAYS check for out-of-scope dependencies** and warn the user
+1. **ALWAYS use git worktrees** for agent isolation to prevent conflicts
+2. **ALWAYS use sequential_thinking** for complex planning and dependency resolution
+3. **ALWAYS use context7** when uncertain about algorithms or best practices
+4. **ALWAYS update state files** in `.agent-orchestration/` to track progress
+5. **NEVER skip dependency checks** - stories must wait for dependencies to be approved
+6. **ALWAYS verify test results** before marking stories as complete
+7. **ALWAYS check for out-of-scope dependencies** and warn the user
+8. **ALWAYS cleanup worktrees** after story completion or failure
+
+## ⚠️ CRITICAL REQUIREMENT - Git Worktree Isolation ⚠️
+
+**MANDATORY WORKTREE USAGE:**
+
+When multiple agents work simultaneously, they MUST use isolated git worktrees to prevent conflicts.
+
+**Orchestrator Responsibilities:**
+
+1. **Before assigning a story to an agent:**
+   - Create a worktree using: `./agents/lib/git-worktree-manager.sh create "{story-id}" "{agent-name}"`
+   - Save the worktree path in the task state file
+   - Provide the worktree path to the agent
+
+2. **During story implementation:**
+   - Track active worktrees in `.agent-orchestration/worktree-registry.json`
+   - Monitor for abandoned worktrees (older than 24 hours)
+   - Ensure agents work exclusively in their worktrees
+
+3. **After story completion:**
+   - Verify the agent merged their worktree
+   - Verify the agent cleaned up their worktree
+   - If cleanup failed, manually cleanup: `./agents/lib/git-worktree-manager.sh cleanup "{worktree-path}"`
+
+4. **Error handling:**
+   - If merge fails due to conflicts, STOP and report to user
+   - Do NOT cleanup worktrees with merge conflicts
+   - Provide clear instructions for manual conflict resolution
+
+**See `agents/directives/git-worktree-workflow.md` for complete workflow details.**
 
 ## ⚠️ CRITICAL REQUIREMENT - Code Review After Every Story ⚠️
 
@@ -356,15 +388,35 @@ For each in-scope story in implementation order:
 2. **Start Story Implementation**:
    - Update task state: `status: "in_progress"`, `started_at: <timestamp>`
    - Update progress.json counters
+   - **Create Git Worktree** for the agent:
+     ```bash
+     WORKTREE_PATH=$(./agents/lib/git-worktree-manager.sh create "{story_id}" "{assigned_agent}")
+     ```
+   - Save the worktree path in task state: `worktree_path: "$WORKTREE_PATH"`
+   - **Register Files for Tracking** (optional, for conflict prevention):
+     ```bash
+     # Auto-register files after agent makes changes
+     ./agents/lib/file-tracker.sh auto-register "{story_id}" "{assigned_agent}" "$WORKTREE_PATH"
+     ```
    - Invoke appropriate dev agent:
      ```
      @agent-{assigned_agent}, please implement story {story_id}.
 
      Story file: {story_file}
 
-     Please read the story file carefully, review the acceptance criteria,
-     and implement the required functionality following the critical workflow
-     requirements in your agent definition.
+     ⚠️ CRITICAL: You MUST use the git worktree workflow to prevent conflicts.
+
+     Your worktree has been created at: {worktree_path}
+
+     Follow these steps:
+     1. Switch to worktree: cd {worktree_path}
+     2. Implement the story (all work in worktree)
+     3. Commit all changes
+     4. Return to repo root: cd ../../
+     5. Merge: ./agents/lib/git-worktree-manager.sh merge "{worktree_path}"
+     6. Cleanup: ./agents/lib/git-worktree-manager.sh cleanup "{worktree_path}"
+
+     See agents/directives/git-worktree-workflow.md for complete details.
 
      When complete, update the story status to "Ready for Review" and add
      a Dev Agent Record section documenting your implementation.
@@ -375,6 +427,83 @@ For each in-scope story in implementation order:
    - Verify story status changed to "Ready for Review"
    - Verify Dev Agent Record section was added
    - Update task state: `status: "ready_for_review"`
+
+3a. **Conflict Detection and Resolution** (NEW):
+
+   **Before merging, detect potential conflicts:**
+   ```bash
+   # Detect conflicts
+   CONFLICT_RESULT=$(./agents/lib/conflict-detector.sh detect "$WORKTREE_PATH")
+   ```
+
+   **If conflicts detected:**
+
+   - Extract conflict information from JSON result
+   - Check severity level (low/medium/high/critical)
+
+   **For low/medium severity conflicts:**
+   - Proceed with merge attempt
+   - If merge fails, invoke conflict-resolver (see below)
+
+   **For high/critical severity conflicts:**
+   - **STOP before merge**
+   - Invoke conflict-resolver agent immediately:
+     ```
+     @agent-conflict-resolver, please analyze and resolve the following conflicts:
+
+     Story: {story_id}
+     Worktree: {worktree_path}
+     Conflicting files: {list_of_files}
+     Severity: {severity_level}
+
+     Please:
+     1. Analyze both versions of the conflicting code
+     2. Understand the intent of each change
+     3. Propose an intelligent resolution
+     4. Provide reasoning and confidence level
+     5. Suggest alternative resolutions if applicable
+
+     Context:
+     - Story description: {story_description}
+     - Files modified: {modified_files}
+     - Recent changes in main: {recent_main_changes}
+     ```
+
+   - **Wait for conflict-resolver analysis**
+   - Present proposed resolution to user:
+     ```
+     ## Conflict Resolution Proposal
+
+     {conflict_resolver_analysis}
+
+     Options:
+     1. Accept proposed resolution (recommended)
+     2. Choose alternative resolution
+     3. Manually resolve conflicts
+
+     Please review and choose an option.
+     ```
+
+   - **User reviews and approves resolution**
+   - Apply approved resolution
+   - Continue with merge
+
+   **If merge fails despite detection:**
+   - Invoke conflict-resolver agent (same process as above)
+   - Get proposed resolution
+   - Present to user for approval
+   - Apply resolution
+   - Retry merge
+
+   **After successful merge:**
+   - Unregister files from tracking:
+     ```bash
+     ./agents/lib/file-tracker.sh unregister "{story_id}"
+     ```
+   - Cleanup worktree:
+     ```bash
+     ./agents/lib/git-worktree-manager.sh cleanup "$WORKTREE_PATH"
+     ```
 
 4. **⚠️ MANDATORY CODE REVIEW - DO NOT SKIP ⚠️**:
 

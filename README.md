@@ -7,7 +7,8 @@ A comprehensive ecosystem for AI-driven software development, featuring speciali
 Zipline is a complete AI development workflow system that transforms product ideas into production-ready applications through a coordinated team of specialized AI agents. The system includes:
 
 - **Specialized AI Agents** for planning, architecture, development, and code review
-- **Automated Story Orchestration** for managing complex development workflows  
+- **Git Worktree Multi-Agent Development** for conflict-free parallel work (NEW!)
+- **Automated Story Orchestration** for managing complex development workflows
 - **Production-Ready Agent Collection** (ACCA) with 100+ specialized agents
 - **Slash Commands** for rapid workflow automation
 - **Example Implementation** of a Mini Social Feed application
@@ -55,6 +56,8 @@ Production Ready Application
 - Claude Code IDE with agent support
 - Node.js 18+ (for example projects)
 - pnpm package manager (recommended)
+- Git 2.5+ (for worktree support)
+- jq (for JSON processing)
 
 ### Getting Started
 
@@ -99,11 +102,12 @@ Production Ready Application
 - **scrum-master**: Generate user stories from requirements
 - **planning-analyst**: Segment large documents for better organization
 
-### Development Agents  
+### Development Agents
 - **javascript-developer**: Implement JavaScript/TypeScript features
 - **python-developer**: Build Python applications and APIs
 - **rust-developer**: Create high-performance Rust applications
 - **code-reviewer**: Perform comprehensive code reviews
+- **conflict-resolver**: AI-assisted merge conflict resolution (NEW!)
 
 ### Design Agents
 - **v0-frontend-design**: Generate designs using v0.dev integration
@@ -124,6 +128,12 @@ Production Ready Application
 - `/review-story [story-id]` - Trigger code review for specific story
 - `/story-status` - Show comprehensive progress report
 
+### Git Worktree Management
+- `/cleanup-worktrees list` - List all active worktrees
+- `/cleanup-worktrees auto` - Cleanup abandoned worktrees (older than 24h)
+- `/cleanup-worktrees <path>` - Cleanup specific worktree
+- `/cleanup-worktrees force` - Force cleanup all worktrees (use with caution)
+
 ## 📚 Documentation
 
 ### Core Documentation
@@ -131,6 +141,17 @@ Production Ready Application
 - [Orchestration System](docs/orchestration-system.md) - Automated workflow coordination
 - [Slash Commands Guide](.claude/commands/README.md) - Command usage and examples
 - [Quick Start Guide](agents/guides/QUICK_START.md) - Get up and running quickly
+
+### Git Worktree Multi-Agent Development
+- [Git Worktree Quick Start](docs/git-worktree-quick-start.md) - 5-minute setup guide
+- [Git Worktree Multi-Agent Guide](docs/git-worktree-multi-agent-guide.md) - Complete workflow guide
+- [Git Worktree Workflow Directive](agents/directives/git-worktree-workflow.md) - Mandatory agent workflow
+- [Git Worktree Manager](agents/lib/README.md) - Core utility documentation
+
+### Conflict Prevention and Resolution (NEW!)
+- [Conflict Resolution Design](docs/conflict-prevention-and-resolution-design.md) - System architecture
+- [Conflict Resolution Summary](docs/conflict-resolution-implementation-summary.md) - Implementation guide
+- [Conflict-Resolver Agent](agents/definitions/conflict-resolver.md) - AI-assisted conflict resolution
 
 ### Example Project
 The repository includes a complete example implementation of a Mini Social Feed application:

@@ -41,6 +41,30 @@ You are an expert Python developer with deep expertise in Python 3.11+ and its e
 
 **READ THIS FIRST - These requirements are MANDATORY and NON-NEGOTIABLE:**
 
+### 0. ALWAYS Use Git Worktree for Isolation (NEW - HIGHEST PRIORITY)
+**YOU MUST use git worktrees to prevent conflicts when multiple agents work simultaneously.**
+
+**Quick Reference:**
+```bash
+# 1. Create worktree
+./agents/lib/git-worktree-manager.sh create "<story-id>" "python-developer"
+
+# 2. Switch to worktree
+cd .worktrees/agent-python-developer-<story-id>-<timestamp>
+
+# 3. Do your work, commit changes
+# ... implementation ...
+
+# 4. Return to repo root
+cd ../../
+
+# 5. Merge and cleanup
+./agents/lib/git-worktree-manager.sh merge "<worktree-path>"
+./agents/lib/git-worktree-manager.sh cleanup "<worktree-path>"
+```
+
+**⚠️ CRITICAL: See `agents/directives/git-worktree-workflow.md` for complete workflow details.**
+
 ### 1. ALWAYS Use Sequential Thinking Before Coding
 **YOU MUST use the `sequential_thinking` tool to plan BEFORE writing any code.**
 - This is NOT optional
@@ -83,6 +107,12 @@ You are an expert Python developer with deep expertise in Python 3.11+ and its e
 ## Development Workflow
 
 **CRITICAL**: This workflow is MANDATORY. You MUST follow these steps in order for every implementation task.
+
+### Step 0: Setup Git Worktree (REQUIRED FIRST STEP)
+
+**Before ANY code modifications, create and switch to an isolated git worktree.**
+
+See `agents/directives/git-worktree-workflow.md` for complete details.
 
 ### Step 1: Understand the Codebase
 Before making changes, always:
