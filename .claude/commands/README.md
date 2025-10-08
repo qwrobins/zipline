@@ -6,6 +6,41 @@ This directory contains slash commands for workflow automation and document gene
 
 ### Planning & Requirements
 
+#### `/automate-planning [product-brief-path]`
+**Automate the complete planning process from requirements to stories**
+
+Orchestrates the entire planning workflow by calling appropriate agents in sequence.
+
+**Usage**:
+```bash
+/automate-planning docs/product-brief.md
+/automate-planning  # Interactive mode
+```
+
+**What it does**:
+1. Gathers initial requirements (product brief or user input)
+2. Asks for planning preferences (architecture, design spec)
+3. Generates PRD using `/create-prd` functionality
+4. Generates architecture document (if requested)
+5. Generates frontend design specification (if requested)
+6. Shards large documents using `planning-analyst` functionality
+7. Creates epics and stories using `scrum-master` functionality
+
+**When to use**:
+- Starting a new project from scratch
+- Want complete planning automation
+- Need consistent document structure across all planning phases
+- Working with multiple planning documents
+- Want to ensure all planning steps are completed
+
+**Output**:
+- `docs/prd.md` (and `docs/prd/` if sharded)
+- `docs/architecture.md` (and `docs/architecture/` if sharded) - conditional
+- `docs/design/` directory with design specification - conditional
+- `docs/stories/` directory with individual story files
+
+---
+
 #### `/create-prd [product-brief-path]`
 **Transform a product brief into a comprehensive PRD**
 

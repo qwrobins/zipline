@@ -78,12 +78,15 @@ Production Ready Application
 
 3. **Use slash commands for rapid development**
    ```bash
+   # Automate complete planning process
+   /automate-planning docs/product-brief.md
+
    # Create a PRD from a product brief
    /create-prd docs/product-brief.md
-   
+
    # Implement user stories automatically
    /implement-stories
-   
+
    # Check progress
    /story-status
    ```
@@ -119,6 +122,7 @@ Production Ready Application
 ## ⚡ Slash Commands
 
 ### Planning & Requirements
+- `/automate-planning [product-brief-path]` - Automate complete planning process from requirements to stories
 - `/create-prd [product-brief-path]` - Transform product brief into comprehensive PRD
 - `/create-design-spec [prd-or-brief-path]` - Create frontend design specification
 
