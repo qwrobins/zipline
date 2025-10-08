@@ -54,7 +54,7 @@ cd ../../
 ./agents/lib/git-worktree-manager.sh cleanup "<worktree-path>"
 ```
 
-**⚠️ See `agents/directives/git-worktree-workflow.md` for complete details.**
+**⚠️ See `agents/directives/git-worktree-workflow.md` for complete enhanced workflow with design validation.**
 
 ### 1. ALWAYS Use Sequential Thinking Before Coding
 **YOU MUST use the `sequential_thinking` tool to plan BEFORE writing any code.**
@@ -103,7 +103,7 @@ cd ../../
 
 **Before ANY code modifications, create and switch to an isolated git worktree.**
 
-See `agents/directives/git-worktree-workflow.md` for complete details.
+See `agents/directives/git-worktree-workflow.md` for complete enhanced workflow with design validation.
 
 ### Step 1: Understand the Codebase
 Before making changes, always:
@@ -858,6 +858,109 @@ func BenchmarkStringConcatenation(b *testing.B) {
         })
     }
 }
+```
+
+## CLI Design Quality Requirements (For Terminal Applications)
+
+**When building CLI applications, you MUST implement professional visual design:**
+
+### Terminal UI Standards
+- **Color coding**: Use semantic colors (red=error, yellow=warning, green=success, blue=info)
+- **Progress indicators**: Implement progress bars, spinners, or status updates for long operations
+- **Responsive layout**: Adapt to different terminal widths (80, 120, 160+ columns)
+- **Accessibility**: Support screen readers, high contrast mode, color blindness
+- **Terminal compatibility**: Test with xterm, alacritty, kitty, tmux
+
+### Required CLI Testing Setup
+Create a `test_cli_design.go` file for visual validation:
+
+```go
+package main
+
+import (
+    "fmt"
+    "os"
+    "os/exec"
+    "strings"
+    "testing"
+)
+
+func TestCLIVisualOutput(t *testing.T) {
+    // Test color support
+    testColorSupport(t)
+
+    // Test responsive layout
+    testResponsiveLayout(t)
+
+    // Test accessibility features
+    testAccessibility(t)
+}
+
+func testColorSupport(t *testing.T) {
+    // Test ANSI color output
+    cmd := exec.Command("./your-cli-app", "--help")
+    cmd.Env = append(os.Environ(), "TERM=xterm-256color")
+    output, err := cmd.Output()
+    if err != nil {
+        t.Fatalf("CLI failed: %v", err)
+    }
+
+    // Verify color codes are present
+    if !strings.Contains(string(output), "\033[") {
+        t.Error("No ANSI color codes found in output")
+    }
+}
+
+func testResponsiveLayout(t *testing.T) {
+    widths := []string{"80", "120", "160"}
+
+    for _, width := range widths {
+        cmd := exec.Command("./your-cli-app", "--help")
+        cmd.Env = append(os.Environ(), "COLUMNS="+width)
+        output, err := cmd.Output()
+        if err != nil {
+            t.Fatalf("CLI failed at width %s: %v", width, err)
+        }
+
+        // Check no line exceeds terminal width
+        lines := strings.Split(string(output), "\n")
+        for _, line := range lines {
+            if len(line) > 80 && width == "80" {
+                t.Errorf("Line exceeds terminal width: %s", line)
+            }
+        }
+    }
+}
+
+func testAccessibility(t *testing.T) {
+    // Test monochrome mode
+    cmd := exec.Command("./your-cli-app", "--help")
+    cmd.Env = append(os.Environ(), "NO_COLOR=1")
+    output, err := cmd.Output()
+    if err != nil {
+        t.Fatalf("CLI failed in monochrome mode: %v", err)
+    }
+
+    // Verify no color codes in monochrome mode
+    if strings.Contains(string(output), "\033[") {
+        t.Error("Color codes found in NO_COLOR mode")
+    }
+}
+```
+
+### CLI Design Validation Command
+Add this to your Makefile or run manually:
+
+```bash
+# Test CLI design quality
+test-cli-design:
+    @echo "Testing CLI visual design..."
+    @go test -v ./test_cli_design.go
+    @echo "Testing terminal compatibility..."
+    @TERM=xterm ./your-cli-app --help > /dev/null
+    @TERM=screen ./your-cli-app --help > /dev/null
+    @NO_COLOR=1 ./your-cli-app --help > /dev/null
+    @echo "CLI design validation passed"
 ```
 
 ## Quality Standards

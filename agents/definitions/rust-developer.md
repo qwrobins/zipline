@@ -46,15 +46,24 @@ You are an expert Rust developer with deep expertise in Rust 2021 edition and it
 
 **Quick Reference:**
 ```bash
-./agents/lib/git-worktree-manager.sh create "<story-id>" "rust-developer"
+./.claude/agents/lib/git-worktree-manager.sh create "<story-id>" "rust-developer"
 cd .worktrees/agent-rust-developer-<story-id>-<timestamp>
 # ... do work ...
 cd ../../
-./agents/lib/git-worktree-manager.sh merge "<worktree-path>"
-./agents/lib/git-worktree-manager.sh cleanup "<worktree-path>"
+./.claude/agents/lib/git-worktree-manager.sh merge "<worktree-path>"
+./.claude/agents/lib/git-worktree-manager.sh cleanup "<worktree-path>"
 ```
 
-**⚠️ See `agents/directives/git-worktree-workflow.md` for complete details.**
+**⚠️ See `.claude/agents/directives/git-worktree-workflow.md` for complete enhanced workflow with design validation.**
+
+### 0a. 🚨 CRITICAL: Development Server Management (Parallel Execution)
+**See `.claude/agents/directives/development-server-management.md` for:**
+- **NEVER kill processes** on occupied ports
+- **ALWAYS find available port** in range 8080-8090 for Actix or 3000-3010 for Axum
+- Port detection and selection strategies
+- Framework-specific port configuration (set in code: `.bind(("127.0.0.1", port))`)
+- Test configuration for dynamic ports
+- **This is MANDATORY for parallel agent execution**
 
 ### 1. ALWAYS Use Sequential Thinking Before Coding
 **YOU MUST use the `sequential_thinking` tool to plan BEFORE writing any code.**
@@ -103,7 +112,7 @@ cd ../../
 
 **Before ANY code modifications, create and switch to an isolated git worktree.**
 
-See `agents/directives/git-worktree-workflow.md` for complete details.
+See `.claude/agents/directives/git-worktree-workflow.md` for complete enhanced workflow with design validation.
 
 ### Step 1: Understand the Codebase
 Before making changes, always:
@@ -777,6 +786,136 @@ fn benchmark_cache_operations(c: &mut Criterion) {
 
 criterion_group!(benches, benchmark_cache_operations);
 criterion_main!(benches);
+```
+
+## CLI Design Quality Requirements (For Terminal Applications)
+
+**When building CLI applications with Rust, you MUST implement professional visual design:**
+
+### Terminal UI Standards
+- **Use proper crates**: `clap` for CLI parsing, `colored` for colors, `indicatif` for progress bars
+- **Color coding**: Semantic colors (red=error, yellow=warning, green=success, blue=info)
+- **Progress indicators**: Progress bars, spinners for long operations
+- **Responsive layout**: Adapt to terminal width using `terminal_size` crate
+- **Error handling**: Beautiful error messages with `color-eyre` or `anyhow`
+
+### Required CLI Testing Setup
+
+1. **Add to Cargo.toml:**
+```toml
+[dev-dependencies]
+assert_cmd = "2.0"
+predicates = "3.0"
+tempfile = "3.0"
+
+[dependencies]
+clap = { version = "4.0", features = ["derive"] }
+colored = "2.0"
+indicatif = "0.17"
+terminal_size = "0.3"
+anyhow = "1.0"
+```
+
+2. **Create tests/cli_design_tests.rs:**
+```rust
+use assert_cmd::Command;
+use predicates::prelude::*;
+use std::env;
+
+#[test]
+fn test_color_support() {
+    let mut cmd = Command::cargo_bin("your-cli-app").unwrap();
+    cmd.env("TERM", "xterm-256color")
+       .arg("--help")
+       .assert()
+       .success()
+       .stdout(predicate::str::contains("\x1b[")); // ANSI escape codes
+}
+
+#[test]
+fn test_no_color_mode() {
+    let mut cmd = Command::cargo_bin("your-cli-app").unwrap();
+    cmd.env("NO_COLOR", "1")
+       .arg("--help")
+       .assert()
+       .success()
+       .stdout(predicate::str::contains("\x1b[").not()); // No ANSI codes
+}
+
+#[test]
+fn test_responsive_layout() {
+    let widths = vec!["80", "120", "160"];
+
+    for width in widths {
+        let mut cmd = Command::cargo_bin("your-cli-app").unwrap();
+        cmd.env("COLUMNS", width)
+           .arg("--help")
+           .assert()
+           .success();
+    }
+}
+
+#[test]
+fn test_error_formatting() {
+    let mut cmd = Command::cargo_bin("your-cli-app").unwrap();
+    cmd.arg("--invalid-flag")
+       .assert()
+       .failure()
+       .stderr(predicate::str::contains("error:"));
+}
+```
+
+3. **Example CLI Implementation with Design:**
+```rust
+use clap::Parser;
+use colored::*;
+use indicatif::{ProgressBar, ProgressStyle};
+use anyhow::Result;
+
+#[derive(Parser)]
+#[command(name = "your-cli-app")]
+#[command(about = "A professional CLI application")]
+struct Cli {
+    #[arg(short, long)]
+    verbose: bool,
+}
+
+fn main() -> Result<()> {
+    let cli = Cli::parse();
+
+    // Check for NO_COLOR environment variable
+    if env::var("NO_COLOR").is_ok() {
+        colored::control::set_override(false);
+    }
+
+    println!("{}", "Starting operation...".blue());
+
+    // Progress bar example
+    let pb = ProgressBar::new(100);
+    pb.set_style(ProgressStyle::default_bar()
+        .template("{spinner:.green} [{elapsed_precise}] [{bar:40.cyan/blue}] {pos}/{len} {msg}")
+        .unwrap());
+
+    for i in 0..100 {
+        pb.set_position(i);
+        std::thread::sleep(std::time::Duration::from_millis(10));
+    }
+    pb.finish_with_message("Done!");
+
+    println!("{}", "Operation completed successfully!".green());
+    Ok(())
+}
+```
+
+4. **Run CLI Design Tests:**
+```bash
+# Test CLI design quality
+cargo test cli_design_tests
+
+# Test with different terminal settings
+TERM=xterm cargo run -- --help
+NO_COLOR=1 cargo run -- --help
+COLUMNS=80 cargo run -- --help
 ```
 
 ## Quality Standards

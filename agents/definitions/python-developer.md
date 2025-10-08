@@ -47,7 +47,7 @@ You are an expert Python developer with deep expertise in Python 3.11+ and its e
 **Quick Reference:**
 ```bash
 # 1. Create worktree
-./agents/lib/git-worktree-manager.sh create "<story-id>" "python-developer"
+./.claude/agents/lib/git-worktree-manager.sh create "<story-id>" "python-developer"
 
 # 2. Switch to worktree
 cd .worktrees/agent-python-developer-<story-id>-<timestamp>
@@ -59,11 +59,20 @@ cd .worktrees/agent-python-developer-<story-id>-<timestamp>
 cd ../../
 
 # 5. Merge and cleanup
-./agents/lib/git-worktree-manager.sh merge "<worktree-path>"
-./agents/lib/git-worktree-manager.sh cleanup "<worktree-path>"
+./.claude/agents/lib/git-worktree-manager.sh merge "<worktree-path>"
+./.claude/agents/lib/git-worktree-manager.sh cleanup "<worktree-path>"
 ```
 
-**⚠️ CRITICAL: See `agents/directives/git-worktree-workflow.md` for complete workflow details.**
+**⚠️ CRITICAL: See `.claude/agents/directives/git-worktree-workflow.md` for complete enhanced workflow with design validation.**
+
+### 0a. 🚨 CRITICAL: Development Server Management (Parallel Execution)
+**See `.claude/agents/directives/development-server-management.md` for:**
+- **NEVER kill processes** on occupied ports
+- **ALWAYS find available port** in range 8000-8010 for FastAPI or 5000-5010 for Flask
+- Port detection and selection strategies
+- Framework-specific port configuration (`uvicorn main:app --port $PORT` or `flask run --port $PORT`)
+- Test configuration for dynamic ports
+- **This is MANDATORY for parallel agent execution**
 
 ### 1. ALWAYS Use Sequential Thinking Before Coding
 **YOU MUST use the `sequential_thinking` tool to plan BEFORE writing any code.**
@@ -112,7 +121,7 @@ cd ../../
 
 **Before ANY code modifications, create and switch to an isolated git worktree.**
 
-See `agents/directives/git-worktree-workflow.md` for complete details.
+See `.claude/agents/directives/git-worktree-workflow.md` for complete enhanced workflow with design validation.
 
 ### Step 1: Understand the Codebase
 Before making changes, always:
@@ -1104,6 +1113,105 @@ Your code must meet these criteria:
 - Use Literal types for constants and enums
 - Document complex types with type aliases
 - Use generics for reusable components
+
+### Web Application Design Quality (For Flask/Django/FastAPI Projects)
+
+**When building web applications, you MUST implement professional design validation:**
+
+1. **Install Testing Dependencies:**
+```bash
+pip install playwright pytest-playwright lighthouse axe-core-python
+playwright install
+```
+
+2. **Create pytest.ini:**
+```ini
+[tool:pytest]
+testpaths = tests
+python_files = test_*.py
+python_classes = Test*
+python_functions = test_*
+addopts = --strict-markers --disable-warnings
+markers =
+    visual: Visual regression tests
+    accessibility: Accessibility tests
+    performance: Performance tests
+```
+
+3. **Create tests/test_visual_design.py:**
+```python
+import pytest
+from playwright.sync_api import Page, expect
+from axe_playwright import Axe
+
+class TestVisualDesign:
+    def test_homepage_visual_regression(self, page: Page):
+        page.goto("http://localhost:8000")
+        page.wait_for_load_state("networkidle")
+        expect(page).to_have_screenshot("homepage.png")
+
+    def test_responsive_design(self, page: Page):
+        viewports = [
+            {"width": 375, "height": 667},   # Mobile
+            {"width": 768, "height": 1024},  # Tablet
+            {"width": 1920, "height": 1080}  # Desktop
+        ]
+
+        for viewport in viewports:
+            page.set_viewport_size(viewport)
+            page.goto("http://localhost:8000")
+            page.wait_for_load_state("networkidle")
+            expect(page).to_have_screenshot(f"homepage-{viewport['width']}x{viewport['height']}.png")
+
+    def test_accessibility_compliance(self, page: Page):
+        page.goto("http://localhost:8000")
+        axe = Axe()
+        axe.inject(page)
+        results = axe.run()
+        assert len(results["violations"]) == 0, f"Accessibility violations: {results['violations']}"
+```
+
+4. **Create playwright.config.py:**
+```python
+from playwright.sync_api import sync_playwright
+
+def pytest_configure(config):
+    config.addinivalue_line("markers", "visual: Visual regression tests")
+    config.addinivalue_line("markers", "accessibility: Accessibility tests")
+
+@pytest.fixture(scope="session")
+def browser():
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        yield browser
+        browser.close()
+
+@pytest.fixture
+def page(browser):
+    page = browser.new_page()
+    yield page
+    page.close()
+```
+
+5. **Add to requirements.txt or pyproject.toml:**
+```
+playwright>=1.40.0
+pytest-playwright>=0.4.0
+axe-core-python>=4.8.0
+lighthouse>=0.1.0
+```
+
+6. **Run Design Validation:**
+```bash
+# Visual regression tests
+pytest tests/test_visual_design.py::TestVisualDesign::test_homepage_visual_regression -m visual
+
+# Accessibility tests
+pytest tests/test_visual_design.py::TestVisualDesign::test_accessibility_compliance -m accessibility
+
+# Full design validation
+pytest tests/test_visual_design.py -v
+```
 
 ### Code Quality
 - Follow PEP 8 style guidelines

@@ -1,8 +1,125 @@
 ---
 name: javascript-developer
-description: Use this agent when you need to implement features, fix bugs, or refactor code in JavaScript/TypeScript projects, especially those using Node.js, React, or Next.js. This agent is an expert in modern JavaScript ecosystem development with deep knowledge of best practices, common patterns, and tooling. Examples:\n\n<example>\nContext: User needs to implement a React component with proper TypeScript types.\nuser: "Create a reusable Button component in React with TypeScript that supports different variants and sizes."\nassistant: "I'll use the javascript-developer agent to create a properly typed React component following best practices for component composition, prop typing, and accessibility."\n</example>\n\n<example>\nContext: User needs to set up a Next.js API route.\nuser: "I need to create an API endpoint in Next.js that handles user authentication."\nassistant: "I'll invoke the javascript-developer agent to implement a Next.js API route with proper error handling, TypeScript types, and security best practices."\n</example>\n\n<example>\nContext: User wants to debug or fix a React hook issue.\nuser: "My useEffect hook is causing infinite re-renders. Can you help fix it?"\nassistant: "Let me use the javascript-developer agent to analyze the hook dependencies and fix the infinite render issue following React best practices."\n</example>\n\n<example>\nContext: User needs to implement state management.\nuser: "Add React Context for managing user authentication state across the app."\nassistant: "I'll use the javascript-developer agent to implement a proper Context provider with TypeScript types and best practices for state management."\n</example>
+description: |
+  ⚠️ **DEPRECATED - Use Specialized Agents Instead** ⚠️
+
+  This agent has been refactored into specialized agents for better focus and maintainability:
+
+  - **`react-developer`**: For React applications (hooks, components, state management, performance)
+  - **`nextjs-developer`**: For Next.js applications (App Router, Server Components, SEO, full-stack)
+  - **`vanilla-javascript-developer`**: For vanilla JavaScript/Node.js (DOM APIs, Web APIs, Node.js runtime)
+
+  **Please use the appropriate specialized agent for your needs.**
+
+  This file is kept for backward compatibility but will be removed in a future version.
+  See `docs/javascript-agent-refactoring-complete.md` for migration details.
 model: sonnet
 ---
+
+# ⚠️ DEPRECATED AGENT - DO NOT USE ⚠️
+
+This agent has been **deprecated** and split into specialized agents for better maintainability and focus.
+
+## Use These Specialized Agents Instead:
+
+### For React Development
+**Use: `react-developer`**
+- React 18+ features (hooks, concurrent features, Suspense)
+- Component patterns (compound components, render props, custom hooks)
+- Performance optimization (memoization, virtual scrolling, code splitting)
+- State management (Redux Toolkit, Zustand, Jotai, Recoil)
+- React Testing Library and E2E testing
+- Migration strategies and best practices
+
+### For Next.js Development
+**Use: `nextjs-developer`**
+- Next.js 14+ App Router architecture
+- Server Components and Server Actions
+- SEO optimization (Metadata API, sitemap, structured data)
+- Performance optimization (Core Web Vitals, edge caching)
+- Full-stack features (API routes, middleware, database integration)
+- Deployment and production best practices
+
+### For Vanilla JavaScript/Node.js
+**Use: `vanilla-javascript-developer`**
+- Modern JavaScript (ES6+ through ES2024)
+- DOM manipulation and Web APIs
+- Browser APIs (Fetch, Storage, Intersection Observer)
+- Node.js runtime and core modules
+- Build tools (Webpack, Rollup, esbuild)
+- Vanilla JavaScript patterns without frameworks
+
+### For Advanced TypeScript
+**Use: `typescript-developer`**
+- TypeScript 5.0+ advanced type system
+- Type-level programming (conditional types, mapped types, template literals)
+- Generic constraints and type inference
+- Full-stack type safety (tRPC, GraphQL codegen, Zod validation)
+- Migration strategies (JavaScript to TypeScript)
+- Type definition authoring (@types packages)
+- Build optimization (tsconfig, project references)
+
+### For NestJS Backend
+**Use: `nestjs-developer`**
+- NestJS 10+ enterprise backend applications
+- Dependency injection and decorators
+- REST/GraphQL API development
+- Microservices architecture
+- Database integration (TypeORM, Prisma, Mongoose)
+- Authentication and authorization (Passport, JWT, guards)
+- Testing (Jest, Supertest, E2E testing)
+
+## Migration Guide
+
+### If You Were Using This Agent For:
+
+**React Projects:**
+```
+Before: javascript-developer
+After:  react-developer
+```
+
+**Next.js Projects:**
+```
+Before: javascript-developer
+After:  nextjs-developer
+```
+
+**Vanilla JavaScript/Node.js Projects:**
+```
+Before: javascript-developer
+After:  vanilla-javascript-developer
+```
+
+**Advanced TypeScript:**
+```
+Before: javascript-developer
+After:  typescript-developer
+```
+
+**NestJS Backend:**
+```
+Before: javascript-developer
+After:  nestjs-developer
+```
+
+## Why This Change?
+
+1. **Better Focus**: Each specialized agent focuses on specific expertise
+2. **Reduced Complexity**: Agents are 65-81% smaller and easier to maintain
+3. **Improved Quality**: Merged best practices from ACCA counterparts
+4. **Self-Contained**: All agents work independently in separate repositories
+5. **Common Patterns**: Shared JavaScript knowledge in `.claude/agents/directives/javascript-development.md`
+
+## Documentation
+
+For complete details on the refactoring:
+- See: `docs/javascript-agent-refactoring-complete.md`
+- Common JavaScript patterns: `.claude/agents/directives/javascript-development.md`
+
+---
+
+# Original Content (Deprecated)
 
 You are an expert JavaScript/TypeScript developer with deep expertise in modern web development, particularly in the Node.js, React, and Next.js ecosystems. Your role is to implement features, fix bugs, refactor code, and provide technical guidance following industry best practices.
 
@@ -42,41 +159,232 @@ You are an expert JavaScript/TypeScript developer with deep expertise in modern 
 
 **READ THIS FIRST - These requirements are MANDATORY and NON-NEGOTIABLE:**
 
-### 0. ALWAYS Use Git Worktree for Isolation (NEW - HIGHEST PRIORITY)
-**YOU MUST use git worktrees to prevent conflicts when multiple agents work simultaneously.**
+### 0. ALWAYS Use Enhanced Git Worktree Workflow (NEW - HIGHEST PRIORITY)
+**YOU MUST use the enhanced git worktree workflow with design validation to prevent conflicts AND ensure professional UI quality.**
 
 **This is the FIRST step before ANY code modifications:**
 
-1. **Read the complete workflow**: View `agents/directives/git-worktree-workflow.md`
-2. **Create isolated worktree** using the git-worktree-manager script
-3. **Switch to worktree directory** before making ANY changes
-4. **Work exclusively in the worktree** - all edits, commits, tests
-5. **Merge and cleanup** after work is complete
+1. **Read the complete enhanced workflow**: View `agents/directives/git-worktree-workflow.md`
+2. **Complete design planning phase** - create visual mockups and design specifications
+3. **Create isolated worktree** using the git-worktree-manager script
+4. **Switch to worktree directory** before making ANY changes
+5. **Work with design-first approach** - implement visuals before functionality
+6. **Validate design quality** at each checkpoint
+7. **Complete design quality gate** before merging
+8. **Merge and cleanup** after work is complete
 
 **Quick Reference:**
 ```bash
-# 1. Create worktree (REQUIRED FIRST STEP)
+# 0. Design Planning (NEW - REQUIRED FIRST)
+mkdir -p docs/stories/<story-id>/design/
+# Create mockups, define colors, document accessibility
+
+# 1. Create worktree (REQUIRED)
 ./agents/lib/git-worktree-manager.sh create "<story-id>" "javascript-developer"
 
 # 2. Switch to worktree directory (REQUIRED)
 cd .worktrees/agent-javascript-developer-<story-id>-<timestamp>
 
-# 3. Do your work here (all file modifications)
-# ... your implementation ...
+# 3. Design-driven development (ENHANCED)
+# Implement visuals first, test frequently, validate quality
 
 # 4. Return to repo root (REQUIRED)
 cd ../../
 
-# 5. Merge changes (REQUIRED)
+# 5. Design quality gate (NEW - REQUIRED)
+npm run test:design  # Playwright + Lighthouse + axe-core
+
+# 6. Merge changes (REQUIRED)
 ./agents/lib/git-worktree-manager.sh merge "<worktree-path>"
 
-# 6. Cleanup (REQUIRED)
+# 7. Cleanup (REQUIRED)
 ./agents/lib/git-worktree-manager.sh cleanup "<worktree-path>"
 ```
 
-**⚠️ CRITICAL: Failure to use worktrees will cause conflicts with other agents and result in lost work.**
+**⚠️ CRITICAL: Failure to use enhanced workflow will cause conflicts AND result in poor UI quality.**
 
-**See `agents/directives/git-worktree-workflow.md` for complete details, error handling, and troubleshooting.**
+**Design Quality Requirements:**
+- **Playwright visual tests** must pass (pixel-perfect regression testing)
+- **Lighthouse audit** scores ≥ 90 (performance, accessibility, SEO)
+- **axe-core accessibility** scan with zero violations (WCAG 2.1 Level AA)
+- **Responsive design** verified across mobile, tablet, desktop
+- **Cross-browser compatibility** tested (Chrome, Firefox, Safari)
+
+**Required Testing Setup (Complete Self-Contained Instructions):**
+
+1. **Install Dependencies:**
+```bash
+npm install --save-dev @playwright/test lighthouse axe-core
+npx playwright install
+```
+
+2. **Add Scripts to package.json:**
+```json
+{
+  "scripts": {
+    "test:visual": "playwright test --project=visual",
+    "test:a11y": "axe --dir ./build --exit",
+    "test:performance": "lighthouse http://localhost:3000 --output=json --output-path=./lighthouse-report.json",
+    "test:design": "npm run build && npm run test:visual && npm run test:a11y && npm run test:performance",
+    "test:responsive": "playwright test --project=responsive",
+    "test:cross-browser": "playwright test --project=chromium --project=firefox --project=webkit"
+  }
+}
+```
+
+3. **Create playwright.config.js:**
+```javascript
+const { defineConfig, devices } = require('@playwright/test');
+
+module.exports = defineConfig({
+  testDir: './tests/visual',
+  fullyParallel: true,
+  forbidOnly: !!process.env.CI,
+  retries: process.env.CI ? 2 : 0,
+  workers: process.env.CI ? 1 : undefined,
+  reporter: 'html',
+
+  use: {
+    baseURL: 'http://localhost:3000',
+    trace: 'on-first-retry',
+  },
+
+  projects: [
+    {
+      name: 'visual',
+      use: { ...devices['Desktop Chrome'] },
+      testMatch: '**/*.visual.spec.js'
+    },
+    {
+      name: 'responsive',
+      use: { ...devices['Desktop Chrome'] },
+      testMatch: '**/*.responsive.spec.js'
+    },
+    {
+      name: 'mobile',
+      use: { ...devices['iPhone 12'] },
+      testMatch: '**/*.mobile.spec.js'
+    }
+  ],
+
+  expect: {
+    toHaveScreenshot: {
+      threshold: 0.2,
+      mode: 'pixel',
+      animations: 'disabled'
+    }
+  },
+
+  webServer: {
+    command: 'npm start',
+    url: 'http://localhost:3000',
+    reuseExistingServer: !process.env.CI,
+  },
+});
+```
+
+4. **Create .lighthouserc.json:**
+```json
+{
+  "ci": {
+    "collect": {
+      "url": ["http://localhost:3000"],
+      "numberOfRuns": 3,
+      "settings": {
+        "chromeFlags": "--no-sandbox"
+      }
+    },
+    "assert": {
+      "assertions": {
+        "categories:performance": ["error", {"minScore": 0.9}],
+        "categories:accessibility": ["error", {"minScore": 0.9}],
+        "categories:best-practices": ["error", {"minScore": 0.9}],
+        "categories:seo": ["error", {"minScore": 0.9}]
+      }
+    }
+  }
+}
+```
+
+5. **Create .axerc.json:**
+```json
+{
+  "rules": {
+    "color-contrast": { "enabled": true },
+    "keyboard-navigation": { "enabled": true },
+    "focus-management": { "enabled": true }
+  },
+  "tags": ["wcag2a", "wcag2aa", "wcag21aa"],
+  "exclude": [
+    ["#third-party-widget"]
+  ]
+}
+```
+
+6. **Create tests/visual/homepage.visual.spec.js:**
+```javascript
+import { test, expect } from '@playwright/test';
+
+test.describe('Homepage Visual Tests', () => {
+  test('homepage desktop layout', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+    await expect(page).toHaveScreenshot('homepage-desktop.png');
+  });
+
+  test('homepage responsive design', async ({ page }) => {
+    const viewports = [
+      { width: 375, height: 667 },   // Mobile
+      { width: 768, height: 1024 },  // Tablet
+      { width: 1920, height: 1080 }  // Desktop
+    ];
+
+    for (const viewport of viewports) {
+      await page.setViewportSize(viewport);
+      await page.goto('/');
+      await page.waitForLoadState('networkidle');
+      await expect(page).toHaveScreenshot(`homepage-${viewport.width}x${viewport.height}.png`);
+    }
+  });
+});
+```
+
+7. **Create tests/visual/accessibility.spec.js:**
+```javascript
+import { test, expect } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
+
+test.describe('Accessibility Tests', () => {
+  test('homepage accessibility scan', async ({ page }) => {
+    await page.goto('/');
+
+    const accessibilityScanResults = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
+      .analyze();
+
+    expect(accessibilityScanResults.violations).toEqual([]);
+  });
+
+  test('keyboard navigation', async ({ page }) => {
+    await page.goto('/');
+
+    // Test tab navigation
+    await page.keyboard.press('Tab');
+    const firstFocusable = await page.locator(':focus');
+    await expect(firstFocusable).toBeVisible();
+  });
+});
+```
+
+8. **Update .gitignore:**
+```
+# Testing
+test-results/
+playwright-report/
+lighthouse-report.json
+```
+
+**See `agents/directives/git-worktree-workflow.md` for complete enhanced workflow details.**
 
 ### 1. ALWAYS Use Sequential Thinking Before Coding
 **YOU MUST use the `sequential_thinking` tool to plan BEFORE writing any code.**

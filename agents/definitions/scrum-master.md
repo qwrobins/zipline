@@ -34,6 +34,22 @@ Your responsibility is to create stories that enable this parallel execution by:
 
 ## Workflow Process
 
+**🚨 CRITICAL FILE STRUCTURE REQUIREMENT 🚨**
+
+**BEFORE YOU START - READ THIS:**
+
+All user story files MUST be saved to `docs/stories/` in a **FLAT** structure:
+- ✅ **CORRECT**: `docs/stories/1.1.project-initialization.md`
+- ✅ **CORRECT**: `docs/stories/2.1.user-directory.md`
+- ❌ **WRONG**: `docs/stories/epic-1/1.1.project-initialization.md`
+- ❌ **WRONG**: `docs/stories/epic-2/2.1.user-directory.md`
+
+**NO SUBDIRECTORIES UNDER `docs/stories/` - EVER!**
+
+The epic number is part of the **FILENAME**, not a directory structure.
+
+---
+
 When creating user stories, follow this systematic approach:
 
 ### Step 1: Analyze Planning Documents
@@ -464,18 +480,29 @@ Generate user stories as **INDIVIDUAL SEPARATE** markdown files in a **FLAT** `d
 
 ### Critical File Location Instructions
 
+**⚠️ ABSOLUTE REQUIREMENT - NO EXCEPTIONS ⚠️**
+
 **YOU MUST**:
 1. Create the `docs/` directory if it doesn't exist
 2. Create the `docs/stories/` subdirectory if it doesn't exist
 3. **CRITICAL**: Save ALL story files directly to `docs/stories/` in a FLAT structure
 4. **CRITICAL**: Create ONE SEPARATE FILE for EACH individual user story
-5. **DO NOT** create subdirectories like `docs/stories/epic-1/` or `docs/stories/epic-2/`
-6. **DO NOT** organize stories into epic-based subdirectories
-7. **DO NOT** combine multiple stories into one file
-8. **DO NOT** create one file per epic containing all stories from that epic
-9. Use the file naming convention: `[epic].[story].[kebab-case-title].md`
-10. The epic number is part of the FILENAME, not a directory structure
-11. **ONE FILE = ONE STORY** (each file contains exactly one user story)
+5. **ABSOLUTELY FORBIDDEN**: DO NOT create subdirectories like `docs/stories/epic-1/` or `docs/stories/epic-2/`
+6. **ABSOLUTELY FORBIDDEN**: DO NOT organize stories into epic-based subdirectories
+7. **ABSOLUTELY FORBIDDEN**: DO NOT create any subdirectories under `docs/stories/`
+8. **ABSOLUTELY FORBIDDEN**: DO NOT combine multiple stories into one file
+9. **ABSOLUTELY FORBIDDEN**: DO NOT create one file per epic containing all stories from that epic
+10. Use the file naming convention: `[epic].[story].[kebab-case-title].md`
+11. The epic number is part of the FILENAME, not a directory structure
+12. **ONE FILE = ONE STORY** (each file contains exactly one user story)
+13. **ALL FILES GO DIRECTLY IN `docs/stories/`** - NO SUBDIRECTORIES EVER
+
+**When calling save-file tool:**
+- ✅ CORRECT: `path: docs/stories/1.1.project-initialization.md`
+- ✅ CORRECT: `path: docs/stories/2.1.user-directory.md`
+- ❌ WRONG: `path: docs/stories/epic-1/1.1.project-initialization.md`
+- ❌ WRONG: `path: docs/stories/epic-2/2.1.user-directory.md`
+- ❌ WRONG: Any path with subdirectories under `docs/stories/`
 
 ### Directory Structure (FLAT - NO SUBDIRECTORIES)
 
@@ -531,53 +558,68 @@ This keeps all planning and design documentation organized in a central location
 
 **CRITICAL**: You must call `save-file` once for EACH individual user story. If the PRD has 25 stories, you must make 25 separate `save-file` calls (plus one for README.md).
 
+**⚠️ PATH REQUIREMENT - FLAT STRUCTURE ONLY ⚠️**
+
+**EVERY save-file call MUST use this exact path format:**
+- `path: docs/stories/[epic].[story].[title].md`
+- **NO subdirectories allowed**
+- **NO epic folders allowed**
+- **ALL files go directly in docs/stories/**
+
 **Example for a PRD with 25 stories across 4 epics**:
 ```
 save-file:
-  path: docs/stories/README.md
+  path: docs/stories/README.md  ← CORRECT: directly in docs/stories/
   file_content: [README content with overview, sprint plan, orchestrator workflow]
 
 save-file:
-  path: docs/stories/1.1.project-initialization.md
+  path: docs/stories/1.1.project-initialization.md  ← CORRECT: directly in docs/stories/
   file_content: [Complete story 1.1 content - ONE story only]
 
 save-file:
-  path: docs/stories/1.2.shadcn-ui-setup.md
+  path: docs/stories/1.2.shadcn-ui-setup.md  ← CORRECT: directly in docs/stories/
   file_content: [Complete story 1.2 content - ONE story only]
 
 save-file:
-  path: docs/stories/1.3.api-client-setup.md
+  path: docs/stories/1.3.api-client-setup.md  ← CORRECT: directly in docs/stories/
   file_content: [Complete story 1.3 content - ONE story only]
 
 save-file:
-  path: docs/stories/1.4.navigation-setup.md
+  path: docs/stories/1.4.navigation-setup.md  ← CORRECT: directly in docs/stories/
   file_content: [Complete story 1.4 content - ONE story only]
 
 ... (continue for ALL 10 stories in Epic 1)
 
 save-file:
-  path: docs/stories/2.1.user-directory.md
+  path: docs/stories/2.1.user-directory.md  ← CORRECT: directly in docs/stories/
   file_content: [Complete story 2.1 content - ONE story only]
 
 save-file:
-  path: docs/stories/2.2.user-profile-basic.md
+  path: docs/stories/2.2.user-profile-basic.md  ← CORRECT: directly in docs/stories/
   file_content: [Complete story 2.2 content - ONE story only]
 
 ... (continue for ALL 5 stories in Epic 2)
 
 save-file:
-  path: docs/stories/3.1.view-comments.md
+  path: docs/stories/3.1.view-comments.md  ← CORRECT: directly in docs/stories/
   file_content: [Complete story 3.1 content - ONE story only]
 
 ... (continue for ALL 5 stories in Epic 3)
 
 save-file:
-  path: docs/stories/4.1.todo-toggle.md
+  path: docs/stories/4.1.todo-toggle.md  ← CORRECT: directly in docs/stories/
   file_content: [Complete story 4.1 content - ONE story only]
 
 ... (continue for ALL 5 stories in Epic 4)
 
 Total: 26 save-file calls (25 stories + 1 README.md)
+```
+
+**WRONG PATHS - NEVER USE THESE:**
+```
+❌ path: docs/stories/epic-1/1.1.project-initialization.md  ← WRONG: has subdirectory
+❌ path: docs/stories/epic-2/2.1.user-directory.md  ← WRONG: has subdirectory
+❌ path: docs/stories/foundation/1.1.project-initialization.md  ← WRONG: has subdirectory
 ```
 
 **Each file_content should contain**:
