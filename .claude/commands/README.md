@@ -7,9 +7,9 @@ This directory contains slash commands for workflow automation and document gene
 ### Planning & Requirements
 
 #### `/automate-planning [product-brief-path]`
-**Automate the complete planning process from requirements to stories**
+**Automate the complete planning process from requirements to implementation-ready state**
 
-Orchestrates the entire planning workflow by calling appropriate agents in sequence.
+Orchestrates the entire planning workflow by calling appropriate agents in sequence, and prepares all orchestration infrastructure for implementation.
 
 **Usage**:
 ```bash
@@ -25,6 +25,10 @@ Orchestrates the entire planning workflow by calling appropriate agents in seque
 5. Generates frontend design specification (if requested)
 6. Shards large documents using `planning-analyst` functionality
 7. Creates epics and stories using `scrum-master` functionality
+8. **Initializes orchestration infrastructure** (`.agent-orchestration/`)
+9. **Analyzes story dependencies** and builds dependency graph
+10. **Matches stories to development agents**
+11. **Generates implementation roadmap** with parallel execution strategy
 
 **When to use**:
 - Starting a new project from scratch
@@ -32,12 +36,19 @@ Orchestrates the entire planning workflow by calling appropriate agents in seque
 - Need consistent document structure across all planning phases
 - Working with multiple planning documents
 - Want to ensure all planning steps are completed
+- **Want implementation-ready orchestration state**
 
 **Output**:
 - `docs/prd.md` (and `docs/prd/` if sharded)
 - `docs/architecture.md` (and `docs/architecture/` if sharded) - conditional
 - `docs/design/` directory with design specification - conditional
 - `docs/stories/` directory with individual story files
+- **`.agent-orchestration/` directory with:**
+  - `dependency-graph.json` - Story dependencies and parallel waves
+  - `progress.json` - Progress tracking
+  - `roadmap.md` - Human-readable implementation plan
+  - `tasks/*.json` - Individual task state files
+  - `worktree-registry.json` - Worktree tracking
 
 ---
 
@@ -94,9 +105,13 @@ Creates a detailed frontend design specification with design system, components,
 ### Story Orchestration
 
 ### `/implement-stories [scope]`
-**Full automated orchestration workflow**
+**Execute implementation using pre-built orchestration state**
 
-Analyzes stories in `docs/stories/`, builds dependency graph, creates roadmap, and coordinates implementation from start to finish.
+Loads orchestration state created by `/automate-planning` and coordinates implementation from start to finish.
+
+**Prerequisites**:
+- **MUST run `/automate-planning` first** to create orchestration infrastructure
+- Requires `.agent-orchestration/` directory with dependency graph, task states, and roadmap
 
 **Usage**:
 ```bash
@@ -118,24 +133,23 @@ Analyzes stories in `docs/stories/`, builds dependency graph, creates roadmap, a
 
 **What it does**:
 1. Parses scope arguments (if provided)
-2. Scans and analyzes stories (filtered by scope)
-3. Builds dependency graph and validates
+2. **Loads orchestration state** from `.agent-orchestration/`
+3. Filters stories based on scope
 4. Warns about out-of-scope dependencies
-5. Determines implementation order
-6. Matches stories to appropriate agents
-7. Creates implementation roadmap
-8. Executes stories in dependency order
-9. Coordinates code reviews
-10. Handles review feedback loops
-11. Tracks progress in state files
+5. Executes stories in parallel waves (based on dependency graph)
+6. Coordinates code reviews after each story
+7. Handles review feedback loops
+8. Manages git worktrees for parallel execution
+9. Tracks progress in state files
 
 **When to use**:
-- Starting a new project
+- After running `/automate-planning`
 - Implementing multiple stories
 - Want fully automated coordination
-- Need dependency resolution
+- Need parallel execution of independent stories
 - Working on a specific epic or feature set
 - Testing orchestration with a subset of stories
+- Resuming interrupted implementation
 
 ---
 
@@ -216,31 +230,75 @@ Generates detailed status report showing progress across all stories.
 
 ## 🚀 Quick Start Guide
 
-### First Time Setup
+### First Time Setup (Complete Planning + Implementation)
+
+1. **Create a product brief** at `docs/product-brief.md` with your project requirements
+
+2. **Run automated planning** to generate all planning docs and orchestration state:
+   ```bash
+   /automate-planning docs/product-brief.md
+   ```
+
+   This creates:
+   - `docs/prd.md` - Product Requirements Document
+   - `docs/stories/` - Individual user story files
+   - `.agent-orchestration/` - Dependency graph, roadmap, task states
+   - (Optional) `docs/architecture.md` - Architecture document
+   - (Optional) `docs/design/` - Design specification
+
+3. **Review generated artifacts**:
+   - Review PRD and stories for accuracy
+   - Review implementation roadmap: `.agent-orchestration/roadmap.md`
+   - Verify dependency graph makes sense
+
+4. **Execute implementation**:
+   ```bash
+   /implement-stories
+   ```
+
+5. **Monitor progress**:
+   ```bash
+   /story-status
+   ```
+
+### Alternative: Manual Story Creation
+
+If you prefer to create stories manually:
 
 1. **Create user stories** in `docs/stories/` directory:
    ```
    docs/stories/
+   ├── 0.0-project-initialization.md
+   ├── 0.1-design-system-foundation.md
    ├── 1.1-user-authentication.md
    ├── 1.2-user-profile.md
    └── 1.3-password-reset.md
    ```
 
-2. **Initialize orchestration**:
+2. **Run planning to build orchestration state**:
+   ```bash
+   /automate-planning
    ```
-   /implement-stories
-   ```
+   (Skip PRD/architecture/design generation, just build orchestration infrastructure)
 
-3. **Monitor progress**:
-   ```
-   /story-status
+3. **Execute implementation**:
+   ```bash
+   /implement-stories
    ```
 
 ### Typical Workflow
 
-**Automated Approach** (Recommended for multiple stories):
+**Complete Workflow** (From requirements to implementation):
 ```bash
-# Start full workflow (all stories)
+# Step 1: Planning (creates all planning docs + orchestration state)
+/automate-planning docs/product-brief.md
+
+# Step 2: Review generated planning artifacts
+# - Review docs/prd.md
+# - Review docs/stories/
+# - Review .agent-orchestration/roadmap.md
+
+# Step 3: Execute implementation (all stories)
 /implement-stories
 
 # Or scope to specific stories
@@ -256,12 +314,24 @@ Generates detailed status report showing progress across all stories.
 /implement-stories
 ```
 
+**Automated Approach** (When planning already done):
+```bash
+# If /automate-planning was already run, just execute
+/implement-stories
+
+# Or scope to specific stories
+/implement-stories 1.1-1.5
+
+# Check progress anytime
+/story-status
+
+# Resume if interrupted
+/implement-stories
+```
+
 **Manual Approach** (More control):
 ```bash
-# Initialize and analyze
-/implement-stories  # Let it analyze, then Escape to stop
-
-# Work on stories one at a time
+# After /automate-planning, work on stories one at a time
 /next-story
 # ... wait for completion ...
 /review-story 1.1

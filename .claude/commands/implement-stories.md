@@ -236,60 +236,84 @@ This ensures consistent code quality and prevents technical debt accumulation ac
    Analyzing stories in docs/stories/...
    ```
 
-### Phase 2: Initialization & Setup
+### Phase 2: Load Planning State
 
-1. **Create orchestration directory structure** if it doesn't exist:
-   ```
-   .agent-orchestration/
-   ├── roadmap.md
-   ├── progress.json
-   ├── dependency-graph.json
-   └── tasks/
-   ```
+**🚨 CRITICAL: This phase loads pre-existing planning artifacts created by `/automate-planning`**
 
-2. **Initialize progress.json** with:
-   ```json
-   {
-     "initialized_at": "<current timestamp>",
-     "last_updated": "<current timestamp>",
-     "scope": "<scope description>",
-     "total_stories": 0,
-     "completed": 0,
-     "in_progress": 0,
-     "blocked": 0,
-     "not_started": 0
-   }
-   ```
+1. **Verify orchestration infrastructure exists**:
+   - Check if `.agent-orchestration/` directory exists
+   - If NOT exists:
+     ```
+     ❌ ERROR: Orchestration infrastructure not found!
 
-### Phase 3: Story Discovery & Analysis
+     The .agent-orchestration/ directory does not exist.
+     This directory should have been created by the /automate-planning command.
 
-1. **Scan `docs/stories/` directory** for all story files
+     Please run /automate-planning first to:
+     1. Create user stories
+     2. Build dependency graph
+     3. Match stories to agents
+     4. Generate implementation roadmap
 
-2. **For each story file**, extract:
-   - **Story ID**: From filename (e.g., "1.1" from "1.1-user-authentication.md")
-   - **Epic**: From story content or directory structure:
-     - Epic field: `**Epic**: auth`
-     - YAML frontmatter: `epic: auth`
-     - Directory: `docs/stories/epic-auth/1.1-login.md`
-     - Prefix: `auth-1.1-login.md`
-   - **Current Status**: Look for "Status:" field in the story
-   - **Dependencies**: Look for "Dependencies:" section or field
-   - **Technology Stack**: Scan content for keywords:
-     - JavaScript/TypeScript/React/Next.js/Node.js
-     - Python/Django/Flask/FastAPI
-     - Rust/Cargo
-     - Database mentions (PostgreSQL, MongoDB, etc.)
-   - **Acceptance Criteria**: Extract from story content
-   - **File Paths**: Look for mentioned files or directories
+     Then run /implement-stories to execute the implementation.
+     ```
+     **STOP** - Do not proceed without orchestration infrastructure
 
-3. **Filter stories based on scope** (from Phase 1):
-   - If scope is "all": include all stories
-   - If scope is range: include only stories in range
-   - If scope is epic: include only stories with matching epic
-   - If scope is pattern: include only stories matching pattern
-   - If scope is list: include only specified stories
+2. **Load dependency graph**:
+   - Read `.agent-orchestration/dependency-graph.json`
+   - Extract:
+     - All story nodes
+     - Dependency edges
+     - Implementation order
+     - Parallel waves
+     - Parallel opportunities
+   - If file missing or invalid:
+     ```
+     ❌ ERROR: Dependency graph not found or invalid!
 
-4. **Check for out-of-scope dependencies**:
+     Expected: .agent-orchestration/dependency-graph.json
+
+     Please run /automate-planning to generate the dependency graph.
+     ```
+     **STOP** - Do not proceed without dependency graph
+
+3. **Load progress tracking**:
+   - Read `.agent-orchestration/progress.json`
+   - Extract current progress metrics
+   - If file missing, create with default values
+
+4. **Load task state files**:
+   - Scan `.agent-orchestration/tasks/` directory
+   - Read all `*-task.json` files
+   - Build map of story ID → task state
+   - If directory missing or empty:
+     ```
+     ❌ ERROR: Task state files not found!
+
+     Expected: .agent-orchestration/tasks/*.json
+
+     Please run /automate-planning to generate task state files.
+     ```
+     **STOP** - Do not proceed without task state files
+
+5. **Load roadmap**:
+   - Read `.agent-orchestration/roadmap.md`
+   - Display roadmap to user for reference
+   - If file missing, warn but continue (not critical)
+
+6. **Apply scope filter** (from Phase 1):
+   - If scope is "all": use all stories from loaded state
+   - If scope is range: filter loaded stories to range
+   - If scope is epic: filter loaded stories to epic
+   - If scope is pattern: filter loaded stories to pattern
+   - If scope is list: filter loaded stories to specific IDs
+
+7. **Filter dependency graph and waves**:
+   - Remove out-of-scope stories from dependency graph
+   - Recalculate parallel waves for in-scope stories only
+   - Update implementation order for filtered set
+
+8. **Check for out-of-scope dependencies**:
    - For each in-scope story, check if dependencies are also in scope
    - If dependencies are out of scope, warn the user:
      ```
@@ -303,190 +327,31 @@ This ensures consistent code quality and prevents technical debt accumulation ac
      What would you like to do?
      ```
 
-5. **Create task state file** for each in-scope story at `.agent-orchestration/tasks/{story-id}-task.json`:
-   ```json
-   {
-     "story_id": "1.1",
-     "story_file": "docs/stories/1.1-user-authentication.md",
-     "epic": "auth",
-     "status": "not_started",
-     "assigned_agent": null,
-     "dependencies": [],
-     "tech_stack": [],
-     "started_at": null,
-     "completed_at": null,
-     "review_status": null,
-     "review_file": null,
-     "iteration_count": 0,
-     "last_updated": "<timestamp>",
-     "in_scope": true
-   }
-   ```
+9. **Update task state files** for scope:
+   - Mark in-scope stories: `in_scope: true`
+   - Mark out-of-scope stories: `in_scope: false`
+   - Update progress.json with filtered counts
 
-### Phase 4: Dependency Resolution & Parallel Execution Planning
+10. **Report loaded state**:
+    ```
+    ✅ Planning State Loaded Successfully
 
-**🚀 CRITICAL: This phase determines parallel execution opportunities - maximize parallelism!**
+    📊 Orchestration Infrastructure:
+    - Dependency graph: [X] stories, [Y] dependencies
+    - Task state files: [X] stories
+    - Progress tracking: [C] completed, [P] in progress, [N] not started
+    - Roadmap: Available
 
-1. **Use sequential_thinking** to build dependency graph:
-   - Create adjacency list of story dependencies (only in-scope stories)
-   - Validate no circular dependencies exist
-   - If circular dependencies found, report error and stop
+    🎯 Scope: <scope description>
+    - In-scope stories: [X]
+    - Out-of-scope stories: [Y]
+    - Parallel waves: [Z]
+    - Max concurrent agents: [N]
 
-2. **Identify Parallel Execution Waves:**
-   - **Wave 0**: Stories with NO dependencies (can start immediately)
-   - **Wave 1**: Stories that depend only on Wave 0 stories
-   - **Wave 2**: Stories that depend only on Wave 0 or Wave 1 stories
-   - Continue until all stories are assigned to waves
-   - **CRITICAL**: All stories in the same wave can run in PARALLEL
+    🚀 Ready to begin implementation!
+    ```
 
-3. **Perform topological sort** to determine implementation order:
-   - Use context7 if uncertain about topological sort algorithm
-   - Generate ordered list of stories
-   - **Prioritize grouping independent stories into waves**
-
-4. **Calculate Parallel Opportunities:**
-   - For each wave, count how many stories can run simultaneously
-   - Estimate time savings from parallel execution
-   - Example: Wave 2 has 4 stories = 4 agents can work simultaneously
-
-5. **Save dependency graph** to `.agent-orchestration/dependency-graph.json`:
-   ```json
-   {
-     "scope": "Range: 1.1-1.5",
-     "nodes": ["1.1", "1.2", "1.3", "1.4", "1.5"],
-     "edges": [
-       {"from": "1.1", "to": "1.2"},
-       {"from": "1.1", "to": "1.3"},
-       {"from": "1.2", "to": "1.4"},
-       {"from": "1.3", "to": "1.4"}
-     ],
-     "implementation_order": ["1.1", "1.5", "1.2", "1.3", "1.4"],
-     "parallel_waves": [
-       {"wave": 0, "stories": ["1.1", "1.5"], "can_run_parallel": true},
-       {"wave": 1, "stories": ["1.2", "1.3"], "can_run_parallel": true},
-       {"wave": 2, "stories": ["1.4"], "can_run_parallel": false}
-     ],
-     "parallel_opportunities": [
-       ["1.1", "1.5"],
-       ["1.2", "1.3"]
-     ],
-     "max_parallel_agents": 2,
-     "estimated_time_savings": "50% faster with parallel execution",
-     "out_of_scope_dependencies": []
-   }
-   ```
-
-### Phase 5: Agent Matching
-
-For each in-scope story, determine the appropriate development agent:
-
-**Technology Detection Rules:**
-- **JavaScript/TypeScript/React/Next.js** → `@agent-javascript-developer`
-- **Python/Django/Flask** → `@agent-python-developer` (if exists, else javascript-developer)
-- **Rust** → `@agent-rust-developer` (if exists, else javascript-developer)
-- **Backend/API** → Check for framework-specific agent first
-
-**Agent Discovery:**
-1. Scan `.claude/agents/` directory for available agent definition files (*.md)
-2. Read each agent's YAML frontmatter to understand capabilities
-3. Match story requirements to agent capabilities
-4. Update task state file with `assigned_agent` field
-
-**Available Agents:**
-- `.claude/agents/code-reviewer.md`
-- `.claude/agents/conflict-resolver.md`
-- `.claude/agents/nestjs-developer.md`
-- `.claude/agents/nextjs-developer.md`
-- `.claude/agents/planning-analyst.md`
-- `.claude/agents/product-manager.md`
-- `.claude/agents/python-developer.md`
-- `.claude/agents/react-developer.md`
-- `.claude/agents/rust-developer.md`
-- `.claude/agents/scrum-master.md`
-- `.claude/agents/typescript-developer.md`
-- `.claude/agents/vanilla-javascript-developer.md`
-
-### Phase 6: Create Implementation Roadmap
-
-Generate `.agent-orchestration/roadmap.md` with:
-
-```markdown
-# Story Implementation Roadmap
-
-**Generated**: <timestamp>
-**Scope**: <scope description>
-**Total Stories**: X (in scope)
-**Parallel Execution**: Y stories can run simultaneously
-**Estimated Time Savings**: Z% faster with parallel execution
-
-## Scope
-
-<Description of what stories are included>
-
-Examples:
-- "All stories in docs/stories/"
-- "Stories 1.1 through 1.5"
-- "Stories in epic: auth"
-- "Stories matching pattern: 1.*"
-
-## 🚀 Parallel Execution Strategy
-
-**CRITICAL: The orchestrator will launch multiple agents simultaneously for independent stories.**
-
-### Wave 1 (No Dependencies) - **2 agents in parallel**
-- [ ] Story 1.1: User Authentication (@agent-javascript-developer)
-- [ ] Story 1.5: Error Logging (@agent-javascript-developer)
-
-**Action**: Launch BOTH agents simultaneously. Do NOT wait for 1.1 to complete before starting 1.5.
-
-### Wave 2 (Depends on Wave 1) - **2 agents in parallel**
-- [ ] Story 1.2: User Profile (@agent-javascript-developer) - Depends on: 1.1
-- [ ] Story 1.3: Password Reset (@agent-javascript-developer) - Depends on: 1.1
-
-**Action**: After Wave 1 completes, launch BOTH agents simultaneously. Do NOT wait for 1.2 to complete before starting 1.3.
-
-### Wave 3 (Depends on Wave 2) - **1 agent (sequential)**
-- [ ] Story 1.4: Admin Dashboard (@agent-javascript-developer) - Depends on: 1.2, 1.3
-
-**Action**: Wait for BOTH 1.2 and 1.3 to complete, then launch 1.4.
-
-## Dependency Graph
-
-```
-Wave 1 (Parallel):     1.1 ──┐
-                       1.5    │
-                              ↓
-Wave 2 (Parallel):     1.2 ──┤
-                       1.3 ──┘
-                              ↓
-Wave 3 (Sequential):   1.4
-```
-
-## Parallel Execution Benefits
-
-- **Without Parallelism**: 5 stories × 4 hours = 20 hours total
-- **With Parallelism**: Wave 1 (4h) + Wave 2 (4h) + Wave 3 (4h) = 12 hours total
-- **Time Savings**: 40% faster (8 hours saved)
-
-## Out of Scope
-
-<If any stories were excluded, list them here>
-
-## Notes
-- **🚀 DEFAULT: Stories in the same wave WILL be implemented in parallel automatically**
-- **⚠️ CRITICAL: Each story MUST pass code review before proceeding to the next wave**
-- Code reviews are MANDATORY and CANNOT be skipped under any circumstances
-- Out-of-scope dependencies will block stories from starting
-- Parallel execution uses git worktrees to prevent conflicts
-
-## Code Review Enforcement
-- ✅ Every story implementation triggers immediate code review
-- ✅ No story can be marked "done" without approved code review
-- ✅ Next story cannot start until current story's code review is approved
-- ✅ Code review results must be documented in story's Dev Agent Record
-```
-
-### Phase 7: Parallel Execution Loop
+### Phase 3: Parallel Execution Loop
 
 **🚨 CRITICAL: Git Initialization Check (REQUIRED FIRST STEP) 🚨**
 
@@ -599,7 +464,7 @@ Wave 3 (Sequential):   1.4
    ```bash
    # Verify git is initialized
    if ! git rev-parse --git-dir >/dev/null 2>&1; then
-     echo "ERROR: Git is not initialized. This should have been caught in Phase 7 initialization."
+     echo "ERROR: Git is not initialized. This should have been caught in Phase 3 initialization."
      echo "Please ensure git is initialized before proceeding."
      exit 1
    fi
@@ -609,7 +474,7 @@ Wave 3 (Sequential):   1.4
    - STOP immediately
    - Report: "CRITICAL ERROR: Git not initialized. Cannot proceed with worktree workflow."
    - Do NOT attempt to launch any agents
-   - Return to Phase 7 git initialization step
+   - Return to Phase 3 git initialization step
 
 4. **Start Wave Implementation (Launch ALL agents simultaneously)**:
 
@@ -927,7 +792,7 @@ Wave 3 (Sequential):   1.4
 - ✅ **ALWAYS document** code review results in story file
 - ✅ **ALWAYS keep worktree intact** until after code review approval
 
-### Phase 7a: Conflict Detection and Resolution (When Needed)
+### Phase 4: Conflict Detection and Resolution (When Needed)
 
 **This phase is triggered when a developer agent reports conflicts during merge attempt.**
 
@@ -1011,7 +876,7 @@ Wave 3 (Sequential):   1.4
 - [ ] Developer agent notified to retry
 - [ ] Merge completed successfully after resolution
 
-### Phase 8: Completion & Reporting
+### Phase 5: Completion & Reporting
 
 When all stories are done:
 

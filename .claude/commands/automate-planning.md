@@ -242,6 +242,252 @@ For each large document created (PRD, Architecture), if it's over 500 lines:
    - Ready for implementation
    ```
 
+### 2.6: Initialize Orchestration Infrastructure
+
+**Create the orchestration directory structure and state files**:
+
+1. **Create orchestration directory structure** if it doesn't exist:
+   ```bash
+   mkdir -p .agent-orchestration/tasks
+   ```
+
+2. **Count total stories** by scanning `docs/stories/` directory:
+   - Count all `.md` files except `README.md`
+   - Extract story IDs from filenames
+
+3. **Initialize progress.json** using `save-file` tool:
+   ```json
+   {
+     "initialized_at": "<current timestamp>",
+     "last_updated": "<current timestamp>",
+     "scope": "all stories",
+     "total_stories": <count>,
+     "completed": 0,
+     "in_progress": 0,
+     "blocked": 0,
+     "not_started": <count>
+   }
+   ```
+   Save to: `.agent-orchestration/progress.json`
+
+4. **Initialize worktree registry** using `save-file` tool:
+   ```json
+   {
+     "active_worktrees": [],
+     "last_updated": "<current timestamp>"
+   }
+   ```
+   Save to: `.agent-orchestration/worktree-registry.json`
+
+5. **Report infrastructure initialization**:
+   ```
+   ✅ Orchestration Infrastructure Initialized:
+   - Directory: .agent-orchestration/
+   - Progress tracking: progress.json
+   - Worktree registry: worktree-registry.json
+   - Total stories: [X]
+   ```
+
+### 2.7: Analyze Story Dependencies
+
+**Build dependency graph and identify parallel execution opportunities**:
+
+1. **Scan all story files** in `docs/stories/`:
+   - Read each story file
+   - Extract story ID from filename
+   - Extract dependencies from story content:
+     - Look for "Dependencies:" section or field
+     - Look for "**Dependencies**:" in story body
+     - Parse dependency story IDs
+
+2. **Use sequential_thinking** to build dependency graph:
+   - Create adjacency list of story dependencies
+   - Validate no circular dependencies exist
+   - If circular dependencies found, report error and stop
+
+3. **Identify Parallel Execution Waves**:
+   - **Wave 0**: Stories with NO dependencies (can start immediately)
+   - **Wave 1**: Stories that depend only on Wave 0 stories
+   - **Wave 2**: Stories that depend only on Wave 0 or Wave 1 stories
+   - Continue until all stories are assigned to waves
+   - **CRITICAL**: All stories in the same wave can run in PARALLEL
+
+4. **Perform topological sort** to determine implementation order:
+   - Use context7 if uncertain about topological sort algorithm
+   - Generate ordered list of stories
+   - Prioritize grouping independent stories into waves
+
+5. **Calculate Parallel Opportunities**:
+   - For each wave, count how many stories can run simultaneously
+   - Estimate time savings from parallel execution
+   - Identify maximum parallel agents needed
+
+6. **Save dependency graph** using `save-file` tool to `.agent-orchestration/dependency-graph.json`:
+   ```json
+   {
+     "scope": "all stories",
+     "nodes": ["0.0", "0.1", "1.1", "1.2", ...],
+     "edges": [
+       {"from": "0.0", "to": "0.1"},
+       {"from": "0.1", "to": "1.1"},
+       ...
+     ],
+     "implementation_order": ["0.0", "0.1", "1.1", "1.2", ...],
+     "parallel_waves": [
+       {"wave": 0, "stories": ["0.0"], "can_run_parallel": false},
+       {"wave": 1, "stories": ["0.1"], "can_run_parallel": false},
+       {"wave": 2, "stories": ["1.1", "1.2", "1.3"], "can_run_parallel": true},
+       ...
+     ],
+     "parallel_opportunities": [
+       ["1.1", "1.2", "1.3"],
+       ["2.1", "2.2"],
+       ...
+     ],
+     "max_parallel_agents": 3,
+     "estimated_time_savings": "40% faster with parallel execution"
+   }
+   ```
+
+7. **Report dependency analysis**:
+   ```
+   ✅ Dependency Analysis Complete:
+   - Total stories: [X]
+   - Dependency edges: [Y]
+   - Parallel waves: [Z]
+   - Max parallel agents: [N]
+   - Estimated time savings: [P]% with parallel execution
+   - No circular dependencies detected ✓
+   ```
+
+### 2.8: Match Stories to Agents
+
+**Determine appropriate development agent for each story**:
+
+1. **Scan available agents**:
+   - List all files in `.claude/agents/` directory
+   - Filter for agent definition files (*.md)
+   - Read each agent's YAML frontmatter to understand capabilities
+
+2. **For each story**, determine the appropriate development agent:
+   - Read story file
+   - Extract technology stack indicators:
+     - JavaScript/TypeScript/React/Next.js/Node.js
+     - Python/Django/Flask/FastAPI
+     - Rust/Cargo
+     - Database mentions (PostgreSQL, MongoDB, etc.)
+   - Match to agent based on technology detection rules:
+     - **JavaScript/TypeScript/React/Next.js** → `nextjs-developer` or `react-developer`
+     - **Python/Django/Flask** → `python-developer`
+     - **Rust** → `rust-developer`
+     - **Backend/API** → Check for framework-specific agent first
+     - **Default** → `typescript-developer`
+
+3. **Create task state file** for each story using `save-file` tool:
+   Save to: `.agent-orchestration/tasks/{story-id}-task.json`
+   ```json
+   {
+     "story_id": "1.1",
+     "story_file": "docs/stories/1.1-user-authentication.md",
+     "epic": "auth",
+     "status": "not_started",
+     "assigned_agent": "nextjs-developer",
+     "dependencies": ["0.1"],
+     "tech_stack": ["Next.js", "TypeScript", "React"],
+     "started_at": null,
+     "completed_at": null,
+     "review_status": null,
+     "review_file": null,
+     "iteration_count": 0,
+     "last_updated": "<timestamp>",
+     "in_scope": true,
+     "worktree_path": null
+   }
+   ```
+
+4. **Report agent matching**:
+   ```
+   ✅ Agent Matching Complete:
+   - Total stories: [X]
+   - nextjs-developer: [N] stories
+   - python-developer: [M] stories
+   - rust-developer: [K] stories
+   - Task state files created: .agent-orchestration/tasks/
+   ```
+
+### 2.9: Generate Implementation Roadmap
+
+**Create human-readable implementation plan**:
+
+1. **Generate roadmap content** using the dependency graph and task state files
+
+2. **Create roadmap.md** using `save-file` tool to `.agent-orchestration/roadmap.md`:
+   ```markdown
+   # Story Implementation Roadmap
+
+   **Generated**: <timestamp>
+   **Scope**: All stories
+   **Total Stories**: X
+   **Parallel Execution**: Y stories can run simultaneously
+   **Estimated Time Savings**: Z% faster with parallel execution
+
+   ## 🚀 Parallel Execution Strategy
+
+   **CRITICAL: The orchestrator will launch multiple agents simultaneously for independent stories.**
+
+   ### Wave 0 (Foundation) - **1 agent (sequential)**
+   - [ ] Story 0.0: Project Initialization (@agent-nextjs-developer)
+
+   **Action**: Launch agent. Wait for completion and code review before Wave 1.
+
+   ### Wave 1 (Design System) - **1 agent (sequential)**
+   - [ ] Story 0.1: Design System Foundation Setup (@agent-nextjs-developer) - Depends on: 0.0
+
+   **Action**: After Wave 0 completes, launch agent. Wait for completion and code review before Wave 2.
+
+   ### Wave 2 (Core Features) - **3 agents in parallel**
+   - [ ] Story 1.1: User Authentication (@agent-nextjs-developer) - Depends on: 0.1
+   - [ ] Story 1.2: User Profile (@agent-nextjs-developer) - Depends on: 0.1
+   - [ ] Story 1.3: Dashboard (@agent-nextjs-developer) - Depends on: 0.1
+
+   **Action**: After Wave 1 completes, launch ALL 3 agents simultaneously. Wait for ALL to complete and pass code review before Wave 3.
+
+   [Continue for all waves...]
+
+   ## Dependency Graph
+
+   ```
+   Wave 0:     0.0
+                ↓
+   Wave 1:     0.1
+                ↓
+   Wave 2:     1.1 ── 1.2 ── 1.3 (parallel)
+                ↓      ↓      ↓
+   Wave 3:     2.1 ── 2.2 (parallel)
+   ```
+
+   ## Parallel Execution Benefits
+
+   - **Without Parallelism**: X stories × 4 hours = Y hours total
+   - **With Parallelism**: Wave times sum = Z hours total
+   - **Time Savings**: P% faster (Q hours saved)
+
+   ## Notes
+   - **🚀 DEFAULT: Stories in the same wave WILL be implemented in parallel automatically**
+   - **⚠️ CRITICAL: Each story MUST pass code review before proceeding to the next wave**
+   - Code reviews are MANDATORY and CANNOT be skipped under any circumstances
+   - Parallel execution uses git worktrees to prevent conflicts
+   ```
+
+3. **Report roadmap generation**:
+   ```
+   ✅ Implementation Roadmap Generated:
+   - File: .agent-orchestration/roadmap.md
+   - Parallel waves: [X]
+   - Max concurrent agents: [Y]
+   - Ready for /implement-stories command
+   ```
+
 ## Step 3: Final Summary
 
 Provide a comprehensive summary of all generated documents:
@@ -257,12 +503,28 @@ Provide a comprehensive summary of all generated documents:
 [✅/❌] Sharded Architecture: docs/architecture/ ([X] sections)
 ✅ User Stories: docs/stories/ ([X] stories across [X] epics)
 
+📊 Orchestration Infrastructure:
+✅ Dependency Graph: .agent-orchestration/dependency-graph.json
+✅ Progress Tracking: .agent-orchestration/progress.json
+✅ Task State Files: .agent-orchestration/tasks/ ([X] files)
+✅ Implementation Roadmap: .agent-orchestration/roadmap.md
+✅ Worktree Registry: .agent-orchestration/worktree-registry.json
+
+🚀 Parallel Execution Analysis:
+- Total stories: [X]
+- Parallel waves: [Y]
+- Max concurrent agents: [Z]
+- Estimated time savings: [P]% with parallel execution
+
 🚀 Next Steps:
 1. Review generated documents for accuracy
-2. Run /implement-stories to begin development
-3. Use /story-status to track progress
+2. Review implementation roadmap: .agent-orchestration/roadmap.md
+3. Run /implement-stories to begin development (all stories)
+4. Or run /implement-stories [scope] to implement specific stories
+5. Use /story-status to track progress
 
 📁 All planning documents are organized in the docs/ directory
+📁 All orchestration state is in the .agent-orchestration/ directory
 ```
 
 ## Error Handling
@@ -403,15 +665,29 @@ docs/
 │   └── implementation.md
 └── stories/                        # User Stories
     ├── README.md
-    ├── 1.1.project-initialization.md
-    ├── 1.2.shadcn-ui-setup.md
-    ├── 2.1.user-directory.md
+    ├── 0.0-project-initialization.md
+    ├── 0.1-design-system-foundation.md
+    ├── 1.1-[feature-name].md
     └── [additional story files]
+
+.agent-orchestration/
+├── README.md                       # Orchestration system documentation
+├── progress.json                   # Overall progress tracking
+├── dependency-graph.json           # Story dependencies and parallel waves
+├── roadmap.md                      # Human-readable implementation plan
+├── worktree-registry.json          # Active worktree tracking
+└── tasks/                          # Individual task state files
+    ├── 0.0-task.json
+    ├── 0.1-task.json
+    ├── 1.1-task.json
+    └── [additional task files]
 ```
 
 ## Validation Checklist
 
 Before completing, verify:
+
+**Planning Documents:**
 - [ ] Product brief was successfully read or provided
 - [ ] User preferences were collected for architecture and design
 - [ ] PRD was created with all required sections
@@ -420,8 +696,23 @@ Before completing, verify:
 - [ ] Large documents were sharded appropriately
 - [ ] User stories created with individual files per story
 - [ ] All documents saved to correct locations
+
+**Orchestration Infrastructure:**
+- [ ] .agent-orchestration/ directory created
+- [ ] progress.json initialized with correct story counts
+- [ ] worktree-registry.json created
+- [ ] dependency-graph.json created with all stories
+- [ ] No circular dependencies detected
+- [ ] Parallel waves identified correctly
+- [ ] Task state files created for all stories
+- [ ] All stories matched to appropriate agents
+- [ ] roadmap.md generated with parallel execution strategy
+
+**Quality Checks:**
 - [ ] Progress updates provided throughout process
 - [ ] Final summary includes all generated documents
+- [ ] Final summary includes orchestration infrastructure
+- [ ] Ready for /implement-stories command
 
 ## Troubleshooting
 
