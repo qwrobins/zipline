@@ -206,14 +206,136 @@ Create a PRD at `docs/prd.md` with the following structure:
 | Performance | < 2s load time | Lighthouse score |
 | Adoption | [X] users in [Y] days | Analytics |
 
-## 13. Timeline (Optional)
+## 13. Implementation Phasing
+
+**🚨 CRITICAL: Feature Phasing Rules 🚨**
+
+### Pre-Launch (Initial Development Phase)
+
+**ALL user-facing features and functionality MUST be implemented before launch:**
+
+✅ **User Interface & Experience:**
+- Theme switching (light/dark mode)
+- All UI components and interactions
+- Responsive design for all breakpoints (mobile, tablet, desktop)
+- Loading states and skeleton screens
+- Error boundaries and user-facing error handling
+- Form validation and inline error messages
+- Animations and transitions
+- Empty states and placeholder content
+
+✅ **Accessibility & Usability:**
+- WCAG 2.1 AA compliance
+- Keyboard navigation
+- Screen reader support
+- Focus management
+- Color contrast requirements
+- Alternative text for images
+
+✅ **Core Functionality:**
+- All features described in functional requirements
+- Data fetching and state management
+- User authentication and authorization
+- Search and filtering
+- Sorting and pagination
+- CRUD operations
+- Real-time updates (if applicable)
+
+✅ **Design System:**
+- All design tokens (colors, typography, spacing)
+- Component library implementation
+- Theme configuration
+- Icon system
+- Layout system
+
+✅ **Performance & Security:**
+- Performance optimizations (code splitting, lazy loading)
+- Application-level security (input validation, XSS prevention)
+- Error handling and recovery
+- Data validation
+- API error handling
+
+**Rule:** If a user can see it, interact with it, or it affects the user experience, it MUST be implemented before launch.
+
+### Post-Launch (After User Acceptance Testing)
+
+**ONLY deployment and operational infrastructure:**
+
+✅ **Deployment Infrastructure:**
+- CI/CD pipeline setup and automation
+- Production deployment configurations
+- Environment-specific configurations
+- Blue-green deployment setup
+- Rollback procedures
+
+✅ **Monitoring & Operations:**
+- Application monitoring and alerting
+- Log aggregation and analysis
+- Performance monitoring dashboards
+- Error tracking and reporting
+- Uptime monitoring
+
+✅ **Production Infrastructure:**
+- CDN configuration and optimization
+- Database scaling and replication
+- Backup and disaster recovery
+- Infrastructure as Code (IaC) setup
+- Production security hardening (beyond application-level)
+- Load balancing configuration
+
+**Rule:** Only items related to deploying, monitoring, and operating the application in production should be post-launch.
+
+### ❌ NEVER Post-Launch
+
+- Any feature visible to end users
+- Any functionality described in functional requirements
+- Design system implementation
+- Accessibility features
+- Responsive design
+- Theme/styling systems
+- Component libraries
+- User-facing error handling
+- Form validation
+- Loading states
+- Any UI component or interaction
+
+### Feature Categorization Decision Tree
+
+```
+Is this feature/item visible to or interacts with end users?
+├─ YES → Pre-Launch (Initial Development)
+└─ NO → Is it deployment/operations infrastructure?
+    ├─ YES → Post-Launch (After UAT)
+    └─ NO → Pre-Launch (Initial Development)
+```
+
+### Example Categorization
+
+**Pre-Launch:**
+- ✅ Dark mode toggle button
+- ✅ User profile page
+- ✅ Search functionality
+- ✅ Form validation
+- ✅ Loading spinners
+- ✅ Error messages
+- ✅ Responsive navigation menu
+- ✅ Accessibility features
+
+**Post-Launch:**
+- ✅ CI/CD pipeline
+- ✅ Production monitoring dashboards
+- ✅ Log aggregation setup
+- ✅ CDN configuration
+- ✅ Database backup automation
+
+## 14. Timeline (Optional)
 
 | Phase | Duration | Deliverables |
 |-------|----------|--------------|
-| Phase 1 | [X weeks] | [Deliverables] |
-| Phase 2 | [X weeks] | [Deliverables] |
+| Phase 1: Initial Development | [X weeks] | All user-facing features, accessibility, responsive design |
+| Phase 2: Post-Launch Operations | [X weeks] | CI/CD, monitoring, production infrastructure |
 
-## 14. Next Steps
+## 15. Next Steps
 
 ### For Design Team
 "Review this PRD and create design specifications for [key features]. Focus on [design priorities]."
@@ -248,6 +370,41 @@ Use the `save-file` tool to create `docs/prd.md` with the complete PRD content.
 - ✅ Clearly states what's in-scope and out-of-scope
 - ✅ Includes technical assumptions and constraints
 - ✅ Identifies risks and mitigation strategies
+
+**🚨 CRITICAL: Feature Phasing Validation 🚨**
+
+Before finalizing the PRD, verify:
+- ✅ **All user-facing features are in Pre-Launch phase**
+  - Theme switching (light/dark mode) is NOT post-launch
+  - All UI components are NOT post-launch
+  - Accessibility features are NOT post-launch
+  - Responsive design is NOT post-launch
+  - Form validation is NOT post-launch
+  - Loading states are NOT post-launch
+  - Error handling is NOT post-launch
+
+- ✅ **Only deployment/operations infrastructure is Post-Launch**
+  - CI/CD pipeline is post-launch
+  - Monitoring dashboards are post-launch
+  - Log aggregation is post-launch
+  - Production infrastructure is post-launch
+
+- ✅ **No functionality gaps that would require rework**
+  - All features users interact with are complete before launch
+  - No "we'll add this later" for user-facing features
+  - Design system is fully implemented before launch
+
+**Common Mistakes to Avoid:**
+- ❌ Marking dark mode as "post-launch enhancement"
+- ❌ Marking accessibility as "nice to have for later"
+- ❌ Marking responsive design as "phase 2"
+- ❌ Marking any UI component as "post-launch"
+- ❌ Marking form validation as "can add later"
+
+**Validation Questions:**
+1. Can a user see or interact with this feature? → Pre-Launch
+2. Is this purely deployment/operations infrastructure? → Post-Launch
+3. When in doubt? → Pre-Launch
 - ✅ Reflects best practices from context7 research
 - ✅ Addresses insights from sequential_thinking analysis
 

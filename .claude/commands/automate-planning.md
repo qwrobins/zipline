@@ -67,15 +67,25 @@ Once you have the product brief and user preferences, execute the following step
 
 3. **Create PRD** using `save-file` tool:
    - Save to `docs/prd.md`
-   - Include all 14 essential PRD sections
+   - Include all 15 essential PRD sections (including Implementation Phasing)
    - Base content on analysis and research
+   - **🚨 CRITICAL: Follow feature phasing rules from `.claude/agents/directives/prd-feature-phasing.md`**
 
-4. **Report PRD completion**:
+4. **Validate Feature Phasing** (CRITICAL):
+   - ✅ All user-facing features in Pre-Launch phase
+   - ✅ Theme switching (light/dark mode) is Pre-Launch
+   - ✅ Accessibility features are Pre-Launch
+   - ✅ Responsive design is Pre-Launch
+   - ✅ Only deployment/operations infrastructure is Post-Launch
+   - ✅ No functionality gaps requiring rework
+
+5. **Report PRD completion**:
    ```
    ✅ PRD Created: docs/prd.md
    - [X] epics created
    - [X] user stories created
    - Key features: [list]
+   - ✅ Feature phasing validated (all user-facing features Pre-Launch)
    ```
 
 ### 2.2: Generate Architecture Document (Conditional)
@@ -185,33 +195,50 @@ For each large document created (PRD, Architecture), if it's over 500 lines:
 
 **Use the `scrum-master` agent functionality**:
 
-1. **Analyze Planning Documents** using `sequential_thinking` tool:
+1. **Detect Project State** (CRITICAL - FIRST STEP):
+   - Check for package.json, node_modules, next.config.ts, app/ directory
+   - Determine if Story 0.0 (Project Initialization) is needed
+   - Document decision in stories README.md
+
+2. **Analyze Planning Documents** using `sequential_thinking` tool:
    - Read PRD (sharded or monolithic)
    - Read Architecture document (if exists)
    - Read Design specification (if exists)
    - Identify all epics and stories from PRD
 
-2. **Research Agile Best Practices** using `context7` tools:
+3. **Research Agile Best Practices** using `context7` tools:
    ```
    resolve-library-id: "agile user stories best practices"
    get-library-docs: [Use the library ID from resolve-library-id]
-   
+
    resolve-library-id: "acceptance criteria patterns"
    get-library-docs: [Use the library ID from resolve-library-id]
    ```
 
-3. **Create User Stories** using `save-file` tool:
-   - Create `docs/stories/README.md` with overview
+4. **Create Foundation Stories** using `save-file` tool:
+   - **Story 0.0** (if needed): Project Initialization
+   - **Story 0.1** (always): Design System Foundation Setup
+     - Extract ALL CSS variables from design-system.md
+     - Include exact HSL values in acceptance criteria
+   - **Story 0.2+** (as needed): Other infrastructure
+
+5. **Create Feature Stories** using `save-file` tool:
+   - Create `docs/stories/README.md` with overview and project state detection
    - Create individual story files: `docs/stories/[epic].[story].[title].md`
    - **CRITICAL**: One file per story (not per epic)
    - Include all required sections per story template
+   - Add foundation story dependencies to ALL feature stories
+   - Use specific design tokens in acceptance criteria (not generic descriptions)
 
-4. **Report Stories completion**:
+6. **Report Stories completion**:
    ```
    ✅ User Stories Created: docs/stories/
+   - Story 0.0: [GENERATED/SKIPPED] - Project Initialization
+   - Story 0.1: GENERATED - Design System Foundation Setup
    - [X] epics created
    - [X] individual story files created
-   - Dependencies mapped
+   - Dependencies mapped (all feature stories depend on foundation stories)
+   - Design tokens extracted into acceptance criteria
    - Ready for implementation
    ```
 

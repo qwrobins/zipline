@@ -52,6 +52,87 @@ The epic number is part of the **FILENAME**, not a directory structure.
 
 When creating user stories, follow this systematic approach:
 
+### Step 0: Detect Project State (CRITICAL - FIRST STEP)
+
+**🚨 BEFORE analyzing any planning documents, you MUST detect the project state. 🚨**
+
+This determines whether Story 0.0 (Project Initialization) is needed.
+
+**1. Check for Existing Codebase**
+
+Use the `view` tool to check for these files/directories in the project root:
+
+```bash
+# Check these files/directories
+view: package.json
+view: node_modules (directory)
+view: next.config.ts OR next.config.js
+view: app (directory) OR pages (directory)
+view: .git (directory)
+view: components (directory)
+```
+
+**2. Evaluate Project State**
+
+Use `sequential_thinking` to analyze the results:
+
+```
+thought: "Checking project state to determine if Story 0.0 is needed..."
+- package.json exists: [YES/NO]
+- node_modules exists: [YES/NO]
+- next.config exists: [YES/NO]
+- app or pages directory exists: [YES/NO]
+- .git directory exists: [YES/NO]
+
+Decision: [PROJECT_EXISTS / NO_PROJECT]
+Reasoning: [Explain why based on the checks above]
+```
+
+**3. Make Decision**
+
+**IF no codebase exists** (package.json NOT found OR no app/pages directory):
+- ✅ Set `needsStory0_0 = true`
+- ✅ Generate Story 0.0: "Project Initialization and Setup"
+- ✅ Mark Story 0.0 as blocker for ALL other stories (including 0.1)
+- ✅ Log: "No project detected - Story 0.0 will be generated"
+
+**IF codebase exists** (package.json found AND app/pages directory exists):
+- ✅ Set `needsStory0_0 = false`
+- ✅ Skip Story 0.0
+- ✅ Start with Story 0.1 (Design System Setup)
+- ✅ Log: "Project exists - skipping Story 0.0"
+- ✅ Document which files were found
+
+**4. Document Decision in README.md**
+
+Add a section to `docs/stories/README.md`:
+
+```markdown
+## Project State Detection
+
+**Detection Date:** [TIMESTAMP]
+
+**Files Checked:**
+- package.json: [FOUND/NOT FOUND]
+- node_modules/: [FOUND/NOT FOUND]
+- next.config.ts/js: [FOUND/NOT FOUND]
+- app/ or pages/: [FOUND/NOT FOUND]
+- .git/: [FOUND/NOT FOUND]
+
+**Decision:** [PROJECT_EXISTS / NO_PROJECT]
+
+**Story 0.0 Generated:** [YES/NO]
+
+**Reasoning:** [Explain the decision based on the checks above]
+```
+
+**5. Proceed to Story Generation**
+
+- If `needsStory0_0 = true`: Generate Story 0.0 first, then Story 0.1, then feature stories
+- If `needsStory0_0 = false`: Generate Story 0.1 first, then feature stories
+
+---
+
 ### Step 1: Analyze Planning Documents
 
 **CRITICAL: Handle Large Documents Intelligently**
@@ -222,6 +303,35 @@ Each story file must follow this exact structure:
 **For stories with no dependencies**:
 None - This story can be started immediately
 
+### 🚨 Foundation Story Dependencies (CRITICAL)
+
+**ALL feature stories (1.1+) MUST depend on foundation stories:**
+
+**IF Story 0.0 was generated:**
+```markdown
+## Dependencies
+- Story 0.0 (Project Initialization and Setup) - Must be in "Done" status
+- Story 0.1 (Design System Foundation Setup) - Must be in "Done" status
+[... other dependencies ...]
+```
+
+**IF Story 0.0 was NOT generated:**
+```markdown
+## Dependencies
+- Story 0.1 (Design System Foundation Setup) - Must be in "Done" status
+[... other dependencies ...]
+```
+
+**For stories using specific components or infrastructure:**
+```markdown
+## Dependencies
+- Story 0.1 (Design System Foundation Setup) - Must be in "Done" status
+- Story 0.2 (Component Library Configuration) - Must be in "Done" status
+[... other dependencies ...]
+```
+
+**IMPORTANT**: Foundation stories (0.0, 0.1, 0.2+) are BLOCKERS for all feature stories. Every feature story must list them as dependencies.
+
 ## Design Reference (if applicable)
 **Note**: Include this section only for stories involving UI implementation.
 
@@ -252,6 +362,55 @@ None - This story can be started immediately
 - Meets accessibility requirements (Section 9)
 - Implements responsive behavior (Section 8)
 - Uses design tokens consistently (Section 3)
+
+### 🎨 Design Token Usage in Acceptance Criteria (CRITICAL)
+
+**For ANY story involving UI elements, colors, or styling:**
+
+**1. Read Design System Documentation**
+
+Before writing acceptance criteria, use `view` tool to read:
+- `docs/design/design-system.md` - For color tokens and values
+- `docs/design/components.md` - For component specifications
+
+**2. Replace Generic Descriptions with Specific Tokens**
+
+❌ **WRONG (Generic):**
+```markdown
+- Validation errors displayed inline with red text
+- Delete button has destructive styling
+- Primary actions use blue color
+- Success message shown in green
+```
+
+✅ **CORRECT (Specific with tokens and HSL values):**
+```markdown
+- [ ] Validation errors use `text-destructive` token (HSL: 0 84.2% 60.2%)
+- [ ] Error field borders use `border-destructive` token
+- [ ] Error backgrounds use `bg-destructive/10` for subtle highlighting
+- [ ] Delete button uses `variant="destructive"` from design system
+- [ ] Delete icon uses `text-destructive-foreground` color
+- [ ] Primary action buttons use `bg-primary` token (HSL: 221.2 83.2% 53.3%)
+- [ ] Success messages use `text-success` token (HSL: 142 76% 36%)
+- [ ] Success backgrounds use `bg-success/10` for subtle highlighting
+```
+
+**3. Add Design Compliance to Definition of Done**
+
+Add this section to EVERY feature story:
+
+```markdown
+## Definition of Done
+
+### Design System Compliance
+- [ ] All colors use design tokens (no hardcoded values like bg-red-600)
+- [ ] Component works in both light and dark themes
+- [ ] Semantic colors used appropriately (success/warning/destructive/info)
+- [ ] Typography uses design system scales
+- [ ] Spacing uses design system tokens
+- [ ] No ESLint warnings for hardcoded colors
+- [ ] Visual appearance matches design specifications
+```
 
 ## Tasks / Subtasks
 - [ ] [Task description] (AC: [AC number])
@@ -316,6 +475,478 @@ _To be filled by Implementation Agent_
 ## QA Results
 _To be filled by QA Agent_
 ```
+
+---
+
+## Foundation Story Templates
+
+### Story 0.0: Project Initialization (Conditional)
+
+**🚨 Generate this story ONLY when `needsStory0_0 = true` (no codebase exists). 🚨**
+
+**File:** `docs/stories/0.0.project-initialization.md`
+
+**Template:**
+
+```markdown
+# Story 0.0: Project Initialization and Setup
+
+## Status
+Draft
+
+## Story
+**As a** developer,
+**I want** a properly initialized Next.js 15 project with TypeScript and all development tools,
+**so that** I have a solid foundation for building the application.
+
+## Dependencies
+None (this is the first story - all other stories depend on this)
+
+## Acceptance Criteria
+
+1. **Next.js Project Setup**
+   - [ ] Next.js 15 installed with App Router
+   - [ ] TypeScript configured with strict mode enabled
+   - [ ] Project created using `create-next-app@latest`
+   - [ ] Tailwind CSS installed and configured
+   - [ ] Can run `npm run dev` successfully
+
+2. **Development Tools**
+   - [ ] ESLint configured with Next.js recommended rules
+   - [ ] Prettier installed with configuration file
+   - [ ] Git repository initialized
+   - [ ] .gitignore includes: node_modules/, .next/, .env*, .DS_Store
+
+3. **Project Structure**
+   - [ ] app/ directory created (App Router)
+   - [ ] components/ directory created
+   - [ ] lib/ directory created for utilities
+   - [ ] types/ directory created for TypeScript types
+   - [ ] public/ directory exists for static assets
+
+4. **Package Manager**
+   - [ ] Package manager selected and documented (npm/yarn/pnpm)
+   - [ ] package.json has correct scripts: dev, build, start, lint
+   - [ ] Dependencies installed successfully
+   - [ ] Lock file committed to repository
+
+5. **Validation**
+   - [ ] `npm run dev` starts development server on port 3000
+   - [ ] TypeScript compilation succeeds with no errors
+   - [ ] ESLint runs with no errors
+   - [ ] Can access http://localhost:3000 in browser
+   - [ ] Hot reload works when editing files
+
+## Tasks
+
+### 1. Initialize Next.js Project
+- [ ] Run `npx create-next-app@latest [project-name] --typescript --tailwind --app`
+- [ ] Select options: TypeScript (Yes), ESLint (Yes), Tailwind CSS (Yes), App Router (Yes)
+- [ ] Navigate into project directory
+
+### 2. Configure Development Tools
+- [ ] Install Prettier: `npm install --save-dev prettier`
+- [ ] Create `.prettierrc` configuration file
+- [ ] Create `.prettierignore` file
+- [ ] Add Prettier script to package.json
+
+### 3. Set Up Project Structure
+- [ ] Create `components/` directory
+- [ ] Create `lib/` directory
+- [ ] Create `types/` directory
+- [ ] Verify `app/` directory exists
+- [ ] Verify `public/` directory exists
+
+### 4. Initialize Git Repository
+- [ ] Run `git init` (if not already initialized)
+- [ ] Verify .gitignore is comprehensive
+- [ ] Create initial commit: `git add . && git commit -m "Initial project setup"`
+
+### 5. Validate Setup
+- [ ] Run `npm run dev` and verify server starts
+- [ ] Run `npm run build` and verify build succeeds
+- [ ] Run `npm run lint` and verify no errors
+- [ ] Test hot reload by editing app/page.tsx
+
+## Dev Notes
+
+### Commands Reference
+
+**Project Initialization:**
+\`\`\`bash
+npx create-next-app@latest [project-name] --typescript --tailwind --app
+cd [project-name]
+npm install
+\`\`\`
+
+**Development:**
+\`\`\`bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run start        # Start production server
+npm run lint         # Run ESLint
+\`\`\`
+
+### Expected Folder Structure
+
+\`\`\`
+[project-name]/
+├── app/
+│   ├── layout.tsx
+│   ├── page.tsx
+│   └── globals.css
+├── components/
+├── lib/
+├── types/
+├── public/
+├── node_modules/
+├── .git/
+├── .gitignore
+├── .eslintrc.json
+├── .prettierrc
+├── next.config.ts
+├── package.json
+├── tsconfig.json
+├── tailwind.config.ts
+└── README.md
+\`\`\`
+
+### Technology Versions
+
+- Next.js: 15.x
+- React: 18.x
+- TypeScript: 5.x
+- Tailwind CSS: 3.x
+
+## Testing Requirements
+
+### Manual Testing
+- [ ] Development server starts without errors
+- [ ] TypeScript compilation succeeds
+- [ ] ESLint passes with no warnings
+- [ ] Can navigate to localhost:3000
+- [ ] Hot reload works when editing files
+
+### Validation Checklist
+- [ ] All required directories exist
+- [ ] All configuration files present
+- [ ] Git repository initialized
+- [ ] Dependencies installed
+- [ ] Scripts in package.json work
+
+## Definition of Done
+
+- [ ] All acceptance criteria met
+- [ ] All tasks completed
+- [ ] Project runs successfully with `npm run dev`
+- [ ] TypeScript compilation succeeds with no errors
+- [ ] ESLint passes with no errors or warnings
+- [ ] Git repository initialized with initial commit
+- [ ] README.md documents setup steps
+- [ ] All team members can clone and run the project
+
+## Change Log
+| Date | Version | Description | Author |
+|------|---------|-------------|--------|
+| [DATE] | 1.0 | Initial story creation | Scrum Master Agent |
+
+## Dev Agent Record
+_To be filled by Implementation Agent_
+
+## QA Results
+_To be filled by QA Agent_
+```
+
+**CRITICAL NOTES:**
+
+1. **This story is ONLY generated when no project exists**
+2. **This story BLOCKS ALL other stories** (including Story 0.1)
+3. **All other stories must list this as a dependency** (if it was generated)
+4. **Mark this story with Priority: Must Have (Blocker)**
+5. **Save to:** `docs/stories/0.0.project-initialization.md`
+
+---
+
+### Story 0.1: Design System Foundation Setup (Always Generate)
+
+**🚨 Generate this story ALWAYS (regardless of whether Story 0.0 was generated). 🚨**
+
+**File:** `docs/stories/0.1.design-system-foundation-setup.md`
+
+**Template:**
+
+```markdown
+# Story 0.1: Design System Foundation Setup
+
+## Status
+Draft
+
+## Story
+**As a** developer,
+**I want** a fully configured design system with all color tokens and theme configuration,
+**so that** all components use consistent, themeable colors and styling.
+
+## Dependencies
+
+[IF Story 0.0 was generated]:
+- Story 0.0 (Project Initialization and Setup) - Must be in "Done" status
+
+[IF Story 0.0 was NOT generated]:
+None (project already initialized)
+
+## Acceptance Criteria
+
+**🚨 CRITICAL: Extract ALL values from `docs/design/design-system.md` 🚨**
+
+**Use the `view` tool to read the design system document and extract exact HSL values.**
+
+1. **Primary Color Configuration**
+   - [ ] Primary color is [COLOR_NAME] (HSL: [EXTRACT_HSL_FROM_DESIGN_DOC])
+   - [ ] Primary foreground is [COLOR_NAME] (HSL: [EXTRACT_HSL_FROM_DESIGN_DOC])
+   - [ ] CSS variable `--primary` defined in `:root` block of app/globals.css
+   - [ ] CSS variable `--primary-foreground` defined in `:root` block
+   - [ ] Tailwind config registers `bg-primary`, `text-primary`, `border-primary` utilities
+
+2. **Semantic Colors - Light Theme**
+   - [ ] Success color (HSL: [EXTRACT]) defined in `:root`
+   - [ ] Success foreground (HSL: [EXTRACT]) defined in `:root`
+   - [ ] Warning color (HSL: [EXTRACT]) defined in `:root`
+   - [ ] Warning foreground (HSL: [EXTRACT]) defined in `:root`
+   - [ ] Destructive/Error color (HSL: [EXTRACT]) defined in `:root`
+   - [ ] Destructive foreground (HSL: [EXTRACT]) defined in `:root`
+   - [ ] Info color (HSL: [EXTRACT]) defined in `:root` (if specified in design doc)
+   - [ ] Info foreground (HSL: [EXTRACT]) defined in `:root` (if specified)
+
+3. **Semantic Colors - Dark Theme**
+   - [ ] All semantic colors defined in `.dark` class
+   - [ ] Success color (HSL: [EXTRACT]) optimized for dark backgrounds
+   - [ ] Warning color (HSL: [EXTRACT]) optimized for dark backgrounds
+   - [ ] Destructive color (HSL: [EXTRACT]) optimized for dark backgrounds
+   - [ ] Info color (HSL: [EXTRACT]) optimized for dark backgrounds (if specified)
+   - [ ] Contrast ratios meet WCAG AA standards (4.5:1 minimum)
+
+4. **Tailwind Integration**
+   - [ ] All CSS variables registered in tailwind.config.ts `extend.colors`
+   - [ ] Can use `bg-success`, `text-success`, `border-success` utilities
+   - [ ] Can use `bg-warning`, `text-warning`, `border-warning` utilities
+   - [ ] Can use `bg-destructive`, `text-destructive`, `border-destructive` utilities
+   - [ ] Can use `bg-info`, `text-info`, `border-info` utilities (if applicable)
+   - [ ] Can use `bg-primary`, `text-primary-foreground` utilities
+
+5. **Theme Switching**
+   - [ ] Theme provider component implemented
+   - [ ] Theme switcher toggles between light and dark modes
+   - [ ] Theme preference persists in localStorage
+   - [ ] System preference detection works (prefers-color-scheme)
+   - [ ] All colors render correctly in both themes
+
+6. **Validation**
+   - [ ] All CSS variables from design-system.md present in globals.css
+   - [ ] No hardcoded Tailwind colors in component library (no bg-red-600, etc.)
+   - [ ] Theme preview shows all colors correctly
+   - [ ] Automated test validates CSS variables exist
+   - [ ] Visual regression test passes for both themes
+
+## Tasks
+
+### 1. Extract Design Tokens from Documentation
+- [ ] Read `docs/design/design-system.md` completely
+- [ ] Extract all color definitions with exact HSL values
+- [ ] Extract typography scales (if specified)
+- [ ] Extract spacing tokens (if specified)
+- [ ] Create checklist of all tokens to implement
+
+### 2. Configure Light Theme Colors
+- [ ] Open `app/globals.css`
+- [ ] Locate `:root` block
+- [ ] Add/update `--primary` with extracted HSL value
+- [ ] Add/update `--primary-foreground` with extracted HSL value
+- [ ] Add `--success` and `--success-foreground` with extracted values
+- [ ] Add `--warning` and `--warning-foreground` with extracted values
+- [ ] Add `--destructive` and `--destructive-foreground` with extracted values
+- [ ] Add `--info` and `--info-foreground` if specified in design doc
+- [ ] Verify all values match design-system.md exactly
+
+### 3. Configure Dark Theme Colors
+- [ ] Locate `.dark` class in app/globals.css
+- [ ] Add/update all semantic colors for dark theme
+- [ ] Verify contrast ratios meet WCAG AA (use contrast checker)
+- [ ] Test colors on dark background for readability
+
+### 4. Update Tailwind Configuration
+- [ ] Open `tailwind.config.ts`
+- [ ] Add all CSS variables to `extend.colors` section
+- [ ] Register success, warning, destructive, info colors
+- [ ] Verify Tailwind can generate utilities (bg-*, text-*, border-*)
+- [ ] Test utility classes in a component
+
+### 5. Implement Theme Provider
+- [ ] Create `components/theme-provider.tsx`
+- [ ] Implement theme context with light/dark state
+- [ ] Add localStorage persistence
+- [ ] Add system preference detection
+- [ ] Wrap app in theme provider (app/layout.tsx)
+
+### 6. Create Theme Switcher Component
+- [ ] Create `components/theme-switcher.tsx`
+- [ ] Add toggle button for light/dark mode
+- [ ] Add visual indicator of current theme
+- [ ] Test theme switching works correctly
+
+### 7. Validate Implementation
+- [ ] Create test file to verify all CSS variables exist
+- [ ] Test all semantic color utilities (bg-success, text-warning, etc.)
+- [ ] Verify theme switching works in browser
+- [ ] Check localStorage persistence
+- [ ] Validate WCAG AA contrast ratios
+
+## Dev Notes
+
+### Files to Create/Modify
+
+**app/globals.css:**
+\`\`\`css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Primary Colors - EXTRACT FROM design-system.md */
+    --primary: [HSL_VALUE];
+    --primary-foreground: [HSL_VALUE];
+
+    /* Semantic Colors - Light Theme */
+    --success: [HSL_VALUE];
+    --success-foreground: [HSL_VALUE];
+    --warning: [HSL_VALUE];
+    --warning-foreground: [HSL_VALUE];
+    --destructive: [HSL_VALUE];
+    --destructive-foreground: [HSL_VALUE];
+    --info: [HSL_VALUE];  /* if specified */
+    --info-foreground: [HSL_VALUE];  /* if specified */
+
+    /* ... other tokens ... */
+  }
+
+  .dark {
+    /* Semantic Colors - Dark Theme */
+    --success: [HSL_VALUE];
+    --success-foreground: [HSL_VALUE];
+    --warning: [HSL_VALUE];
+    --warning-foreground: [HSL_VALUE];
+    --destructive: [HSL_VALUE];
+    --destructive-foreground: [HSL_VALUE];
+    --info: [HSL_VALUE];  /* if specified */
+    --info-foreground: [HSL_VALUE];  /* if specified */
+
+    /* ... other tokens ... */
+  }
+}
+\`\`\`
+
+**tailwind.config.ts:**
+\`\`\`typescript
+export default {
+  darkMode: ["class"],
+  content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}"],
+  theme: {
+    extend: {
+      colors: {
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        info: {
+          DEFAULT: "hsl(var(--info))",
+          foreground: "hsl(var(--info-foreground))",
+        },
+      },
+    },
+  },
+};
+\`\`\`
+
+### Reference Documentation
+- Design System Spec: `/docs/design/design-system.md`
+- Implementation Guide: `/docs/design/implementation.md`
+- WCAG Contrast Checker: https://webaim.org/resources/contrastchecker/
+
+## Testing Requirements
+
+### Manual Testing
+- [ ] All CSS variables defined in globals.css
+- [ ] Tailwind utilities work (test bg-success, text-warning, etc.)
+- [ ] Theme switcher toggles between light and dark
+- [ ] Theme preference persists after page reload
+- [ ] All colors visible and readable in both themes
+
+### Automated Testing
+- [ ] Write test to verify all CSS variables exist
+- [ ] Write test to verify Tailwind utilities are generated
+- [ ] Write test for theme provider functionality
+- [ ] Write test for localStorage persistence
+
+### Visual Testing
+- [ ] Create sample page with all semantic colors
+- [ ] Verify colors in light mode
+- [ ] Verify colors in dark mode
+- [ ] Check contrast ratios with WCAG tool
+- [ ] Test with screen reader
+
+## Definition of Done
+
+- [ ] All acceptance criteria met
+- [ ] All tasks completed
+- [ ] All CSS variables from design-system.md implemented
+- [ ] Theme switching works in both directions
+- [ ] Theme preference persists correctly
+- [ ] All Tailwind utilities work (bg-success, text-warning, etc.)
+- [ ] WCAG AA contrast ratios verified
+- [ ] No hardcoded colors in codebase (ESLint check passes)
+- [ ] Visual regression tests pass
+- [ ] Code reviewed and approved
+
+### Design System Compliance
+- [ ] All colors use design tokens (no hardcoded values)
+- [ ] Component works in both light and dark themes
+- [ ] Semantic colors used appropriately
+- [ ] No ESLint warnings for hardcoded colors
+
+## Change Log
+| Date | Version | Description | Author |
+|------|---------|-------------|--------|
+| [DATE] | 1.0 | Initial story creation | Scrum Master Agent |
+
+## Dev Agent Record
+_To be filled by Implementation Agent_
+
+## QA Results
+_To be filled by QA Agent_
+```
+
+**CRITICAL NOTES:**
+
+1. **This story is ALWAYS generated** (regardless of project state)
+2. **This story BLOCKS all feature stories** (1.1+)
+3. **Extract exact HSL values from design-system.md** - do NOT use generic placeholders
+4. **If Story 0.0 was generated, this depends on it**
+5. **If Story 0.0 was NOT generated, this has no dependencies**
+6. **Save to:** `docs/stories/0.1.design-system-foundation-setup.md`
+
+---
 
 ## Story Writing Guidelines
 
