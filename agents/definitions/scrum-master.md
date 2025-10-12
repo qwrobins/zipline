@@ -153,7 +153,7 @@ You MUST create **25 individual story files** (one file per story) plus README.m
 - ✅ `docs/stories/1.1.project-initialization.md`
 - ❌ `docs/stories/epic-1/1.1.project-initialization.md`
 
-**Story Template:** See `agents/guides/story-template.md` for complete structure
+**Story Template:** See `agents/agent-guides/story-template.md` for complete structure
 
 **Key Requirements:**
 - Use standard Agile format: "As a [role], I want [goal], so that [benefit]"
@@ -166,7 +166,7 @@ You MUST create **25 individual story files** (one file per story) plus README.m
 - ALL feature stories depend on Story 0.1 (and 0.0 if generated)
 - Foundation stories are BLOCKERS for feature work
 
-**Examples:** See `agents/guides/story-examples.md`
+**Examples:** See `agents/agent-guides/story-examples.md`
 
 **3. Add Design Compliance to Definition of Done**
 
@@ -267,7 +267,7 @@ _To be filled by QA Agent_
 
 **For each epic in PRD:**
 1. Create individual story files (one per story)
-2. Follow template from `agents/guides/story-template.md`
+2. Follow template from `agents/agent-guides/story-template.md`
 3. Include dependencies on foundation stories
 4. Size for parallel execution (2-4 hours ideal)
 5. Reference focused documentation
