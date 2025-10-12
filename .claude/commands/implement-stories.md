@@ -84,51 +84,231 @@ Implements all stories matching the pattern
 
 **See `.claude/agents/agent-guides/orchestration-patterns.md` for argument parsing details.**
 
-### Step 2: Discover and Analyze Stories
+### Step 2: Load Planning State
 
-**Scan `docs/stories/` directory:**
-- List all .md files
-- Filter out README.md and non-story files
-- Parse story IDs from filenames
-- Filter stories based on scope from Step 1
+**🚨 CRITICAL: This phase loads pre-existing planning artifacts created by `/automate-planning`**
 
-**For each story in scope:**
-- Read story file
-- Extract dependencies
-- Identify technology stack
-- Determine appropriate agent
+#### 2.1: Verify Orchestration Infrastructure
 
-**See `.claude/agents/agent-guides/orchestration-patterns.md` for story discovery patterns.**
+1. **Check if `.agent-orchestration/` directory exists**
+   - If NOT exists:
+     ```
+     ❌ ERROR: Orchestration infrastructure not found!
 
-### Step 3: Build Dependency Graph
+     The .agent-orchestration/ directory does not exist.
+     This directory should have been created by the /automate-planning command.
 
-**Create dependency graph:**
-- Map all dependencies between stories
-- Identify stories with zero dependencies (Wave 0)
-- Categorize stories into waves based on dependencies
-- Detect circular dependencies (error if found)
+     Please run /automate-planning first to:
+     1. Create user stories
+     2. Build dependency graph
+     3. Match stories to agents
+     4. Generate implementation roadmap
 
-**Check for out-of-scope dependencies:**
-- If story depends on story outside scope, warn user
-- Offer to expand scope or skip story
-- Wait for user decision
+     Then run /implement-stories to execute the implementation.
+     ```
+     **STOP** - Do not proceed without orchestration infrastructure
 
-**See `.claude/agents/agent-guides/orchestration-patterns.md` for dependency resolution details.**
+#### 2.2: Load Dependency Graph
+
+2. **Read `.agent-orchestration/dependency-graph.json`**
+   - Extract:
+     - All story nodes
+     - Dependency edges
+     - Implementation order
+     - Parallel waves
+     - Parallel opportunities
+   - If file missing or invalid:
+     ```
+     ❌ ERROR: Dependency graph not found or invalid!
+
+     Expected: .agent-orchestration/dependency-graph.json
+
+     Please run /automate-planning to generate the dependency graph.
+     ```
+     **STOP** - Do not proceed without dependency graph
+
+#### 2.3: Load Task State Files
+
+3. **Scan `.agent-orchestration/tasks/` directory**
+   - Read all `*-task.json` files
+   - Build map of story ID → task state
+   - If directory missing or empty:
+     ```
+     ❌ ERROR: Task state files not found!
+
+     Expected: .agent-orchestration/tasks/*.json
+
+     Please run /automate-planning to generate task state files.
+     ```
+     **STOP** - Do not proceed without task state files
+
+#### 2.4: Load Roadmap
+
+4. **Read `.agent-orchestration/roadmap.md`**
+   - Display roadmap to user for reference
+   - If file missing, warn but continue (not critical)
+
+#### 2.5: Apply Scope Filter
+
+5. **Filter based on scope from Step 1:**
+   - If scope is "all": use all stories from loaded state
+   - If scope is range: filter loaded stories to range
+   - If scope is epic: filter loaded stories to epic
+   - If scope is pattern: filter loaded stories to pattern
+   - If scope is list: filter loaded stories to specific IDs
+
+6. **Filter dependency graph and waves:**
+   - Remove out-of-scope stories from dependency graph
+   - Recalculate parallel waves for in-scope stories only
+   - Update implementation order for filtered set
+
+#### 2.6: Check Out-of-Scope Dependencies
+
+7. **For each in-scope story, check if dependencies are also in scope**
+   - If dependencies are out of scope, warn the user:
+     ```
+     ⚠️  Warning: Story 1.3 depends on Story 1.1, which is not in scope.
+
+     Options:
+     1. Add Story 1.1 to scope (recommended)
+     2. Continue anyway (Story 1.3 will be blocked)
+     3. Cancel and adjust scope
+
+     What would you like to do?
+     ```
+
+#### 2.7: Report Loaded State
+
+8. **Report loaded state:**
+   ```
+   ✅ Planning State Loaded Successfully
+
+   📊 Orchestration Infrastructure:
+   - Dependency Graph: ✅ Loaded
+   - Task State Files: ✅ Loaded ([count] stories)
+   - Roadmap: ✅ Loaded
+   - Parallel Waves: [count] waves identified
+   - Max Parallel Agents: [count]
+
+   📋 Scope:
+   - Total Stories in Scope: [count]
+   - Out-of-Scope Dependencies: [count] warnings
+   ```
+
+### Step 3: Git Initialization Check
+
+**🚨 CRITICAL: Verify git is initialized BEFORE any story implementation begins 🚨**
+
+#### 3.1: Check Git Status
+
+1. **Verify git repository exists:**
+   ```bash
+   git rev-parse --git-dir 2>/dev/null
+   ```
+   - If succeeds → Git is initialized, proceed to Step 4
+   - If fails → Git is NOT initialized, proceed to 3.2
+
+#### 3.2: Initialize Git (If Missing)
+
+2. **Initialize git repository (MANDATORY if missing):**
+   ```bash
+   # Initialize git repository
+   git init
+
+   # Create .gitignore if it doesn't exist
+   if [ ! -f .gitignore ]; then
+     cat > .gitignore << 'EOF'
+   node_modules/
+   .env
+   .env.local
+   dist/
+   build/
+   .DS_Store
+   *.log
+   .agent-orchestration/
+   .worktrees/
+   EOF
+   fi
+
+   # Create initial commit
+   git add .
+   git commit -m "Initial commit"
+
+   # Set default branch to "main"
+   git branch -M main
+
+   # Verify initialization succeeded
+   git rev-parse --git-dir 2>/dev/null
+   ```
+
+   **Error Handling:**
+   - If `git init` fails → STOP and report: "Failed to initialize git repository. Please check git installation."
+   - If initial commit fails → STOP and report: "Failed to create initial commit. Please check file permissions."
+   - If verification fails → STOP and report: "Git initialization verification failed. Please initialize git manually."
+
+   **After successful initialization:**
+   - Report: "✅ Git repository initialized successfully. Proceeding with worktree workflow."
+   - Continue to Step 4
+
+#### 3.3: Enforce Worktree Workflow
+
+3. **⚠️ CRITICAL: The git worktree workflow is MANDATORY for ALL story implementations.**
+   - There are NO exceptions to using git worktrees
+   - Even if git was just initialized, worktrees MUST be used
+   - NEVER proceed with story implementation without worktrees
+   - NEVER work directly in the main repository
+
+   **If worktree creation fails:**
+   - STOP and report the error to the user
+   - Do NOT attempt to work without worktrees
+   - Provide troubleshooting guidance
 
 ### Step 4: Execute Stories in Waves (Parallel Execution)
 
+**🚀 CRITICAL: Execute stories in PARALLEL waves, not sequentially! 🚀**
+
+**⚠️ CRITICAL: Each wave MUST complete code review before proceeding to the next wave ⚠️**
+
+**Execution Strategy:**
+
+1. **Process by Waves (NOT individual stories):**
+   - Identify all stories in the current wave (stories with satisfied dependencies)
+   - Launch ALL agents for the wave simultaneously
+   - Wait for ALL stories in the wave to complete and pass code review
+   - Only then proceed to the next wave
+
+2. **NEVER process stories one-by-one if they can run in parallel**
+   - This defeats the purpose of the parallel execution architecture
+   - Always check if multiple stories can run simultaneously
+   - Maximize parallelism to minimize total implementation time
+
 **For each wave:**
 
-#### 4.1: Start All Stories in Wave (Parallel)
+#### 4.1: Identify Stories in Current Wave
 
-**For each story in current wave:**
+1. **Determine which stories can run now:**
+   - Stories with NO dependencies (Wave 0)
+   - Stories whose dependencies are ALL completed and approved
+   - Group these stories into the current wave
+
+2. **Report wave composition:**
+   ```
+   🚀 Wave [N]: [count] stories ready for parallel execution
+   - Story [id]: [title] (@[agent])
+   - Story [id]: [title] (@[agent])
+   - Story [id]: [title] (@[agent])
+   ```
+
+#### 4.2: Launch All Stories in Wave (Parallel)
+
+**For EACH story in current wave, launch simultaneously:**
 
 1. **Create git worktree:**
    ```bash
    ./.claude/agents/lib/git-worktree-manager.sh create "<story-id>" "<agent-name>"
    ```
 
-2. **Invoke agent in worktree:**
+2. **Invoke agent in worktree (non-blocking):**
    - Switch to worktree directory
    - Call appropriate agent with story file
    - Agent implements acceptance criteria
@@ -136,26 +316,46 @@ Implements all stories matching the pattern
    - Agent updates story status to "Ready for Review"
 
 3. **Track progress:**
-   - Update state file in `.agent-orchestration/`
-   - Monitor agent output
-   - Capture test results
+   - Update state file in `.agent-orchestration/tasks/<story-id>-task.json`
+   - Set status to "In Progress"
+   - Record start time
+   - Record worktree path
+   - Record agent name
 
-**All stories in wave execute simultaneously.**
+**🚨 CRITICAL: Launch ALL stories in the wave BEFORE waiting for any to complete 🚨**
 
-#### 4.2: Wait for Wave Completion
+**All stories in wave execute simultaneously in separate worktrees.**
+
+#### 4.3: Wait for Wave Completion
 
 **Monitor all stories in wave:**
-- Wait for all agents to complete
-- Collect test results
-- Check for failures
 
-**If any story fails:**
-- Mark story as "Failed"
-- Cleanup failed story worktree
-- Continue with other stories
-- Report failure at end
+1. **Wait for ALL agents in wave to complete:**
+   - Monitor each agent's progress
+   - Collect test results as they complete
+   - Track completion status in state files
 
-#### 4.3: Code Review (MANDATORY)
+2. **Check for failures:**
+   - If any story fails:
+     - Mark story as "Failed" in state file
+     - Cleanup failed story worktree
+     - Continue monitoring other stories
+     - Report failure at end
+   - If all stories succeed:
+     - Mark stories as "Ready for Review"
+     - Proceed to code review phase
+
+3. **Report wave completion:**
+   ```
+   ✅ Wave [N] Implementation Complete
+   - [count] stories completed successfully
+   - [count] stories failed
+   - Ready for code review
+   ```
+
+#### 4.4: Code Review (MANDATORY - Wave-Based)
+
+**🚨 CRITICAL: Review ALL stories in wave before proceeding to next wave 🚨**
 
 **For EACH completed story in wave:**
 
@@ -164,36 +364,75 @@ Implements all stories matching the pattern
    /review-story <story-id>
    ```
 
-2. **Wait for review completion**
+2. **Wait for review completion:**
+   - Review checks code quality
+   - Review verifies tests pass
+   - Review checks acceptance criteria met
+   - Review validates no regressions
 
 3. **If issues found:**
-   - Agent fixes issues
+   - Agent fixes issues in worktree
    - Re-run tests
-   - Update story
+   - Update story file
+   - Re-trigger review if needed
 
 4. **Document review results:**
    - Add review results to story file
-   - Update story status to "Approved"
+   - Update story status to "Approved" in state file
+   - Record review completion time
 
-**CRITICAL: Do NOT proceed to next wave until ALL stories in current wave are reviewed and approved.**
+5. **Track wave review progress:**
+   ```
+   📋 Wave [N] Code Review Progress:
+   - Story [id]: ✅ Approved
+   - Story [id]: ✅ Approved
+   - Story [id]: 🔄 In Review
+   - Story [id]: ❌ Issues Found (fixing...)
+   ```
 
-#### 4.4: Merge and Cleanup
+**🚨 CRITICAL: Do NOT proceed to next wave until ALL stories in current wave are reviewed and approved 🚨**
 
-**For each approved story:**
+**Wave Review Completion:**
+- ALL stories must be approved
+- NO stories can have pending issues
+- ALL fixes must be tested and verified
+- Only then proceed to merge and cleanup
+
+#### 4.5: Merge and Cleanup (Wave-Based)
+
+**After ALL stories in wave are approved:**
+
+**For each approved story in wave:**
 
 1. **Merge changes:**
    ```bash
    ./.claude/agents/lib/git-worktree-manager.sh merge "<worktree-path>"
    ```
+   - Merges story branch into main
+   - Resolves any conflicts (should be minimal with worktrees)
+   - Verifies merge succeeded
 
 2. **Cleanup worktree:**
    ```bash
    ./.claude/agents/lib/git-worktree-manager.sh cleanup "<worktree-path>"
    ```
+   - Removes worktree directory
+   - Deletes story branch
+   - Frees up disk space
 
 3. **Update state:**
-   - Mark story as "Approved" in state file
+   - Mark story as "Completed" in state file
+   - Record completion time
    - Update orchestration progress
+   - Update dependency graph (mark as satisfied for dependent stories)
+
+4. **Report wave merge completion:**
+   ```
+   ✅ Wave [N] Merged Successfully
+   - [count] stories merged into main
+   - [count] worktrees cleaned up
+   - Ready to proceed to Wave [N+1]
+   ```
 
 ### Step 5: Progress to Next Wave
 
