@@ -22,25 +22,424 @@ You are orchestrating the complete planning workflow from initial requirements t
 
 ### 1.2: Get Planning Preferences
 
-Ask the user whether they need:
-- **Architecture document** (yes/no)
-- **Frontend design specification document** (yes/no)
+Ask the user which documents they would like to generate:
 
-**Example prompt**:
 ```
-I have your product brief. To complete the planning process, I need to know:
+Would you like to generate an architecture document or front end spec?
 
-1. Do you need an architecture document? (yes/no)
-2. Do you need a frontend design specification document? (yes/no)
+1. Generate an Architecture Document
+2. Generate front end specification
+3. Both
+4. Neither
 
-Please respond with your preferences.
+Enter your choice (1-4):
 ```
 
 Wait for user response before proceeding to Step 2.
 
-## Step 2: Execute Planning Workflow (Sequential)
+## Step 2: AI Framework Selection (Conditional)
 
-Once you have the product brief and user preferences, execute the following steps in sequence:
+**ONLY execute this step if AI features are detected in the product brief.**
+
+### 2.1: Detect AI Requirements and Extract Configuration
+
+**Step 2.1a: Scan for AI-related keywords and concepts:**
+
+**Conversational AI patterns**:
+- "chatbot", "AI assistant", "virtual assistant", "conversational interface"
+
+**Content Generation patterns**:
+- "content generation", "text generation", "writing assistant", "summarization"
+
+**Code Analysis patterns**:
+- "code analysis", "code review", "code generation", "AI-powered IDE"
+
+**Natural Language Processing patterns**:
+- "NLP", "natural language", "sentiment analysis", "text classification"
+
+**AI-Powered Features patterns**:
+- "AI-powered", "machine learning", "intelligent", "smart recommendations"
+
+**Model Integration patterns**:
+- "LLM", "language model", "GPT", "Claude", "AI model"
+
+**Step 2.1b: Extract existing AI configuration from product brief:**
+
+**Framework Detection patterns**:
+- "Claude Agent SDK", "Anthropic Claude", "claude-agent-sdk"
+- "Mastra", "Mastra AI", "multi-provider AI", "provider fallback"
+- "OpenAI", "GPT-4", "gpt-4o", "ChatGPT"
+- "Google Gemini", "Gemini Pro", "Google AI"
+
+**Model Detection patterns**:
+- "claude-3-5-sonnet", "claude-3-5-haiku", "claude-3-opus"
+- "gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "gpt-3.5-turbo"
+- "gemini-pro", "gemini-pro-vision", "gemini-ultra"
+
+**Configuration Detection patterns**:
+- Temperature settings: "temperature 0.7", "temp=0.5"
+- Provider preferences: "primary provider", "fallback to", "backup provider"
+- Cost considerations: "cost optimization", "budget constraints", "cheaper models"
+- Multi-agent: "different models for different tasks", "specialized agents"
+
+**Examples of Complete Configuration in Product Brief:**
+
+```
+Example 1 (Claude Agent SDK):
+"The application will use Claude Agent SDK with claude-3-5-sonnet-20241022
+as the primary model at temperature 0.7. We need custom MCP tools for file
+system access and code analysis."
+
+Example 2 (Mastra Framework):
+"We want to use Mastra AI Framework with OpenAI gpt-4o as primary provider
+and Anthropic claude-3-5-haiku as fallback for cost optimization. The system
+needs multi-agent workflows with different models for research vs writing tasks."
+
+Example 3 (Partial Configuration):
+"The app needs AI capabilities using OpenAI models for content generation."
+→ Framework not specified, model not specific, temperature not mentioned
+→ Prompt user for: Framework choice, specific model, temperature, fallback strategy
+```
+
+### 2.2: Determine Configuration Approach
+
+**If AI requirements are detected**, determine the configuration approach:
+
+**Option A: Configuration Already Specified in Product Brief**
+- If framework, models, and configuration are already specified in the product brief
+- Extract and validate the configuration
+- Skip user prompts and proceed to Step 2.5 (Store AI Configuration)
+
+**Option B: Partial Configuration in Product Brief**
+- If some AI configuration is specified but incomplete
+- Extract what's available
+- Only prompt user for missing information
+
+**Option C: No Configuration in Product Brief**
+- If AI features are mentioned but no specific configuration provided
+- Present full framework selection workflow to user
+
+### 2.3: Present Framework Options (If Configuration Needed)
+
+**If configuration is needed from user**, present this prompt:
+
+```
+🤖 AI Integration Detected
+
+Your project needs AI capabilities. I'll help you choose the right framework:
+
+**Option 1: Claude Agent SDK** (Recommended for most projects)
+✅ **Pros:** Simple setup, excellent AI quality, great for teams new to AI
+💰 **Cost:** Moderate (Anthropic Claude models)
+📋 **Best for:** Most business applications, content generation, analysis tasks
+
+**Option 2: Mastra AI Framework** (For advanced needs)
+✅ **Pros:** Multiple AI providers, cost optimization, high availability
+💰 **Cost:** Variable (can optimize across providers)
+📋 **Best for:** Large-scale apps, cost-sensitive projects, complex AI workflows
+
+**Quick Decision:**
+- Choose **Option 1** if you want simplicity and excellent AI quality
+- Choose **Option 2** if you need cost optimization or provider flexibility
+- **Not sure?** Type "recommend" for a personalized suggestion
+
+Enter your choice (1, 2, or "recommend"):
+```
+
+Wait for user response before proceeding.
+
+### 2.4A: Claude Agent SDK Configuration (If Option 1 Selected)
+
+**Only prompt for information not already specified in the product brief.**
+
+**Model Selection (if not specified):**
+
+```
+📋 Claude Model Selection
+
+Choose your Claude model (we recommend option 1 for most projects):
+
+1. **Claude Sonnet** (RECOMMENDED) ⭐
+   - Best overall performance for most tasks
+   - Excellent at reasoning, coding, and analysis
+   - Cost: ~$3 per 1M tokens
+
+2. **Claude Haiku** (Budget-friendly)
+   - Fast and cost-effective
+   - Good for simple tasks and high-volume usage
+   - Cost: ~$0.25 per 1M tokens
+
+**For reference:** 1M tokens ≈ 750,000 words of text
+
+Enter your choice (1-2, or press Enter for recommended):
+```
+
+**Additional Configuration (only ask if not specified in product brief):**
+
+**Temperature Setting (if not specified):**
+```
+🎛️ AI Response Style (Optional)
+
+How creative should the AI responses be?
+
+1. **Focused** (Recommended) - Consistent, predictable responses
+2. **Balanced** - Mix of consistency and creativity
+3. **Creative** - More varied and creative responses
+
+This is optional - press Enter to use the recommended setting.
+Enter your choice (1-3, or press Enter for default):
+```
+
+**Custom Tools (if not specified):**
+```
+🔧 Custom Capabilities (Optional)
+
+Do you need the AI to access external tools like:
+- File systems or databases
+- APIs or web services
+- Custom business logic
+
+Most projects don't need this initially.
+
+Add custom tools? (y/N - press Enter for No):
+```
+
+### 2.4B: Mastra AI Framework Configuration (If Option 2 Selected)
+
+**Only prompt for information not already specified in the product brief.**
+
+**Provider Selection (if not specified):**
+
+```
+📋 Primary AI Provider Selection
+
+Choose your main AI provider:
+
+1. **OpenAI** (Most popular)
+   - Strengths: Coding, general tasks, multimodal (text + images)
+   - Cost: Moderate, good performance/price ratio
+
+2. **Anthropic (Claude)** (Best reasoning)
+   - Strengths: Complex reasoning, analysis, safety-focused
+   - Cost: Moderate to high, excellent quality
+
+3. **Google (Gemini)** (Most affordable)
+   - Strengths: Fast responses, cost-effective, good for simple tasks
+   - Cost: Low, great for high-volume usage
+
+**Recommendation:** Choose OpenAI (1) for most business applications
+
+Enter your choice (1-3, or press Enter for recommended):
+```
+
+**After primary provider selection, show provider-specific models:**
+
+**If OpenAI selected:**
+```
+📋 OpenAI Model Selection
+
+Choose your OpenAI model (we recommend option 1 for most projects):
+
+1. **GPT-4o** (RECOMMENDED) ⭐
+   - Best overall performance, handles text and images
+   - Excellent for complex reasoning and coding
+   - Cost: ~$2.50 per 1M tokens
+
+2. **GPT-4o Mini** (Budget-friendly)
+   - Fast and cost-effective
+   - Good for most business tasks
+   - Cost: ~$0.15 per 1M tokens
+
+**For reference:** 1M tokens ≈ 750,000 words of text
+
+Enter your choice (1-2, or press Enter for recommended):
+```
+
+**If Anthropic selected:**
+```
+📋 Anthropic Model Selection
+
+Choose your Claude model (we recommend option 1 for most projects):
+
+1. **Claude Sonnet** (RECOMMENDED) ⭐
+   - Best overall performance for most tasks
+   - Excellent at reasoning, coding, and analysis
+   - Cost: ~$3 per 1M tokens
+
+2. **Claude Haiku** (Budget-friendly)
+   - Fast and cost-effective
+   - Good for simple tasks and high-volume usage
+   - Cost: ~$0.25 per 1M tokens
+
+**For reference:** 1M tokens ≈ 750,000 words of text
+
+Enter your choice (1-2, or press Enter for recommended):
+```
+
+**If Google selected:**
+```
+📋 Google Model Selection
+
+Choose your Gemini model (we recommend option 1 for most projects):
+
+1. **Gemini Pro** (RECOMMENDED) ⭐
+   - Best overall performance for most tasks
+   - Good balance of capability and cost
+   - Cost: ~$0.50 per 1M tokens
+
+2. **Gemini Pro Vision** (Multimodal)
+   - Handles text and images
+   - Good for visual analysis tasks
+   - Cost: ~$0.50 per 1M tokens
+
+**For reference:** 1M tokens ≈ 750,000 words of text
+
+Enter your choice (1-2, or press Enter for recommended):
+```
+
+**Additional Configuration (only ask if not specified in product brief):**
+
+**Fallback Provider (if not specified):**
+```
+🛡️ Backup Provider (Recommended for production)
+
+If your primary AI provider has issues, should we automatically switch to a backup?
+
+This prevents downtime but adds complexity.
+
+Configure backup provider? (Y/n - press Enter for Yes):
+```
+
+**Multi-Agent Workflows (if not specified):**
+```
+🤖 Multi-Agent Setup (Optional)
+
+Do you need different AI models for different tasks? For example:
+- Research agent using one model
+- Writing agent using another model
+- Analysis agent using a third model
+
+Most projects start simple with one model.
+
+Set up multi-agent workflows? (y/N - press Enter for No):
+```
+
+**Priority Setting (if not specified):**
+```
+🎯 Project Priority (Optional)
+
+What's most important for your project?
+
+1. **Cost optimization** - Minimize AI expenses
+2. **Performance** - Best possible AI quality
+3. **Reliability** - Maximum uptime and availability
+
+This helps optimize your configuration.
+
+Enter your priority (1-3, or press Enter to skip):
+```
+
+### 2.4: Provide Recommendations (If User Is Unsure)
+
+If the user responds with "I'm not sure" or "What do you recommend?", provide a recommendation based on these criteria:
+
+**Recommend Claude Agent SDK when:**
+- Project is relatively simple with straightforward AI needs
+- Team is new to AI development and wants simpler setup
+- Project specifically requires Anthropic/Claude features
+- Single-provider approach is acceptable
+- Budget allows for Claude pricing
+
+**Recommend Mastra AI Framework when:**
+- Project requires high availability and needs provider fallbacks
+- Cost optimization is a priority (can switch to cheaper providers for simple tasks)
+- Project needs multi-agent workflows with different models
+- Team wants flexibility to switch providers in the future
+- Project has complex AI orchestration requirements
+
+**Example recommendation response:**
+```
+💡 Recommendation: [Framework Name]
+
+Based on your project, I recommend **[Framework Name]** because:
+
+✅ **Perfect fit:** [Primary reason based on project needs]
+💰 **Cost-effective:** [Cost consideration]
+⚡ **Easy to implement:** [Implementation benefit]
+
+This choice will work well for your project and you can always adjust later as your needs evolve.
+
+Proceed with this recommendation? (Y/n - press Enter for Yes):
+```
+
+### 2.5: Validate and Store AI Configuration
+
+**Step 2.5a: Validate Configuration**
+
+Validate the AI configuration (whether extracted from product brief or collected from user):
+
+**Framework Validation:**
+- Ensure framework choice is valid (Claude Agent SDK or Mastra AI Framework)
+- Verify model names are current and available
+- Check provider/model compatibility (e.g., don't use GPT models with Claude Agent SDK)
+
+**Configuration Completeness:**
+- Framework: Must be specified
+- Primary model: Must be specified
+- Temperature: Default to 0.7 if not specified
+- Fallback provider: Optional but recommended for production
+- Multi-agent setup: Optional, document if specified
+
+**Step 2.5b: Store Configuration**
+
+Store the validated AI framework configuration for use in subsequent planning steps. This will be included in architecture documents and PRDs.
+
+**Required AI Configuration Documentation:**
+
+```markdown
+## AI Integration [Architecture/Requirements]
+
+### Framework Selection
+- **Framework**: [Claude Agent SDK / Mastra AI Framework]
+- **Rationale**: [Brief explanation based on project needs]
+
+### Model Configuration
+- **Primary Provider**: [OpenAI / Anthropic / Google]
+- **Primary Model**: [specific model name]
+- **Temperature**: [0.0-1.0]
+- **Fallback Provider** (if applicable): [provider name]
+- **Fallback Model** (if applicable): [model name]
+
+### Multi-Agent Configuration (if applicable)
+[Document different agent roles and their assigned models]
+
+### Cost Considerations
+- **Estimated Monthly Cost**: [based on expected usage]
+- **Cost Optimization Strategy**: [e.g., use cheaper models for simple tasks]
+
+### Security Requirements
+- API key management strategy
+- Input validation and sanitization requirements
+- Output filtering requirements
+- Rate limiting configuration
+
+### Testing Strategy
+- Unit testing approach for AI tools
+- Integration testing with mocked responses
+- E2E testing budget and approach
+- Evaluation metrics for AI quality
+
+### References
+- **Main Framework Guide**: `agents/directives/[claude-agent-sdk.md / mastra-ai-framework.md]`
+- **Security Guidelines**: `agents/directives/[claude-agent-security.md / mastra-ai-security.md]`
+- **Testing Patterns**: `agents/directives/[claude-agent-testing.md / mastra-ai-testing.md]`
+```
+
+**If no AI requirements detected**, skip this entire step and proceed directly to Step 3.
+
+## Step 3: Execute Planning Workflow (Sequential)
+
+Once you have the product brief, user preferences, and AI configuration (if applicable), execute the following steps in sequence:
 
 ### 2.1: Generate PRD
 
@@ -52,6 +451,7 @@ Once you have the product brief and user preferences, execute the following step
    - Key features and functionality
    - Technical constraints and assumptions
    - Success metrics and acceptance criteria
+   - **AI integration requirements** (if AI framework was selected)
 
 2. **Research Best Practices** using `context7` tools:
    ```
@@ -68,6 +468,7 @@ Once you have the product brief and user preferences, execute the following step
 3. **Create PRD** using `save-file` tool:
    - Save to `docs/prd.md`
    - Include all 15 essential PRD sections (including Implementation Phasing)
+   - **Include AI Integration Requirements section** (if AI framework was selected)
    - Base content on analysis and research
    - **🚨 CRITICAL: Follow feature phasing rules from `.claude/agents/directives/prd-feature-phasing.md`**
 
@@ -99,6 +500,7 @@ Invoke the `software-architect` agent approach:
    - Identify technical constraints and assumptions
    - Determine scalability and performance needs
    - Understand integration requirements
+   - **Review AI integration requirements** (if AI framework was selected)
 
 2. **Research Technologies** using `context7` tools:
    ```
@@ -113,6 +515,7 @@ Invoke the `software-architect` agent approach:
    - Save to `docs/architecture.md`
    - Follow Phase 1 approach (1000-1500 lines maximum)
    - Include all 12 essential architecture sections
+   - **Include AI Integration Architecture section** (if AI framework was selected)
 
 4. **Report Architecture completion**:
    ```
