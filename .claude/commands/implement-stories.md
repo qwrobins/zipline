@@ -371,13 +371,49 @@ Implements all stories matching the pattern
    - Review validates no regressions
 
 3. **If issues found:**
-   - Agent fixes issues in worktree
-   - Re-run tests
-   - Update story file
-   - Re-trigger review if needed
 
-4. **Document review results:**
-   - Add review results to story file
+   **🚨 CRITICAL: Main agent MUST NOT fix issues directly 🚨**
+
+   **Required workflow for fixes:**
+
+   a. **Identify the original developer agent:**
+      - Read task state file: `.agent-orchestration/tasks/<story-id>-task.json`
+      - Extract `agent` field (e.g., "nextjs-developer", "python-developer")
+      - Extract `worktree_path` field (existing worktree location)
+
+   b. **Hand story back to ORIGINAL developer agent:**
+      ```bash
+      # Switch to the existing worktree
+      cd <worktree_path>
+
+      # Invoke the SAME developer agent that did original implementation
+      # Pass code review feedback to the agent
+      # Agent name from task state file (e.g., @nextjs-developer)
+      ```
+
+   c. **Developer agent fixes issues in EXISTING worktree:**
+      - Developer agent reads code review feedback
+      - Fixes issues in the worktree (NOT main branch)
+      - Re-runs tests to verify fixes
+      - Updates story file in worktree (NOT main branch)
+      - Marks story as "Ready for Re-Review"
+
+   d. **Re-invoke code-reviewer agent (NOT self-review):**
+      ```bash
+      /review-story <story-id>
+      ```
+      - Code-reviewer agent reviews the fixes
+      - If still has issues: repeat steps a-d
+      - If approved: proceed to step 4
+
+   **🚨 NEVER allow:**
+   - Main agent fixing code directly
+   - Creating new worktree for fixes (use existing worktree)
+   - Self-review (agent reviewing its own fixes)
+   - Updating story files on main branch
+
+4. **Document review results (after approval):**
+   - Add review results to story file (in worktree)
    - Update story status to "Approved" in state file
    - Record review completion time
 
@@ -389,6 +425,43 @@ Implements all stories matching the pattern
    - Story [id]: 🔄 In Review
    - Story [id]: ❌ Issues Found (fixing...)
    ```
+
+#### 4.4.1: Parallel Fix Execution (If Multiple Stories Have Issues)
+
+**If multiple stories in wave have review issues:**
+
+1. **Identify all stories needing fixes:**
+   - Collect all story IDs with review issues
+   - Read task state files for each story
+   - Extract agent name and worktree path for each
+
+2. **Hand ALL stories back to their developer agents IN PARALLEL:**
+   ```bash
+   # For each story with issues, invoke its developer agent simultaneously
+   # Story 1.1 → @nextjs-developer in worktree-1
+   # Story 1.2 → @python-developer in worktree-2
+   # Story 1.3 → @nextjs-developer in worktree-3
+   # All agents work in parallel in separate worktrees
+   ```
+
+3. **Wait for ALL developer agents to complete fixes:**
+   - Monitor all agents in parallel
+   - Track completion status for each
+   - Collect test results from each
+
+4. **Re-review ALL fixed stories IN PARALLEL:**
+   ```bash
+   # Invoke code-reviewer for all fixed stories simultaneously
+   /review-story 1.1
+   /review-story 1.2
+   /review-story 1.3
+   ```
+
+5. **If any still have issues:**
+   - Repeat parallel fix process for remaining issues
+   - Continue until ALL stories approved
+
+**🚨 CRITICAL: Maintain parallel execution even during fix cycles 🚨**
 
 **🚨 CRITICAL: Do NOT proceed to next wave until ALL stories in current wave are reviewed and approved 🚨**
 
