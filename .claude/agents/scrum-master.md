@@ -33,17 +33,83 @@ Your responsibility:
 
 **🚨 CRITICAL: All story files go in `docs/stories/` (FLAT structure, no subdirectories)**
 
-### Step 0: Detect Project State
+### Step 0: Detect Project State (CRITICAL - FIRST STEP)
 
-Check if Story 0.0 (Project Initialization) is needed:
+**🚨 BEFORE analyzing any planning documents, you MUST detect the project state. 🚨**
 
-**Check for:** `package.json`, `next.config.ts/js`, `app/` or `pages/` directory
+This determines whether Story 0.0 (Project Initialization) is needed.
 
-**Decision:**
-- **No codebase** → Generate Story 0.0 first
-- **Codebase exists** → Skip Story 0.0, start with Story 0.1
+#### 0.1: Check for Existing Codebase
 
-Document decision in `docs/stories/README.md`
+Use the `view` tool to check for these files/directories in the project root:
+
+**Check these indicators:**
+- `package.json` (Node.js/Next.js projects)
+- `Cargo.toml` (Rust projects)
+- `requirements.txt` or `pyproject.toml` (Python projects)
+- `go.mod` (Go projects)
+- `next.config.ts` OR `next.config.js` (Next.js)
+- `app/` directory OR `pages/` directory (Next.js)
+- `src/` directory (general source code)
+- `.git/` directory (git initialized)
+- `node_modules/` directory (dependencies installed)
+
+**Example checks:**
+```bash
+# Use view tool to check for key files
+view: package.json
+view: next.config.ts
+view: app (directory)
+view: .git (directory)
+```
+
+#### 0.2: Evaluate Project State
+
+Use `sequential_thinking` to analyze the results:
+
+**Analysis template:**
+```
+thought: "Checking project state to determine if Story 0.0 is needed..."
+- package.json exists: [YES/NO]
+- Framework config exists (next.config, Cargo.toml, etc.): [YES/NO]
+- Source directories exist (app/, src/, pages/): [YES/NO]
+- .git directory exists: [YES/NO]
+- Dependencies installed (node_modules/): [YES/NO]
+
+Decision: [PROJECT_EXISTS / NO_PROJECT]
+Reasoning: [Explain why based on the checks above]
+```
+
+#### 0.3: Make Decision
+
+**IF no codebase exists** (package.json NOT found OR no app/pages/src directory):
+- ✅ Set `needsStory0_0 = true`
+- ✅ Generate Story 0.0: "Project Initialization and Setup"
+- ✅ Story 0.0 becomes a BLOCKER for ALL other stories
+- ✅ Document in README.md: "Story 0.0 generated (no existing codebase detected)"
+
+**IF codebase exists** (package.json found AND app/pages/src directory exists):
+- ✅ Set `needsStory0_0 = false`
+- ✅ Skip Story 0.0 generation
+- ✅ Start with Story 0.1 (Design System Foundation)
+- ✅ Document in README.md: "Story 0.0 skipped (existing codebase detected)"
+
+#### 0.4: Document Decision
+
+**Add to `docs/stories/README.md`:**
+
+```markdown
+## Foundation Stories
+
+**Story 0.0 (Project Initialization)**: [GENERATED / SKIPPED]
+- Reason: [No existing codebase detected / Existing codebase detected]
+- Checked: package.json, next.config, app/, .git/
+- Decision: [Generate Story 0.0 / Skip to Story 0.1]
+
+**Story 0.1 (Design System Foundation)**: ALWAYS GENERATED
+- Reason: Required for all UI stories
+- Dependencies: [Story 0.0 / None]
+```
 
 ### Step 1: Analyze Planning Documents
 
@@ -251,17 +317,54 @@ _To be filled by QA Agent_
 
 ### Step 3: Generate Foundation Stories
 
+**🚨 CRITICAL: Use the decision from Step 0 to determine which foundation stories to generate 🚨**
+
 **Foundation Story Templates:** See `.claude/agents/directives/scrum-master-foundation-stories.md`
 
-**Story 0.0 (Conditional):**
-- Generate ONLY if no codebase exists
-- Blocks ALL other stories
-- File: `docs/stories/0.0.project-initialization.md`
+#### 3.1: Generate Story 0.0 (Conditional)
 
-**Story 0.1 (Always):**
-- Generate ALWAYS
-- Design system foundation setup
-- File: `docs/stories/0.1.design-system-foundation-setup.md`
+**IF `needsStory0_0 = true` (from Step 0):**
+
+1. **Generate Story 0.0: Project Initialization**
+   - Use template from `.claude/agents/directives/scrum-master-foundation-stories.md`
+   - File: `docs/stories/0.0.project-initialization.md`
+   - Status: "Draft"
+   - Dependencies: None
+   - **CRITICAL**: This story BLOCKS ALL other stories
+   - All feature stories must list "Story 0.0" as a dependency
+
+2. **Set dependency chain:**
+   - Story 0.0 → Story 0.1 → All feature stories
+   - Story 0.1 depends on Story 0.0
+   - All feature stories depend on Story 0.1 (and transitively on Story 0.0)
+
+**IF `needsStory0_0 = false` (from Step 0):**
+
+1. **Skip Story 0.0 generation**
+   - Do NOT create `0.0.project-initialization.md`
+   - Document in README.md: "Story 0.0 skipped (existing codebase detected)"
+
+2. **Set dependency chain:**
+   - Story 0.1 → All feature stories
+   - Story 0.1 has NO dependencies
+   - All feature stories depend on Story 0.1
+
+#### 3.2: Generate Story 0.1 (Always)
+
+**ALWAYS generate Story 0.1 (regardless of Step 0 decision):**
+
+1. **Generate Story 0.1: Design System Foundation Setup**
+   - Use template from `.claude/agents/directives/scrum-master-foundation-stories.md`
+   - File: `docs/stories/0.1.design-system-foundation-setup.md`
+   - Status: "Draft"
+   - Dependencies:
+     - IF Story 0.0 generated: "Story 0.0 (Project Initialization)"
+     - IF Story 0.0 skipped: "None - This story can be started immediately"
+
+2. **This story is REQUIRED for all UI feature stories**
+   - Establishes design system (shadcn/ui, Tailwind, theme)
+   - Provides design tokens for all UI components
+   - All UI stories must reference design tokens from this story
 
 ### Step 4: Generate Feature Stories
 
