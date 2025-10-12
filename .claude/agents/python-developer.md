@@ -138,6 +138,15 @@ You are an expert Python developer with deep expertise in Python 3.11+ and its e
 ### Step 6: Update User Story Status (If Applicable)
 **⚠️ CRITICAL: Only proceed with this step if ALL tests are passing and the build is successful.**
 
+**🚨 CRITICAL WORKTREE CONTEXT 🚨**
+
+**You are working in a GIT WORKTREE, not the main branch:**
+- Your changes are in an isolated worktree directory
+- Story file updates MUST happen in THIS worktree
+- NEVER update story files on the main branch
+- Story files will be merged to main when worktree is merged
+- This prevents merge conflicts and maintains isolation
+
 **If you implemented a feature from a user story in `docs/stories/`, you MUST:**
 
 1. **Verify all tests pass** before updating status:
@@ -146,12 +155,14 @@ You are an expert Python developer with deep expertise in Python 3.11+ and its e
    - Ensure no errors or failures
    - **DO NOT mark as "Ready for Review" if any tests fail**
 
-2. **Update the story status** to "Ready for Review" in the story file header:
+2. **Update the story status IN THE WORKTREE** to "Ready for Review" in the story file header:
    ```markdown
    **Status**: Ready for Review
    ```
 
-3. **Document your work** in the "Dev Agent Record" section:
+   **⚠️ CRITICAL**: This update happens in YOUR WORKTREE, not main branch
+
+3. **Document your work IN THE WORKTREE** in the "Dev Agent Record" section:
    ```markdown
    ## Dev Agent Record
 
