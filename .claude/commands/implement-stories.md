@@ -56,6 +56,36 @@ Implements all stories matching the pattern
 
 **See `.claude/agents/agent-guides/orchestration-patterns.md` for detailed argument parsing logic.**
 
+## ⚠️ CRITICAL REQUIREMENT - Git Worktree Isolation ⚠️
+
+**MANDATORY WORKTREE USAGE:**
+
+When multiple agents work simultaneously, they MUST use isolated git worktrees to prevent conflicts.
+
+**Orchestrator Responsibilities:**
+
+1. **Before assigning a story to an agent:**
+   - Create a worktree using: `./.claude/agents/lib/git-worktree-manager.sh create "{story-id}" "{agent-name}"`
+   - Save the worktree path in the task state file
+   - Provide the worktree path to the agent
+
+2. **During story implementation:**
+   - Track active worktrees in `.agent-orchestration/worktree-registry.json`
+   - Monitor for abandoned worktrees (older than 24 hours)
+   - Ensure agents work exclusively in their worktrees
+
+3. **After story completion:**
+   - Verify the agent merged their worktree
+   - Verify the agent cleaned up their worktree
+   - If cleanup failed, manually cleanup: `./.claude/agents/lib/git-worktree-manager.sh cleanup "{worktree-path}"`
+
+4. **Error handling:**
+   - If merge fails due to conflicts, STOP and report to user
+   - Do NOT cleanup worktrees with merge conflicts
+   - Provide clear instructions for manual conflict resolution
+
+**See `.claude/agents/agent-guides/git-workflow.md` for complete workflow details.**
+
 ## CRITICAL REQUIREMENTS
 
 1. **ALWAYS use git worktrees** for agent isolation to prevent conflicts
@@ -301,28 +331,97 @@ Implements all stories matching the pattern
 
 #### 4.2: Launch All Stories in Wave (Parallel)
 
-**For EACH story in current wave, launch simultaneously:**
+**🚨 CRITICAL: You MUST create worktrees and invoke agents for ALL stories in the wave 🚨**
 
-1. **Create git worktree:**
-   ```bash
-   ./.claude/agents/lib/git-worktree-manager.sh create "<story-id>" "<agent-name>"
-   ```
+**For EACH story in current wave, execute these steps:**
 
-2. **Invoke agent in worktree (non-blocking):**
-   - Switch to worktree directory
-   - Call appropriate agent with story file
-   - Agent implements acceptance criteria
-   - Agent runs tests and verifies
-   - Agent updates story status to "Ready for Review"
+**Step 1: Create git worktree (MANDATORY)**
 
-3. **Track progress:**
-   - Update state file in `.agent-orchestration/tasks/<story-id>-task.json`
-   - Set status to "In Progress"
-   - Record start time
-   - Record worktree path
-   - Record agent name
+Execute the worktree creation script:
+```bash
+./.claude/agents/lib/git-worktree-manager.sh create "<story-id>" "<agent-name>"
+```
+
+Example:
+```bash
+# For story 1.1 assigned to nextjs-developer
+./.claude/agents/lib/git-worktree-manager.sh create "1.1" "nextjs-developer"
+
+# For story 1.2 assigned to python-developer
+./.claude/agents/lib/git-worktree-manager.sh create "1.2" "python-developer"
+```
+
+This script will:
+- Create a new branch: `story/<story-id>`
+- Create worktree directory: `.worktrees/agent-<agent-name>-<story-id>-<timestamp>/`
+- Return the worktree path
+- Initialize the worktree with main branch code
+
+**Step 2: Save worktree path**
+
+Capture the worktree path returned by the script and save it to the task state file:
+```json
+{
+  "storyId": "1.1",
+  "status": "In Progress",
+  "agent": "nextjs-developer",
+  "worktree": ".worktrees/agent-nextjs-developer-1.1-20250112143022/",
+  "dependencies": ["0.1"],
+  "startTime": "2025-01-12T14:30:22Z"
+}
+```
+
+**Step 3: Invoke agent in worktree**
+
+Switch to the worktree directory and invoke the agent:
+```bash
+cd <worktree-path>
+
+# Invoke the agent with the story file
+# Example: @nextjs-developer, please implement story 1.1
+# Story file: docs/stories/1.1-user-authentication.md
+```
+
+The agent will:
+- Read the story file and acceptance criteria
+- Implement the required functionality
+- Write and run tests (ALL tests must pass)
+- Update story file with Dev Agent Record
+- Change story status to "Ready for Review"
+
+**Step 4: Track progress**
+
+Update state file in `.agent-orchestration/tasks/<story-id>-task.json`:
+- Set status to "In Progress"
+- Record start time
+- Record worktree path
+- Record agent name
 
 **🚨 CRITICAL: Launch ALL stories in the wave BEFORE waiting for any to complete 🚨**
+
+**Parallel Execution Pattern:**
+```bash
+# Wave 1 has stories 1.1, 1.2, 1.3 (all independent)
+
+# Launch story 1.1 (don't wait)
+./.claude/agents/lib/git-worktree-manager.sh create "1.1" "nextjs-developer"
+cd .worktrees/agent-nextjs-developer-1.1-*/
+# Invoke @nextjs-developer for story 1.1
+
+# Launch story 1.2 (don't wait)
+cd /path/to/main/repo
+./.claude/agents/lib/git-worktree-manager.sh create "1.2" "python-developer"
+cd .worktrees/agent-python-developer-1.2-*/
+# Invoke @python-developer for story 1.2
+
+# Launch story 1.3 (don't wait)
+cd /path/to/main/repo
+./.claude/agents/lib/git-worktree-manager.sh create "1.3" "nextjs-developer"
+cd .worktrees/agent-nextjs-developer-1.3-*/
+# Invoke @nextjs-developer for story 1.3
+
+# NOW wait for all three to complete
+```
 
 **All stories in wave execute simultaneously in separate worktrees.**
 
