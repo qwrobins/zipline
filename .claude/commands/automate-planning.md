@@ -210,23 +210,157 @@ Enter your choice (1-2, or 'help' for recommendations):
 - References architecture and design docs (if applicable)
 - AI requirements documented (if applicable)
 
-## Step 6: Generate Epics and Stories
+## Step 6: Shard Large Documents (Conditional)
 
-### 6.1: Invoke Scrum Master Agent
+**🚨 CRITICAL: Shard large documents to enable efficient consumption by scrum-master agent 🚨**
+
+This step uses document sharding to break large planning documents into focused, digestible sections.
+
+### 6.1: Check Document Sizes
+
+**Check line counts for generated documents:**
+
+```bash
+# Count lines in each document
+wc -l docs/requirements/prd.md
+wc -l docs/architecture/architecture.md
+wc -l docs/design/frontend-design-spec.md
+```
+
+**Determine which documents need sharding:**
+- **PRD**: If > 500 lines → Shard into `docs/requirements/prd/`
+- **Architecture**: If > 500 lines → Shard into `docs/architecture/`
+- **Design Spec**: If > 500 lines → Shard into `docs/design/`
+
+### 6.2: Shard Documents Using md-tree
+
+**For each document that exceeds 500 lines:**
+
+#### PRD Sharding
+
+**If PRD > 500 lines:**
+
+1. **Analyze PRD structure** using `sequential_thinking`:
+   - Identify level 2 headings (## sections)
+   - Verify sections are properly structured
+   - Plan output directory structure
+
+2. **Shard PRD using md-tree:**
+   ```bash
+   md-tree explode docs/requirements/prd.md docs/requirements/prd
+   ```
+
+3. **Verify sharding results:**
+   - Check `docs/requirements/prd/` directory created
+   - Verify `index.md` exists with navigation links
+   - Verify all sections extracted correctly
+   - Ensure no content was lost
+
+4. **Expected structure:**
+   ```
+   docs/requirements/prd/
+   ├── index.md                    # Navigation index
+   ├── overview.md                 # Executive summary, goals, scope
+   ├── epic-1-foundation.md        # Epic 1 requirements
+   ├── epic-2-user-profiles.md     # Epic 2 requirements
+   ├── epic-3-features.md          # Epic 3 requirements
+   └── non-functional.md           # NFRs, constraints
+   ```
+
+#### Architecture Sharding
+
+**If Architecture > 500 lines:**
+
+1. **Shard architecture using md-tree:**
+   ```bash
+   md-tree explode docs/architecture/architecture.md docs/architecture/
+   ```
+
+2. **Expected structure:**
+   ```
+   docs/architecture/
+   ├── index.md                    # Navigation index
+   ├── overview.md                 # System overview
+   ├── technology-stack.md         # Tech stack decisions
+   ├── component-architecture.md   # Component design
+   ├── data-flow.md               # Data flow diagrams
+   └── deployment.md              # Deployment architecture
+   ```
+
+#### Design Spec Sharding
+
+**If Design Spec > 500 lines:**
+
+1. **Shard design spec using md-tree:**
+   ```bash
+   md-tree explode docs/design/frontend-design-spec.md docs/design/
+   ```
+
+2. **Expected structure:**
+   ```
+   docs/design/
+   ├── index.md                    # Navigation index
+   ├── design-system.md            # Colors, typography, spacing
+   ├── components.md               # Component specifications
+   ├── user-flows.md              # User flow diagrams
+   └── accessibility.md           # Accessibility requirements
+   ```
+
+### 6.3: Report Sharding Results
+
+**Report which documents were sharded:**
+
+```
+✅ Document Sharding Complete
+
+Documents Sharded:
+  ✅ PRD: docs/requirements/prd/ ([X] sections)
+  ✅ Architecture: docs/architecture/ ([X] sections)
+  ✅ Design Spec: docs/design/ ([X] sections)
+
+Documents Not Sharded (under 500 lines):
+  ℹ️  PRD: 450 lines (no sharding needed)
+  ℹ️  Architecture: 380 lines (no sharding needed)
+
+Benefits:
+  - Scrum master can read focused sections incrementally
+  - Reduces context window usage
+  - Improves story generation accuracy
+  - Enables parallel document consumption
+```
+
+### 6.4: Update References
+
+**If documents were sharded, update references:**
+
+- Scrum master will read from sharded directories
+- Use `docs/requirements/prd/index.md` as entry point
+- Read individual sections as needed
+- Avoid loading entire large documents at once
+
+## Step 7: Generate Epics and Stories
+
+### 7.1: Invoke Scrum Master Agent
 
 **Call the scrum-master agent:**
-- Provide PRD content
-- Provide architecture document (if generated)
-- Provide design specification (if generated)
+- Provide PRD content (sharded or monolithic)
+- Provide architecture document (sharded or monolithic, if generated)
+- Provide design specification (sharded or monolithic, if generated)
 - Request epic and story generation
 
+**If documents were sharded:**
+- Scrum master will read from sharded directories
+- Use `docs/requirements/prd/index.md` as entry point
+- Read individual sections incrementally
+- Avoid loading entire large documents at once
+
 **Expected output:**
-- `docs/stories/README.md` (Epic overview)
-- `docs/stories/0.0.project-initialization.md` (if no codebase)
+- `docs/stories/README.md` (Epic overview with project state detection)
+- `docs/stories/0.0.project-initialization.md` (if no codebase detected)
 - `docs/stories/0.1.design-system-foundation-setup.md` (always)
 - `docs/stories/[epic].[story].[title].md` (Feature stories)
 
-### 6.2: Verify Stories
+### 7.2: Verify Stories
 
 **Validate output:**
 - README.md exists with epic overview
@@ -463,6 +597,11 @@ Documents Generated:
   ✅ Epic Overview: docs/stories/README.md
   ✅ Stories: [count] stories in docs/stories/
 
+Document Sharding:
+  ✅ PRD Sharded: docs/requirements/prd/ ([X] sections)
+  ✅ Architecture Sharded: docs/architecture/ ([X] sections)
+  ℹ️  Design Spec: Not sharded (under 500 lines)
+
 Orchestration Files:
   ✅ Dependency Graph: .agent-orchestration/dependency-graph.json
   ✅ Implementation Roadmap: .agent-orchestration/roadmap.md
@@ -479,7 +618,7 @@ Parallel Execution:
   Estimated Time Savings: [P]%
 
 Next Steps:
-  1. Review generated documents
+  1. Review generated documents (sharded for easy navigation)
   2. Review implementation roadmap
   3. Run /implement-stories to begin parallel development
 ```
