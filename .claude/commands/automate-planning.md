@@ -237,9 +237,219 @@ Enter your choice (1-2, or 'help' for recommendations):
   - Appropriate sizing
   - Design tokens (for UI stories)
 
-## Step 7: Summary and Next Steps
+## Step 7: Analyze Story Dependencies
 
-### 7.1: Display Planning Summary
+**Build dependency graph and identify parallel execution opportunities**:
+
+### 7.1: Scan Story Dependencies
+
+1. **Scan all story files** in `docs/stories/`:
+   - Read each story file
+   - Extract story ID from filename
+   - Extract dependencies from story content:
+     - Look for "Dependencies:" section or field
+     - Look for "**Dependencies**:" in story body
+     - Parse dependency story IDs
+
+2. **Use sequential_thinking** to build dependency graph:
+   - Create adjacency list of story dependencies
+   - Validate no circular dependencies exist
+   - If circular dependencies found, report error and stop
+
+### 7.2: Identify Parallel Execution Waves
+
+1. **Identify Parallel Execution Waves**:
+   - **Wave 0**: Stories with NO dependencies (can start immediately)
+   - **Wave 1**: Stories that depend only on Wave 0 stories
+   - **Wave 2**: Stories that depend only on Wave 0 or Wave 1 stories
+   - Continue until all stories are assigned to waves
+   - **CRITICAL**: All stories in the same wave can run in PARALLEL
+
+2. **Perform topological sort** to determine implementation order:
+   - Use context7 if uncertain about topological sort algorithm
+   - Generate ordered list of stories
+   - Prioritize grouping independent stories into waves
+
+3. **Calculate Parallel Opportunities**:
+   - For each wave, count how many stories can run simultaneously
+   - Estimate time savings from parallel execution
+   - Identify maximum parallel agents needed
+
+### 7.3: Save Dependency Graph
+
+**Save dependency graph** using `save-file` tool to `.agent-orchestration/dependency-graph.json`:
+
+```json
+{
+  "scope": "all stories",
+  "nodes": ["0.0", "0.1", "1.1", "1.2", ...],
+  "edges": [
+    {"from": "0.0", "to": "0.1"},
+    {"from": "0.1", "to": "1.1"},
+    ...
+  ],
+  "implementation_order": ["0.0", "0.1", "1.1", "1.2", ...],
+  "parallel_waves": [
+    {"wave": 0, "stories": ["0.0"], "can_run_parallel": false},
+    {"wave": 1, "stories": ["0.1"], "can_run_parallel": false},
+    {"wave": 2, "stories": ["1.1", "1.2", "1.3"], "can_run_parallel": true},
+    ...
+  ],
+  "parallel_opportunities": [
+    ["1.1", "1.2", "1.3"],
+    ["2.1", "2.2"],
+    ...
+  ],
+  "max_parallel_agents": 3,
+  "estimated_time_savings": "40% faster with parallel execution"
+}
+```
+
+### 7.4: Report Dependency Analysis
+
+```
+✅ Dependency Analysis Complete:
+- Total stories: [X]
+- Dependency edges: [Y]
+- Parallel waves: [Z]
+- Max parallel agents: [N]
+- Estimated time savings: [P]% with parallel execution
+- No circular dependencies detected ✓
+```
+
+## Step 8: Match Stories to Agents
+
+**Determine appropriate development agent for each story**:
+
+### 8.1: Scan Available Agents
+
+1. **Scan available agents**:
+   - List all files in `.claude/agents/` directory
+   - Filter for agent definition files (*.md)
+   - Read each agent's YAML frontmatter to understand capabilities
+
+### 8.2: Match Stories to Agents
+
+2. **For each story**, determine the appropriate development agent:
+   - Read story file
+   - Extract technology stack indicators:
+     - JavaScript/TypeScript/React/Next.js/Node.js
+     - Python/Django/Flask/FastAPI
+     - Rust/Cargo
+     - Database mentions (PostgreSQL, MongoDB, etc.)
+   - Match to agent based on technology detection rules:
+     - **JavaScript/TypeScript/React/Next.js** → `nextjs-developer` or `react-developer`
+     - **Python/Django/Flask** → `python-developer`
+     - **Rust** → `rust-developer`
+     - **Backend/API** → Check for framework-specific agent first
+     - **Default** → `typescript-developer`
+
+### 8.3: Create Task State Files
+
+3. **Create task state file** for each story using `save-file` tool:
+   Save to: `.agent-orchestration/tasks/{story-id}-task.json`
+
+   ```json
+   {
+     "story_id": "1.1",
+     "story_file": "docs/stories/1.1.user-authentication.md",
+     "agent": "nextjs-developer",
+     "status": "pending",
+     "dependencies": ["0.1"],
+     "wave": 2,
+     "can_run_parallel_with": ["1.2", "1.3"],
+     "assigned_at": null,
+     "started_at": null,
+     "completed_at": null,
+     "worktree_path": null,
+     "branch_name": null
+   }
+   ```
+
+## Step 9: Generate Implementation Roadmap
+
+**Create human-readable implementation plan**:
+
+### 9.1: Generate Roadmap Content
+
+**Create roadmap.md** using `save-file` tool to `.agent-orchestration/roadmap.md`:
+
+```markdown
+# Story Implementation Roadmap
+
+**Generated**: <timestamp>
+**Scope**: All stories
+**Total Stories**: X
+**Parallel Execution**: Y stories can run simultaneously
+**Estimated Time Savings**: Z% faster with parallel execution
+
+## 🚀 Parallel Execution Strategy
+
+**CRITICAL: The orchestrator will launch multiple agents simultaneously for independent stories.**
+
+### Wave 0 (Foundation) - **1 agent (sequential)**
+- [ ] Story 0.0: Project Initialization (@nextjs-developer)
+
+**Action**: Launch agent. Wait for completion and code review before Wave 1.
+
+### Wave 1 (Design System) - **1 agent (sequential)**
+- [ ] Story 0.1: Design System Foundation Setup (@nextjs-developer) - Depends on: 0.0
+
+**Action**: After Wave 0 completes, launch agent. Wait for completion and code review before Wave 2.
+
+### Wave 2 (Core Features) - **3 agents in parallel**
+- [ ] Story 1.1: User Authentication (@nextjs-developer) - Depends on: 0.1
+- [ ] Story 1.2: User Profile (@nextjs-developer) - Depends on: 0.1
+- [ ] Story 1.3: Dashboard (@nextjs-developer) - Depends on: 0.1
+
+**Action**: After Wave 1 completes, launch ALL 3 agents simultaneously. Wait for ALL to complete and pass code review before Wave 3.
+
+[Continue for all waves...]
+
+## Dependency Graph
+
+```
+Wave 0:     0.0
+             ↓
+Wave 1:     0.1
+             ↓
+Wave 2:  1.1  1.2  1.3  (parallel)
+          ↓    ↓    ↓
+Wave 3:     2.1  2.2     (parallel)
+```
+
+## Implementation Order
+
+1. Story 0.0 (Wave 0)
+2. Story 0.1 (Wave 1)
+3. Stories 1.1, 1.2, 1.3 (Wave 2 - parallel)
+4. Stories 2.1, 2.2 (Wave 3 - parallel)
+[...]
+
+## Agent Assignments
+
+- **nextjs-developer**: Stories 0.0, 0.1, 1.1, 1.2, 1.3, ...
+- **python-developer**: Stories 2.1, 2.2, ...
+- **rust-developer**: Stories 3.1, ...
+
+## Parallel Execution Commands
+
+### Wave 2 (Example)
+```bash
+# Launch all Wave 2 stories in parallel
+/implement-stories --stories 1.1,1.2,1.3 --parallel
+```
+
+### Wave 3 (Example)
+```bash
+# Launch all Wave 3 stories in parallel
+/implement-stories --stories 2.1,2.2 --parallel
+```
+```
+
+## Step 10: Summary and Next Steps
+
+### 10.1: Display Planning Summary
 
 **Show user what was generated:**
 
@@ -253,25 +463,36 @@ Documents Generated:
   ✅ Epic Overview: docs/stories/README.md
   ✅ Stories: [count] stories in docs/stories/
 
+Orchestration Files:
+  ✅ Dependency Graph: .agent-orchestration/dependency-graph.json
+  ✅ Implementation Roadmap: .agent-orchestration/roadmap.md
+  ✅ Task State Files: .agent-orchestration/tasks/*.json
+
 AI Configuration:
   Framework: [framework-name]
   Primary Model: [model-name]
   Temperature: [value]
 
+Parallel Execution:
+  Max Parallel Agents: [N]
+  Parallel Waves: [Z]
+  Estimated Time Savings: [P]%
+
 Next Steps:
   1. Review generated documents
-  2. Refine requirements if needed
-  3. Run /implement-stories to begin development
+  2. Review implementation roadmap
+  3. Run /implement-stories to begin parallel development
 ```
 
-### 7.2: Suggest Next Actions
+### 10.2: Suggest Next Actions
 
 **Recommend next steps:**
 - Review all generated documents
+- Review dependency graph and roadmap
 - Make any necessary adjustments
 - Run `/story-status` to see story overview
-- Run `/implement-stories` to begin implementation
-- Run `/next-story` to implement stories one at a time
+- Run `/implement-stories` to begin parallel implementation
+- Run `/next-story` to implement stories one at a time (sequential mode)
 
 ## Error Handling
 
