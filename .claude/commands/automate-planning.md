@@ -752,6 +752,58 @@ For each large document created (PRD, Architecture), if it's over 500 lines:
    }
    ```
 
+7. **Generate Dependency Graph Mermaid Diagram** using `save-file` tool to `docs/dependency-graph.mmd`:
+   ```mermaid
+   flowchart TD
+       %% Story Dependencies and Parallel Execution Waves
+
+       %% Wave 0 - Foundation
+       S0_0["0.0: Project Initialization<br/>👤 nextjs-developer"]
+
+       %% Wave 1 - Design System
+       S0_1["0.1: Design System Foundation<br/>👤 nextjs-developer"]
+
+       %% Wave 2 - Core Features (Parallel)
+       S1_1["1.1: User Authentication<br/>👤 nextjs-developer"]
+       S1_2["1.2: User Profile<br/>👤 nextjs-developer"]
+       S1_3["1.3: Dashboard<br/>👤 nextjs-developer"]
+
+       %% Dependencies
+       S0_0 --> S0_1
+       S0_1 --> S1_1
+       S0_1 --> S1_2
+       S0_1 --> S1_3
+
+       %% Wave styling
+       classDef wave0 fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+       classDef wave1 fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+       classDef wave2 fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
+
+       class S0_0 wave0
+       class S0_1 wave1
+       class S1_1,S1_2,S1_3 wave2
+
+       %% Parallel execution indicators
+       subgraph "Wave 0 (Sequential)"
+           S0_0
+       end
+
+       subgraph "Wave 1 (Sequential)"
+           S0_1
+       end
+
+       subgraph "Wave 2 (Parallel - 3 agents)"
+           S1_1
+           S1_2
+           S1_3
+       end
+   ```
+
+8. **Render Dependency Graph Diagram** using `render-mermaid` tool:
+   - Read the Mermaid content from `docs/dependency-graph.mmd`
+   - Render with title "Project Dependency Graph"
+   - This creates an interactive visualization for immediate viewing
+
 7. **Report dependency analysis**:
    ```
    ✅ Dependency Analysis Complete:
@@ -882,10 +934,46 @@ For each large document created (PRD, Architecture), if it's over 500 lines:
    - Parallel execution uses git worktrees to prevent conflicts
    ```
 
-3. **Report roadmap generation**:
+3. **Generate Roadmap Mermaid Diagram** using `save-file` tool to `docs/roadmap.mmd`:
+   ```mermaid
+   gantt
+       title Project Implementation Roadmap
+       dateFormat  YYYY-MM-DD
+       section Foundation
+       Project Initialization    :milestone, m1, 2024-01-01, 0d
+       Story 0.0 Implementation  :active, s0_0, 2024-01-01, 4h
+       Code Review & Merge       :crit, cr0_0, after s0_0, 1h
+
+       section Design System
+       Design System Foundation  :s0_1, after cr0_0, 4h
+       Code Review & Merge       :crit, cr0_1, after s0_1, 1h
+
+       section Core Features (Parallel)
+       User Authentication       :s1_1, after cr0_1, 4h
+       User Profile             :s1_2, after cr0_1, 4h
+       Dashboard                :s1_3, after cr0_1, 4h
+       Code Review & Merge      :crit, cr1_all, after s1_1 s1_2 s1_3, 2h
+
+       section Advanced Features
+       Feature 2.1              :s2_1, after cr1_all, 4h
+       Feature 2.2              :s2_2, after cr1_all, 4h
+       Final Code Review        :crit, cr2_all, after s2_1 s2_2, 2h
+
+       section Deployment
+       Production Deployment    :milestone, deploy, after cr2_all, 0d
+   ```
+
+4. **Render Roadmap Diagram** using `render-mermaid` tool:
+   - Read the Mermaid content from `docs/roadmap.mmd`
+   - Render with title "Project Implementation Roadmap"
+   - This creates an interactive Gantt chart for immediate viewing
+
+5. **Report roadmap generation**:
    ```
    ✅ Implementation Roadmap Generated:
    - File: .agent-orchestration/roadmap.md
+   - Visual Dependency Graph: docs/dependency-graph.mmd (rendered)
+   - Visual Roadmap: docs/roadmap.mmd (rendered)
    - Parallel waves: [X]
    - Max concurrent agents: [Y]
    - Ready for /implement-stories command
@@ -913,6 +1001,10 @@ Provide a comprehensive summary of all generated documents:
 ✅ Implementation Roadmap: .agent-orchestration/roadmap.md
 ✅ Worktree Registry: .agent-orchestration/worktree-registry.json
 
+🎨 Visual Diagrams:
+✅ Dependency Graph Visualization: docs/dependency-graph.mmd (rendered)
+✅ Roadmap Gantt Chart: docs/roadmap.mmd (rendered)
+
 🚀 Parallel Execution Analysis:
 - Total stories: [X]
 - Parallel waves: [Y]
@@ -921,12 +1013,14 @@ Provide a comprehensive summary of all generated documents:
 
 🚀 Next Steps:
 1. Review generated documents for accuracy
-2. Review implementation roadmap: .agent-orchestration/roadmap.md
-3. Run /implement-stories to begin development (all stories)
-4. Or run /implement-stories [scope] to implement specific stories
-5. Use /story-status to track progress
+2. Review visual diagrams: dependency graph and roadmap (already rendered above)
+3. Review implementation roadmap: .agent-orchestration/roadmap.md
+4. Run /implement-stories to begin development (all stories)
+5. Or run /implement-stories [scope] to implement specific stories
+6. Use /story-status to track progress
 
 📁 All planning documents are organized in the docs/ directory
+🎨 Visual diagrams are saved as .mmd files and can be edited/re-rendered as needed
 📁 All orchestration state is in the .agent-orchestration/ directory
 ```
 
@@ -1066,12 +1160,14 @@ docs/
 │   ├── design-system.md
 │   ├── components.md
 │   └── implementation.md
-└── stories/                        # User Stories
-    ├── README.md
-    ├── 0.0-project-initialization.md
-    ├── 0.1-design-system-foundation.md
-    ├── 1.1-[feature-name].md
-    └── [additional story files]
+├── stories/                        # User Stories
+│   ├── README.md
+│   ├── 0.0-project-initialization.md
+│   ├── 0.1-design-system-foundation.md
+│   ├── 1.1-[feature-name].md
+│   └── [additional story files]
+├── dependency-graph.mmd            # Visual dependency graph (Mermaid)
+└── roadmap.mmd                     # Visual roadmap timeline (Mermaid)
 
 .agent-orchestration/
 ├── README.md                       # Orchestration system documentation
@@ -1111,10 +1207,16 @@ Before completing, verify:
 - [ ] All stories matched to appropriate agents
 - [ ] roadmap.md generated with parallel execution strategy
 
+**Visual Diagrams:**
+- [ ] dependency-graph.mmd created and rendered
+- [ ] roadmap.mmd created and rendered
+- [ ] Both diagrams are viewable and accurate
+
 **Quality Checks:**
 - [ ] Progress updates provided throughout process
 - [ ] Final summary includes all generated documents
 - [ ] Final summary includes orchestration infrastructure
+- [ ] Final summary includes visual diagrams
 - [ ] Ready for /implement-stories command
 
 ## Troubleshooting
