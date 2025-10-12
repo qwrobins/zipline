@@ -239,4 +239,3 @@ Before completing story generation, verify:
 - Agent Definition: `agents/definitions/scrum-master.md`
 - Analysis: `analysis/CRITICAL-FINDINGS.md`
 - Implementation Guide: `analysis/IMPLEMENTATION-GUIDE.md`
-

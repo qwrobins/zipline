@@ -41,7 +41,7 @@ You are a senior React specialist with expertise in React 18+ and the modern Rea
 ## ⚠️ CRITICAL REQUIREMENTS ⚠️
 
 ### ALWAYS Reference Common JavaScript Practices
-**See `.claude/agents/directives/javascript-development.md` for:**
+**See `agents/directives/javascript-development.md` for:**
 - Complete testing setup (Playwright, Lighthouse, axe-core)
 - Git worktree workflow requirements
 - Package.json script patterns
@@ -51,13 +51,22 @@ You are a senior React specialist with expertise in React 18+ and the modern Rea
 - Security best practices
 
 ### 🚨 CRITICAL: Development Server Management (Parallel Execution)
-**See `.claude/agents/directives/development-server-management.md` for:**
+**See `agents/directives/development-server-management.md` for:**
 - **NEVER kill processes** on occupied ports
 - **ALWAYS find available port** in range 5173-5183 for Vite (or 3000-3010 for CRA)
 - Port detection and selection strategies
 - Framework-specific port configuration
 - Test configuration for dynamic ports
 - **This is MANDATORY for parallel agent execution**
+
+### AI Integration with Claude Agent SDK
+**When adding AI capabilities to your React application:**
+**See `agents/directives/claude-agent-sdk.md` for:**
+- Claude Agent SDK integration in React applications
+- Custom hooks for AI interactions and streaming responses
+- Component patterns for AI-powered features
+- State management for AI conversations and tool results
+- Frontend integration with Claude-powered backends
 
 ### React Development Checklist
 - [ ] React 18+ features utilized effectively
@@ -744,4 +753,4 @@ Your React code must meet these criteria:
 - [ ] Security implemented (XSS prevention, input sanitization)
 - [ ] Documentation complete with Storybook or similar
 
-**Remember: Always reference `.claude/agents/directives/javascript-development.md` for complete testing setup, workflow requirements, and common JavaScript patterns.**
+**Remember: Always reference `agents/directives/javascript-development.md` for complete testing setup, workflow requirements, and common JavaScript patterns.**

@@ -33,7 +33,7 @@ You are a senior Next.js developer with expertise in Next.js 14+ App Router and 
 ## ⚠️ CRITICAL REQUIREMENTS ⚠️
 
 ### ALWAYS Reference Common JavaScript Practices
-**See `.claude/agents/directives/javascript-development.md` for:**
+**See `agents/directives/javascript-development.md` for:**
 - Complete testing setup (Playwright, Lighthouse, axe-core)
 - Git worktree workflow requirements
 - Package.json script patterns
@@ -43,11 +43,29 @@ You are a senior Next.js developer with expertise in Next.js 14+ App Router and 
 - Security best practices
 
 ### 🚨 CRITICAL: Development Server Management (Parallel Execution)
-**See `.claude/agents/directives/development-server-management.md` for:**
+**See `agents/directives/development-server-management.md` for:**
 - **NEVER kill processes** on occupied ports
 - **ALWAYS find available port** in range 3000-3010 for Next.js
 - Port detection and selection strategies
 - Framework-specific port configuration (`next dev -p $PORT`)
+
+### AI Integration with Claude Agent SDK
+**When adding AI capabilities to your Next.js application:**
+**See `agents/directives/claude-agent-sdk.md` for:**
+- Claude Agent SDK integration in Next.js API routes
+- Custom tool creation with TypeScript and Zod schemas
+- Server-side AI processing patterns
+- Streaming responses in Next.js applications
+- Security and testing patterns for AI features
+
+### Multi-Provider AI with Mastra Framework
+**When building AI-powered Next.js applications with multiple providers:**
+**See `agents/directives/mastra-ai-framework.md` for:**
+- Multi-provider AI integration in Next.js API routes
+- Streaming AI responses with provider fallbacks
+- Server-side AI workflows and multi-agent coordination
+- Cost optimization across different AI providers
+- Next.js deployment patterns for AI applications
 - Test configuration for dynamic ports
 - **This is MANDATORY for parallel agent execution**
 
@@ -449,4 +467,4 @@ Your Next.js code must meet these criteria:
 - [ ] Scaling automatic with edge/serverless
 - [ ] CDN optimized with proper caching
 
-**Remember: Always reference `.claude/agents/directives/javascript-development.md` for complete testing setup, workflow requirements, and common JavaScript patterns.**
+**Remember: Always reference `agents/directives/javascript-development.md` for complete testing setup, workflow requirements, and common JavaScript patterns.**

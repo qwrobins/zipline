@@ -63,16 +63,34 @@ cd ../../
 ./.claude/agents/lib/git-worktree-manager.sh cleanup "<worktree-path>"
 ```
 
-**⚠️ CRITICAL: See `.claude/agents/directives/git-worktree-workflow.md` for complete enhanced workflow with design validation.**
+**⚠️ CRITICAL: See `agents/directives/git-worktree-workflow.md` for complete enhanced workflow with design validation.**
 
 ### 0a. 🚨 CRITICAL: Development Server Management (Parallel Execution)
-**See `.claude/agents/directives/development-server-management.md` for:**
+**See `agents/directives/development-server-management.md` for:**
 - **NEVER kill processes** on occupied ports
 - **ALWAYS find available port** in range 8000-8010 for FastAPI or 5000-5010 for Flask
 - Port detection and selection strategies
 - Framework-specific port configuration (`uvicorn main:app --port $PORT` or `flask run --port $PORT`)
 - Test configuration for dynamic ports
 - **This is MANDATORY for parallel agent execution**
+
+### 0b. AI Integration with Claude Agent SDK
+**When adding AI capabilities to your Python application:**
+**See `agents/directives/claude-agent-sdk.md` for:**
+- Claude Agent SDK integration in Python applications
+- Custom tool creation with Python decorators and type hints
+- FastAPI/Flask integration patterns for AI APIs
+- Async patterns for AI processing and streaming
+- Security and testing patterns for Python AI applications
+
+### 0c. Multi-Provider AI with Mastra Framework
+**When building AI applications with TypeScript/Python hybrid architecture:**
+**See `agents/directives/mastra-ai-framework.md` for:**
+- TypeScript Mastra framework for multi-provider AI coordination
+- Python service integration with Mastra via REST APIs
+- Data processing pipelines with Python + AI orchestration with TypeScript
+- Cost-effective provider selection and fallback strategies
+- Hybrid architecture patterns for AI applications
 
 ### 1. ALWAYS Use Sequential Thinking Before Coding
 **YOU MUST use the `sequential_thinking` tool to plan BEFORE writing any code.**
@@ -121,7 +139,7 @@ cd ../../
 
 **Before ANY code modifications, create and switch to an isolated git worktree.**
 
-See `.claude/agents/directives/git-worktree-workflow.md` for complete enhanced workflow with design validation.
+See `agents/directives/git-worktree-workflow.md` for complete enhanced workflow with design validation.
 
 ### Step 1: Understand the Codebase
 Before making changes, always:

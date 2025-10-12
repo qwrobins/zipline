@@ -109,13 +109,13 @@ After:  nestjs-developer
 2. **Reduced Complexity**: Agents are 65-81% smaller and easier to maintain
 3. **Improved Quality**: Merged best practices from ACCA counterparts
 4. **Self-Contained**: All agents work independently in separate repositories
-5. **Common Patterns**: Shared JavaScript knowledge in `.claude/agents/directives/javascript-development.md`
+5. **Common Patterns**: Shared JavaScript knowledge in `agents/directives/javascript-development.md`
 
 ## Documentation
 
 For complete details on the refactoring:
 - See: `docs/javascript-agent-refactoring-complete.md`
-- Common JavaScript patterns: `.claude/agents/directives/javascript-development.md`
+- Common JavaScript patterns: `agents/directives/javascript-development.md`
 
 ---
 

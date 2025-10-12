@@ -336,4 +336,3 @@ A well-phased PRD achieves:
 - Command: `.claude/commands/create-prd.md`
 - Analysis: `analysis/CRITICAL-FINDINGS.md`
 - Scrum Master: `agents/definitions/scrum-master.md`
-

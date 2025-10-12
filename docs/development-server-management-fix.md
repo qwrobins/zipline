@@ -31,7 +31,7 @@ Created a comprehensive development server management directive that:
 
 ## Files Created
 
-### 1. `.claude/agents/directives/development-server-management.md`
+### 1. `agents/directives/development-server-management.md`
 
 **Comprehensive directive covering:**
 
@@ -219,7 +219,7 @@ All developer agent definitions now reference the new directive:
 
 ```markdown
 ### 🚨 CRITICAL: Development Server Management (Parallel Execution)
-**See `.claude/agents/directives/development-server-management.md` for:**
+**See `agents/directives/development-server-management.md` for:**
 - **NEVER kill processes** on occupied ports
 - **ALWAYS find available port** in range [framework-specific]
 - Port detection and selection strategies

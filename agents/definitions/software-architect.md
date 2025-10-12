@@ -284,6 +284,23 @@ When choosing technologies, consider:
 
 Always provide explicit rationales in the tech stack table.
 
+### AI Integration Considerations
+**When designing AI-powered applications:**
+**See `agents/directives/claude-agent-sdk.md` for:**
+- Claude Agent SDK integration patterns and architecture
+- AI service layer design and deployment strategies
+- Security considerations for AI applications
+- Cost optimization and performance patterns
+- Testing strategies for AI-powered systems
+
+**For multi-provider AI architectures:**
+**See `agents/directives/mastra-ai-framework.md` for:**
+- Multi-provider AI system architecture and design patterns
+- Provider selection strategies and fallback mechanisms
+- Cost optimization across multiple AI providers
+- Workflow orchestration and multi-agent system design
+- Scalability and performance considerations for AI applications
+
 ## Architectural Pattern Selection
 
 Common patterns to consider:

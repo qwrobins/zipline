@@ -159,9 +159,9 @@ The orchestrator and agent definitions were referencing agent resources as `agen
 - `agents/lib/` → Utility scripts
 
 **Changed To:**
-- `.claude/agents/*.md` → Agent definition files
-- `.claude/agents/directives/` → Shared directive files
-- `.claude/agents/lib/` → Utility scripts
+- `agents/definitions/*.md` → Agent definition files
+- `agents/directives/` → Shared directive files
+- `agents/lib/` → Utility scripts
 
 #### Files Updated
 
@@ -217,9 +217,9 @@ user-project/
 
 ### Path References
 - [ ] All script paths use `./.claude/agents/lib/` prefix
-- [ ] All directive paths use `.claude/agents/directives/` prefix
-- [ ] Agent definitions reference `.claude/agents/directives/javascript-development.md`
-- [ ] Orchestrator references `.claude/agents/directives/git-worktree-workflow.md`
+- [ ] All directive paths use `agents/directives/` prefix
+- [ ] Agent definitions reference `agents/directives/javascript-development.md`
+- [ ] Orchestrator references `agents/directives/git-worktree-workflow.md`
 - [ ] No references to `agents/` at repository root remain
 
 ## Benefits

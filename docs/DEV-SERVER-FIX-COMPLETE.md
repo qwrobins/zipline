@@ -42,7 +42,7 @@ When multiple developer agents ran in parallel (e.g., in separate git worktrees)
 
 #### 1. Comprehensive Directive
 
-**File:** `.claude/agents/directives/development-server-management.md`
+**File:** `agents/directives/development-server-management.md`
 
 **Contents:**
 - Absolute prohibitions (NEVER kill processes)
@@ -217,7 +217,7 @@ Result: Clear error, no silent failure
 
 ## Verification Checklist
 
-- [x] Directive created (`.claude/agents/directives/development-server-management.md`)
+- [x] Directive created (`agents/directives/development-server-management.md`)
 - [x] All 7 developer agents updated with directive reference
 - [x] Port ranges defined for all frameworks
 - [x] Code examples provided (Node.js, Python, Rust)
@@ -245,7 +245,7 @@ Result: Clear error, no silent failure
 
 ### Created
 
-1. `.claude/agents/directives/development-server-management.md` - Main directive
+1. `agents/directives/development-server-management.md` - Main directive
 2. `docs/development-server-management-fix.md` - Detailed documentation
 3. `docs/dev-server-quick-reference.md` - Quick reference
 4. `docs/DEV-SERVER-FIX-COMPLETE.md` - This summary

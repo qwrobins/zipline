@@ -243,7 +243,7 @@ To verify the fix is working:
 
 **Corrected Paths:**
 - ❌ OLD: `agents/definitions/` → ✅ NEW: `.claude/agents/*.md`
-- ❌ OLD: `agents/directives/` → ✅ NEW: `.claude/agents/directives/`
+- ❌ OLD: `.claude/agents/directives/` → ✅ NEW: `agents/directives/`
 - ❌ OLD: `agents/lib/` → ✅ NEW: `.claude/agents/lib/`
 
 **Correct Directory Structure (User Project):**
@@ -293,47 +293,47 @@ user-project/
 - `.claude/commands/implement-stories.md`
   - Line 149: `./.claude/agents/lib/git-worktree-manager.sh create`
   - Line 161: `./.claude/agents/lib/git-worktree-manager.sh cleanup`
-  - Line 168: `.claude/agents/directives/git-worktree-workflow.md`
+  - Line 168: `agents/directives/git-worktree-workflow.md`
   - Line 535: `./.claude/agents/lib/git-worktree-manager.sh create`
   - Line 541: `./.claude/agents/lib/file-tracker.sh auto-register`
   - Line 564: `./.claude/agents/lib/git-worktree-manager.sh merge`
   - Line 565: `./.claude/agents/lib/git-worktree-manager.sh cleanup`
-  - Line 567: `.claude/agents/directives/git-worktree-workflow.md`
+  - Line 567: `agents/directives/git-worktree-workflow.md`
   - Line 594: `./.claude/agents/lib/conflict-detector.sh detect`
   - Line 659: `./.claude/agents/lib/file-tracker.sh unregister`
   - Line 663: `./.claude/agents/lib/git-worktree-manager.sh cleanup`
 
 #### JavaScript/TypeScript Agent Definitions
 - `agents/definitions/react-developer.md`
-  - Line 44: `.claude/agents/directives/javascript-development.md`
-  - Line 738: `.claude/agents/directives/javascript-development.md`
+  - Line 44: `agents/directives/javascript-development.md`
+  - Line 738: `agents/directives/javascript-development.md`
 
 - `agents/definitions/nextjs-developer.md`
-  - Line 36: `.claude/agents/directives/javascript-development.md`
-  - Line 443: `.claude/agents/directives/javascript-development.md`
+  - Line 36: `agents/directives/javascript-development.md`
+  - Line 443: `agents/directives/javascript-development.md`
 
 - `agents/definitions/nestjs-developer.md`
-  - Line 58: `.claude/agents/directives/javascript-development.md`
-  - Line 705: `.claude/agents/directives/javascript-development.md`
+  - Line 58: `agents/directives/javascript-development.md`
+  - Line 705: `agents/directives/javascript-development.md`
 
 - `agents/definitions/vanilla-javascript-developer.md`
-  - Line 42: `.claude/agents/directives/javascript-development.md`
-  - Line 528: `.claude/agents/directives/javascript-development.md`
+  - Line 42: `agents/directives/javascript-development.md`
+  - Line 528: `agents/directives/javascript-development.md`
 
 - `agents/definitions/typescript-developer.md`
-  - Line 46: `.claude/agents/directives/javascript-development.md`
+  - Line 46: `agents/directives/javascript-development.md`
 
 #### Other Language Agent Definitions
 - `agents/definitions/rust-developer.md`
   - Lines 49-54: `./.claude/agents/lib/git-worktree-manager.sh`
-  - Line 57: `.claude/agents/directives/git-worktree-workflow.md`
-  - Line 106: `.claude/agents/directives/git-worktree-workflow.md`
+  - Line 57: `agents/directives/git-worktree-workflow.md`
+  - Line 106: `agents/directives/git-worktree-workflow.md`
 
 - `agents/definitions/python-developer.md`
   - Lines 49-63: `./.claude/agents/lib/git-worktree-manager.sh`
-  - Line 66: `.claude/agents/directives/git-worktree-workflow.md`
-  - Line 115: `.claude/agents/directives/git-worktree-workflow.md`
+  - Line 66: `agents/directives/git-worktree-workflow.md`
+  - Line 115: `agents/directives/git-worktree-workflow.md`
 
 - `agents/definitions/javascript-developer.md` (deprecated)
-  - Line 112: `.claude/agents/directives/javascript-development.md`
-  - Line 118: `.claude/agents/directives/javascript-development.md`
+  - Line 112: `agents/directives/javascript-development.md`
+  - Line 118: `agents/directives/javascript-development.md`

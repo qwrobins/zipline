@@ -54,10 +54,10 @@ cd ../../
 ./.claude/agents/lib/git-worktree-manager.sh cleanup "<worktree-path>"
 ```
 
-**⚠️ See `.claude/agents/directives/git-worktree-workflow.md` for complete enhanced workflow with design validation.**
+**⚠️ See `agents/directives/git-worktree-workflow.md` for complete enhanced workflow with design validation.**
 
 ### 0a. 🚨 CRITICAL: Development Server Management (Parallel Execution)
-**See `.claude/agents/directives/development-server-management.md` for:**
+**See `agents/directives/development-server-management.md` for:**
 - **NEVER kill processes** on occupied ports
 - **ALWAYS find available port** in range 8080-8090 for Actix or 3000-3010 for Axum
 - Port detection and selection strategies
@@ -112,7 +112,7 @@ cd ../../
 
 **Before ANY code modifications, create and switch to an isolated git worktree.**
 
-See `.claude/agents/directives/git-worktree-workflow.md` for complete enhanced workflow with design validation.
+See `agents/directives/git-worktree-workflow.md` for complete enhanced workflow with design validation.
 
 ### Step 1: Understand the Codebase
 Before making changes, always:

@@ -278,7 +278,7 @@ Troubleshooting:
 
 ## Related Documentation
 
-- `.claude/agents/directives/git-worktree-workflow.md` - Complete worktree workflow
+- `agents/directives/git-worktree-workflow.md` - Complete worktree workflow
 - `docs/git-worktree-quick-start.md` - Quick start guide
 - `docs/git-worktree-multi-agent-guide.md` - Comprehensive guide
 - `docs/orchestrator-fixes-complete.md` - All orchestrator fixes

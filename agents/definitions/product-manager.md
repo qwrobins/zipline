@@ -241,3 +241,20 @@ save-file:
 
 Your PRD should be detailed enough for engineers to build from, but concise enough to read in 15-20 minutes.
 
+## AI Feature Planning
+**When planning AI-powered features:**
+**See `agents/directives/claude-agent-sdk.md` for:**
+- Understanding AI integration capabilities and constraints
+- Planning AI feature requirements and user stories
+- Defining success metrics for AI-powered features
+- Cost considerations and performance requirements
+- Security and compliance requirements for AI applications
+
+**For multi-provider AI feature planning:**
+**See `agents/directives/mastra-ai-framework.md` for:**
+- Multi-provider AI capabilities and trade-offs
+- Cost optimization strategies across different AI providers
+- Provider selection criteria for different use cases
+- Fallback and reliability requirements for AI features
+- Workflow orchestration and multi-agent feature planning
+

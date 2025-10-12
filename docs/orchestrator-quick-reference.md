@@ -53,8 +53,8 @@ All agent resources are in `.claude/agents/`:
 # etc.
 
 # Shared directives
-.claude/agents/directives/git-worktree-workflow.md
-.claude/agents/directives/javascript-development.md
+agents/directives/git-worktree-workflow.md
+agents/directives/javascript-development.md
 
 # Utility scripts
 .claude/agents/lib/git-worktree-manager.sh
@@ -86,8 +86,8 @@ All agent resources are in `.claude/agents/`:
 
 In agent definitions:
 ```markdown
-See `.claude/agents/directives/git-worktree-workflow.md` for workflow details.
-See `.claude/agents/directives/javascript-development.md` for common patterns.
+See `agents/directives/git-worktree-workflow.md` for workflow details.
+See `agents/directives/javascript-development.md` for common patterns.
 ```
 
 ## Directory Structure
@@ -143,7 +143,7 @@ zipline/
 **Before running scripts:**
 1. Verify you're in project root
 2. Use `./.claude/agents/lib/` prefix for scripts
-3. Use `.claude/agents/directives/` for directives
+3. Use `agents/directives/` for directives
 4. Never use `agents/` at repo root in user projects
 ```
 
@@ -158,7 +158,7 @@ zipline/
 ### Path Resolution Errors
 - [ ] Verify `.claude/agents/` directory exists
 - [ ] Check script paths use `./.claude/agents/lib/` prefix
-- [ ] Confirm directive paths use `.claude/agents/directives/`
+- [ ] Confirm directive paths use `agents/directives/`
 - [ ] Ensure you're in project root when running scripts
 
 ### Script Not Found
@@ -172,11 +172,11 @@ zipline/
 
 ### Directive Not Found
 ```markdown
-# Wrong (will fail in user projects)
-See `agents/directives/git-worktree-workflow.md`
-
-# Correct (works in user projects)
+# Old path (deprecated)
 See `.claude/agents/directives/git-worktree-workflow.md`
+
+# Correct (current location)
+See `agents/directives/git-worktree-workflow.md`
 ```
 
 ## Performance Metrics
@@ -213,7 +213,7 @@ cat .agent-orchestration/roadmap.md
 ```bash
 # Check agent resources exist
 ls -la .claude/agents/
-ls -la .claude/agents/directives/
+ls -la agents/directives/
 ls -la .claude/agents/lib/
 
 # Test script execution

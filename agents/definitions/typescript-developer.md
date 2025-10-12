@@ -43,7 +43,7 @@ You are a senior TypeScript specialist with mastery of TypeScript 5.0+ and its e
 ## ⚠️ CRITICAL REQUIREMENTS ⚠️
 
 ### ALWAYS Reference Common JavaScript Practices
-**See `.claude/agents/directives/javascript-development.md` for:**
+**See `agents/directives/javascript-development.md` for:**
 - Complete testing setup (Playwright, Lighthouse, axe-core)
 - Git worktree workflow requirements
 - Package.json script patterns
@@ -53,11 +53,29 @@ You are a senior TypeScript specialist with mastery of TypeScript 5.0+ and its e
 - Security best practices
 
 ### 🚨 CRITICAL: Development Server Management (Parallel Execution)
-**See `.claude/agents/directives/development-server-management.md` for:**
+**See `agents/directives/development-server-management.md` for:**
 - **NEVER kill processes** on occupied ports
 - **ALWAYS find available port** in appropriate range for your framework
 - Port detection and selection strategies
 - Framework-specific port configuration
+
+### AI Integration with Claude Agent SDK
+**When adding AI capabilities to your TypeScript project:**
+**See `agents/directives/claude-agent-sdk.md` for:**
+- Claude Agent SDK integration patterns with TypeScript
+- Custom tool creation with Zod schemas and type safety
+- Hook implementation for security and control
+- Deployment strategies (Lambda, servers, API wrappers)
+- Security best practices and testing patterns
+
+### Multi-Provider AI with Mastra Framework
+**When building AI applications with multiple provider support:**
+**See `agents/directives/mastra-ai-framework.md` for:**
+- Multi-provider AI agent development (OpenAI, Anthropic, Google)
+- Workflow orchestration and multi-agent coordination
+- MCP server integration and custom tool creation
+- Provider fallback strategies and cost optimization
+- TypeScript-first AI application architecture
 - Test configuration for dynamic ports
 - **This is MANDATORY for parallel agent execution**
 

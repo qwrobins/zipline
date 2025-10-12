@@ -335,4 +335,4 @@ kill <PID>
 
 ---
 
-**Full Documentation:** `.claude/agents/directives/development-server-management.md`
+**Full Documentation:** `agents/directives/development-server-management.md`
