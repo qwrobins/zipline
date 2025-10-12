@@ -54,7 +54,7 @@ Implements all stories tagged with epic "auth"
 ### **Pattern Matching** (1.*)
 Implements all stories matching the pattern
 
-**See `agents/agent-guides/orchestration-patterns.md` for detailed argument parsing logic.**
+**See `.claude/agents/agent-guides/orchestration-patterns.md` for detailed argument parsing logic.**
 
 ## CRITICAL REQUIREMENTS
 
@@ -68,8 +68,8 @@ Implements all stories matching the pattern
 8. **ALWAYS cleanup worktrees** after story completion or failure
 9. **PRIORITIZE PARALLEL EXECUTION** - maximize parallelism by running independent stories simultaneously
 
-**See `agents/agent-guides/git-workflow.md` for git worktree details.**
-**See `agents/agent-guides/orchestration-patterns.md` for complete orchestration patterns.**
+**See `.claude/agents/agent-guides/git-workflow.md` for git worktree details.**
+**See `.claude/agents/agent-guides/orchestration-patterns.md` for complete orchestration patterns.**
 
 ## Workflow
 
@@ -82,7 +82,7 @@ Implements all stories matching the pattern
 - Epic scope → Find stories in epic
 - Pattern matching → Match pattern
 
-**See `agents/agent-guides/orchestration-patterns.md` for argument parsing details.**
+**See `.claude/agents/agent-guides/orchestration-patterns.md` for argument parsing details.**
 
 ### Step 2: Discover and Analyze Stories
 
@@ -98,7 +98,7 @@ Implements all stories matching the pattern
 - Identify technology stack
 - Determine appropriate agent
 
-**See `agents/agent-guides/orchestration-patterns.md` for story discovery patterns.**
+**See `.claude/agents/agent-guides/orchestration-patterns.md` for story discovery patterns.**
 
 ### Step 3: Build Dependency Graph
 
@@ -113,7 +113,7 @@ Implements all stories matching the pattern
 - Offer to expand scope or skip story
 - Wait for user decision
 
-**See `agents/agent-guides/orchestration-patterns.md` for dependency resolution details.**
+**See `.claude/agents/agent-guides/orchestration-patterns.md` for dependency resolution details.**
 
 ### Step 4: Execute Stories in Waves (Parallel Execution)
 
@@ -125,7 +125,7 @@ Implements all stories matching the pattern
 
 1. **Create git worktree:**
    ```bash
-   ./agents/lib/git-worktree-manager.sh create "<story-id>" "<agent-name>"
+   ./.claude/agents/lib/git-worktree-manager.sh create "<story-id>" "<agent-name>"
    ```
 
 2. **Invoke agent in worktree:**
@@ -183,12 +183,12 @@ Implements all stories matching the pattern
 
 1. **Merge changes:**
    ```bash
-   ./agents/lib/git-worktree-manager.sh merge "<worktree-path>"
+   ./.claude/agents/lib/git-worktree-manager.sh merge "<worktree-path>"
    ```
 
 2. **Cleanup worktree:**
    ```bash
-   ./agents/lib/git-worktree-manager.sh cleanup "<worktree-path>"
+   ./.claude/agents/lib/git-worktree-manager.sh cleanup "<worktree-path>"
    ```
 
 3. **Update state:**
@@ -253,7 +253,7 @@ Next Steps:
 }
 ```
 
-**See `agents/agent-guides/orchestration-patterns.md` for complete state management patterns.**
+**See `.claude/agents/agent-guides/orchestration-patterns.md` for complete state management patterns.**
 
 ## Error Handling
 
@@ -274,7 +274,7 @@ Next Steps:
 - Mark story as "Failed"
 - Continue with other stories
 
-**See `agents/agent-guides/orchestration-patterns.md` for error handling patterns.**
+**See `.claude/agents/agent-guides/orchestration-patterns.md` for error handling patterns.**
 
 ## Best Practices
 
@@ -286,5 +286,5 @@ Next Steps:
 6. **Mandatory code review** - Review EVERY story before proceeding
 7. **Cleanup resources** - Always cleanup worktrees after completion
 
-**See `agents/agent-guides/orchestration-patterns.md` for complete best practices and patterns.**
+**See `.claude/agents/agent-guides/orchestration-patterns.md` for complete best practices and patterns.**
 

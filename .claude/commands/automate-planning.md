@@ -44,7 +44,7 @@ Wait for user response before proceeding to Step 2.
 ### 2.1: Detect AI Requirements
 
 **Scan for AI-related keywords:**
-- See `agents/agent-guides/ai-framework-selection.md` for complete detection patterns
+- See `.claude/agents/agent-guides/ai-framework-selection.md` for complete detection patterns
 - Conversational AI, Content Generation, Code Analysis, NLP, AI-Powered Features, Model Integration
 
 **Extract existing configuration from product brief:**
@@ -87,7 +87,7 @@ Enter your choice (1-2, or 'help' for recommendations):
 ```
 
 **If user requests help:**
-- See `agents/agent-guides/ai-framework-selection.md` for recommendation criteria
+- See `.claude/agents/agent-guides/ai-framework-selection.md` for recommendation criteria
 - Provide tailored recommendation based on project needs
 
 #### Provider and Model Selection
@@ -104,7 +104,7 @@ Enter your choice (1-2, or 'help' for recommendations):
 - Ask about multi-agent workflows (optional)
 - Ask about priority (cost, performance, reliability)
 
-**All provider/model details:** See `agents/agent-guides/ai-framework-selection.md`
+**All provider/model details:** See `.claude/agents/agent-guides/ai-framework-selection.md`
 
 ### 2.4: Validate and Store AI Configuration
 

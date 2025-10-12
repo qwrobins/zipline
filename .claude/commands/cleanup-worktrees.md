@@ -125,19 +125,19 @@ When invoked, execute the following steps:
 ### For `list` command:
 
 ```bash
-./agents/lib/git-worktree-manager.sh list
+./.claude/agents/lib/git-worktree-manager.sh list
 ```
 
 ### For `auto` command:
 
 ```bash
-./agents/lib/git-worktree-manager.sh cleanup-abandoned
+./.claude/agents/lib/git-worktree-manager.sh cleanup-abandoned
 ```
 
 ### For specific worktree cleanup:
 
 ```bash
-./agents/lib/git-worktree-manager.sh cleanup "<worktree-path>"
+./.claude/agents/lib/git-worktree-manager.sh cleanup "<worktree-path>"
 ```
 
 ### For `force` command:
@@ -157,7 +157,7 @@ When invoked, execute the following steps:
    ```bash
    # Get list of all worktrees (excluding main)
    git worktree list --porcelain | grep "worktree" | grep ".worktrees" | cut -d' ' -f2 | while read worktree_path; do
-       ./agents/lib/git-worktree-manager.sh cleanup "$worktree_path"
+       ./.claude/agents/lib/git-worktree-manager.sh cleanup "$worktree_path"
    done
    ```
 
@@ -188,7 +188,7 @@ When invoked, execute the following steps:
 
 Options:
 1. Commit the changes in the worktree
-2. Force cleanup (changes will be lost): ./agents/lib/git-worktree-manager.sh cleanup "<path>" --force
+2. Force cleanup (changes will be lost): ./.claude/agents/lib/git-worktree-manager.sh cleanup "<path>" --force
 3. Cancel cleanup
 ```
 
@@ -210,8 +210,8 @@ You must resolve conflicts before cleanup:
 3. git add <resolved-files>
 4. git commit
 5. cd ../../
-6. ./agents/lib/git-worktree-manager.sh merge "<worktree-path>"
-7. ./agents/lib/git-worktree-manager.sh cleanup "<worktree-path>"
+6. ./.claude/agents/lib/git-worktree-manager.sh merge "<worktree-path>"
+7. ./.claude/agents/lib/git-worktree-manager.sh cleanup "<worktree-path>"
 ```
 
 ## BEST PRACTICES
@@ -309,7 +309,7 @@ git worktree prune
 
 ## SEE ALSO
 
-- `agents/directives/git-worktree-workflow.md` - Complete worktree workflow guide
-- `agents/lib/git-worktree-manager.sh` - Core worktree management script
+- `.claude/agents/directives/git-worktree-workflow.md` - Complete worktree workflow guide
+- `.claude/agents/lib/git-worktree-manager.sh` - Core worktree management script
 - `.agent-orchestration/worktree-registry.json` - Worktree tracking registry
 
