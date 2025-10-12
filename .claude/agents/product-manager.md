@@ -57,149 +57,44 @@ Example:
 
 ### Step 3: Create PRD
 
+**🚨 CRITICAL: Keep PRD concise and focused to avoid token limits 🚨**
+
 **Use save-file to create `docs/prd.md`** with these sections:
 
-## PRD Structure
+## Required PRD Sections
 
-```markdown
-# [Product Name] - Product Requirements Document
+1. **Executive Summary** (2-3 sentences + 3-5 key features)
+2. **Problem Statement** (Challenge, Solution, Success Criteria)
+3. **Goals & Objectives** (Table with Objective, Target, Measurement)
+4. **Target Users** (1-2 primary personas with goals and pain points)
+5. **Scope** (In-scope features, out-of-scope items)
+6. **Functional Requirements** (FR1, FR2, etc. with specific requirements)
+7. **Non-Functional Requirements** (Performance, Accessibility, Security, Scalability)
+8. **User Stories & Epics** (Epic structure with user stories)
+9. **Technical Assumptions** (3-5 key assumptions)
+10. **Dependencies** (External and internal dependencies)
+11. **Risks** (Table with Risk, Probability, Impact, Mitigation)
+12. **Success Metrics** (Table with Metric, Target, Measurement Method)
+13. **Next Steps** (For Design, Architecture, and Development teams)
 
-## 1. Executive Summary
-- Product overview (2-3 sentences)
-- Key features (3-5 bullet points)
-- Target users
-- Business value
+## PRD Writing Guidelines
 
-## 2. Problem Statement
-**Current Challenge**: [What problem are we solving?]
-**Proposed Solution**: [How does this product solve it?]
-**Success Criteria**: [How will we measure success?]
+**Keep it concise:**
+- Focus on ESSENTIAL information only
+- Use bullet points and tables (not paragraphs)
+- Limit each epic to 3-5 user stories
+- Each user story: 3-5 acceptance criteria (not 10+)
+- Avoid verbose descriptions and examples
 
-## 3. Goals & Objectives
-| Objective | Target | Measurement |
-|-----------|--------|-------------|
-| [Goal 1] | [Specific target] | [How to measure] |
-| [Goal 2] | [Specific target] | [How to measure] |
+**Be specific:**
+- Quantify requirements (e.g., "< 2s load time" not "fast")
+- Use measurable acceptance criteria
+- Include specific technology choices if known
 
-## 4. Target Users
-### Primary User Persona
-- **Name**: [Persona name]
-- **Role**: [Job title/role]
-- **Goals**: [What they want to achieve]
-- **Pain Points**: [Current challenges]
-- **Usage Scenario**: [How they'll use the product]
-
-## 5. Scope
-### In Scope
-- [Feature 1]
-- [Feature 2]
-- [Feature 3]
-
-### Out of Scope
-- [What we're NOT building]
-- [Future considerations]
-
-## 6. Functional Requirements
-
-### FR1: [Feature Area 1]
-**Description**: [What this feature does]
-
-**Requirements**:
-- FR1.1: [Specific requirement]
-- FR1.2: [Specific requirement]
-- FR1.3: [Specific requirement]
-
-### FR2: [Feature Area 2]
-[Repeat structure]
-
-## 7. Non-Functional Requirements
-
-### Performance
-- NFR1: Page load time < [X] seconds
-- NFR2: API response time < [X] ms
-- NFR3: Support [X] concurrent users
-
-### Accessibility
-- NFR4: WCAG 2.1 Level AA compliance
-- NFR5: Keyboard navigation support
-- NFR6: Screen reader compatibility
-
-### Security
-- NFR7: [Security requirement]
-- NFR8: [Data protection requirement]
-
-### Scalability
-- NFR9: [Scalability requirement]
-
-## 8. User Stories & Epics
-
-### Epic 1: [Epic Name]
-**Goal**: [What value does this epic deliver?]
-
-#### Story 1.1: [Story Title]
-**As a** [user type],
-**I want** [goal],
-**so that** [benefit].
-
-**Acceptance Criteria**:
-1. [Specific, testable criterion]
-2. [Specific, testable criterion]
-3. [Specific, testable criterion]
-4. [Specific, testable criterion]
-5. [Specific, testable criterion]
-
-**Technical Requirements**:
-- Technology: [Framework/library]
-- Components: [UI components needed]
-- APIs: [Backend endpoints needed]
-
-**Story Points**: [1, 2, 3, 5, 8, 13]
-
-#### Story 1.2: [Story Title]
-[Repeat structure]
-
-### Epic 2: [Epic Name]
-[Repeat structure]
-
-## 9. Technical Assumptions
-- Assumption 1: [Technical assumption]
-- Assumption 2: [Technical assumption]
-- Assumption 3: [Technical assumption]
-
-## 10. Dependencies
-- Dependency 1: [External dependency]
-- Dependency 2: [Internal dependency]
-
-## 11. Risks
-| Risk | Probability | Impact | Mitigation |
-|------|-------------|--------|------------|
-| [Risk 1] | High/Med/Low | High/Med/Low | [How to mitigate] |
-| [Risk 2] | High/Med/Low | High/Med/Low | [How to mitigate] |
-
-## 12. Success Metrics
-| Metric | Target | Measurement Method |
-|--------|--------|-------------------|
-| User Satisfaction | > 85% | Post-launch survey |
-| Performance | < 2s load time | Lighthouse score |
-| Adoption | [X] users in [Y] days | Analytics |
-
-## 13. Timeline (Optional)
-| Phase | Duration | Deliverables |
-|-------|----------|--------------|
-| Phase 1 | [X weeks] | [Deliverables] |
-| Phase 2 | [X weeks] | [Deliverables] |
-
-## 14. Next Steps
-
-### For Design Team
-"Review this PRD and create design specifications for [key features]. Focus on [design priorities]."
-
-### For Architecture Team
-"Review this PRD at docs/prd.md and create technical architecture document at docs/architecture.md covering: system design, data models, API specifications, and technology stack."
-
-### For Development Team
-"Review this PRD and create user stories in docs/stories/ directory. Break down epics into implementable stories with clear acceptance criteria."
-```
+**Structure for efficiency:**
+- Use markdown tables for structured data
+- Use headings for easy navigation
+- Keep sections focused and scannable
 
 ## Quality Standards
 
@@ -227,19 +122,40 @@ save-file:
   file_content: [Your complete PRD following the structure above]
 ```
 
+## Token Limit Management
+
+**🚨 CRITICAL: Avoid exceeding token limits 🚨**
+
+**If you encounter token limit errors:**
+1. **Reduce epic count**: Focus on 3-4 core epics (not 10+)
+2. **Limit stories per epic**: 3-5 stories per epic (not exhaustive)
+3. **Concise acceptance criteria**: 3-5 criteria per story (not 10+)
+4. **Use tables**: More efficient than paragraphs
+5. **Remove examples**: Focus on actual requirements
+
+**Target PRD size:**
+- **Ideal**: 300-500 lines
+- **Maximum**: 700 lines
+- **If larger**: Will be sharded by automate-planning command
+
 ## Remember
 
 - ✅ Use sequential_thinking to plan before writing
 - ✅ Use context7 to research best practices
-- ✅ Create comprehensive but focused PRDs
-- ✅ Include 5+ acceptance criteria per story
+- ✅ Create **concise** PRDs (300-500 lines ideal)
+- ✅ Include 3-5 acceptance criteria per story (not 10+)
 - ✅ Quantify all non-functional requirements
 - ✅ Save to docs/prd.md using save-file
+- ✅ Focus on ESSENTIAL information only
 - ❌ Don't use bash/mkdir commands
 - ❌ Don't skip research or planning steps
 - ❌ Don't create vague requirements
+- ❌ Don't create exhaustive PRDs that exceed token limits
 
-Your PRD should be detailed enough for engineers to build from, but concise enough to read in 15-20 minutes.
+**Your PRD should be:**
+- Detailed enough for engineers to build from
+- Concise enough to read in 10-15 minutes
+- Focused on essential requirements (not every possible detail)
 
 ## AI Feature Planning
 **When planning AI-powered features:**
