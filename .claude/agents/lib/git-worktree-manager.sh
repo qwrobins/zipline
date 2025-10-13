@@ -166,16 +166,19 @@ create_worktree() {
     # Create worktree base directory if it doesn't exist
     mkdir -p "$WORKTREE_BASE_DIR"
     
+    # Get repository root for absolute path
+    local repo_root=$(git rev-parse --show-toplevel)
+
     # Create the worktree
     log_info "Creating worktree at: $worktree_path"
     if git worktree add "$worktree_path" -b "$branch_name" "$base_branch" 2>&1; then
         log_success "Worktree created successfully"
-        
+
         # Register in registry
         register_worktree "$branch_name" "$story_id" "$agent_name" "$worktree_path"
-        
-        # Output the worktree path for the caller
-        echo "$worktree_path"
+
+        # Output the ABSOLUTE worktree path for the caller
+        echo "$repo_root/$worktree_path"
         return 0
     else
         log_error "Failed to create worktree"
@@ -215,6 +218,16 @@ merge_worktree() {
     # Check if there are uncommitted changes in the worktree
     if ! git -C "$worktree_path" diff-index --quiet HEAD --; then
         log_error "Worktree has uncommitted changes. Please commit all changes before merging."
+        log_error ""
+        log_error "Uncommitted files:"
+        git -C "$worktree_path" status --short
+        log_error ""
+        log_error "To fix:"
+        log_error "  cd $worktree_path"
+        log_error "  git add -A"
+        log_error "  git commit -m 'chore: commit pending changes'"
+        log_error "  cd -"
+        log_error "  $0 merge $worktree_path"
         cd "$original_dir"
         return 1
     fi

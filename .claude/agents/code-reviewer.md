@@ -564,7 +564,50 @@ Review code systematically across these dimensions:
 [Final thoughts and recommendations]
 ```
 
-### Step 7: Save Review Report
+### Step 6.5: Verify Worktree Context (MANDATORY)
+
+**🚨 CRITICAL: Ensure you are operating in the correct worktree 🚨**
+
+**Before saving review report or updating story files:**
+
+1. **Verify current git branch:**
+   ```bash
+   git branch --show-current
+   ```
+   - **MUST NOT be "main"**
+   - **MUST be agent worktree branch** (e.g., `agent-nextjs-developer-1-1-20251012-225658`)
+
+2. **If on main branch, STOP immediately:**
+   - **DO NOT modify any files**
+   - **DO NOT save review report**
+   - **DO NOT update story status**
+   - **ERROR**: Code-reviewer must be invoked from within the worktree directory
+
+3. **Verify worktree path:**
+   ```bash
+   pwd
+   ```
+   - **MUST be in `.worktrees/agent-*` directory**
+   - **MUST NOT be in main repo root**
+
+**⚠️ CRITICAL: If not in worktree, ABORT review and report error**
+
+**Error Message:**
+```
+ERROR: Code-reviewer is not operating in worktree context.
+Current branch: [actual branch]
+Expected: agent worktree branch
+
+Code-reviewer MUST be invoked from within the story's worktree directory.
+
+To fix:
+1. cd <worktree-path>
+2. Re-invoke code-reviewer from within worktree
+```
+
+### Step 7: Save Review Report and Update Story Status
+
+**🚨 PREREQUISITE: Step 6.5 verification MUST pass before proceeding 🚨**
 
 **For User Story Reviews:**
 
@@ -574,6 +617,7 @@ If reviewing code for a user story in `docs/stories/`:
    - Extract the story number from the story filename (e.g., `1.1-user-authentication.md` → `1.1`)
    - Use **save-file** tool with path: `docs/code_reviews/[story-number]-code-review.md`
    - Include the complete review report from Step 6
+   - **This file will be committed in the worktree branch**
 
 2. **Add a brief reference** to the story file using **str-replace-editor**:
    ```markdown
@@ -587,11 +631,36 @@ If reviewing code for a user story in `docs/stories/`:
    - Critical issues: [number]
    - Must fix before merge: [Yes/No]
    ```
+   - **This modification happens in the worktree branch**
 
 3. **Update story status** based on findings:
    - **If critical or high-severity issues**: Change status to "Changes Requested"
    - **If only medium/low issues**: Keep as "Ready for Review" with comments
    - **If approved**: Update status to "Approved"
+   - **This modification happens in the worktree branch**
+
+4. **Commit all changes in worktree (MANDATORY):**
+   ```bash
+   git add docs/code_reviews/[story-number]-code-review.md
+   git add docs/stories/[story-file].md
+   git commit -m "chore: Add code review for story [story-number]
+
+   Review Status: [Approved/Changes Requested/etc.]
+   Critical Issues: [number]
+   Total Issues: [number]
+
+   Full review: docs/code_reviews/[story-number]-code-review.md"
+   ```
+
+5. **Verify commit succeeded:**
+   ```bash
+   git log -1 --oneline
+   ```
+   - **MUST show the review commit**
+   - **MUST be on worktree branch, NOT main**
+
+**⚠️ CRITICAL: All changes MUST be committed before marking story as "Approved"**
+**⚠️ CRITICAL: Do NOT leave uncommitted changes in worktree**
 
 **For General Code Reviews:**
 

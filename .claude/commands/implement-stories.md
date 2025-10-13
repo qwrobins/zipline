@@ -399,31 +399,46 @@ Update state file in `.agent-orchestration/tasks/<story-id>-task.json`:
 
 **🚨 CRITICAL: Launch ALL stories in the wave BEFORE waiting for any to complete 🚨**
 
+**🚨 CRITICAL: Always use absolute paths for worktree operations 🚨**
+
 **Parallel Execution Pattern:**
 ```bash
+# Get repository root for absolute paths
+REPO_ROOT=$(git rev-parse --show-toplevel)
+
 # Wave 1 has stories 1.1, 1.2, 1.3 (all independent)
 
 # Launch story 1.1 (don't wait)
-./.claude/agents/lib/git-worktree-manager.sh create "1.1" "nextjs-developer"
-cd .worktrees/agent-nextjs-developer-1.1-*/
+# create_worktree returns ABSOLUTE path
+WORKTREE_1_1=$($REPO_ROOT/.claude/agents/lib/git-worktree-manager.sh create "1.1" "nextjs-developer")
+cd "$WORKTREE_1_1"
 # Invoke @nextjs-developer for story 1.1
+# Store WORKTREE_1_1 path in task state file
 
 # Launch story 1.2 (don't wait)
-cd /path/to/main/repo
-./.claude/agents/lib/git-worktree-manager.sh create "1.2" "python-developer"
-cd .worktrees/agent-python-developer-1.2-*/
+cd "$REPO_ROOT"
+WORKTREE_1_2=$($REPO_ROOT/.claude/agents/lib/git-worktree-manager.sh create "1.2" "python-developer")
+cd "$WORKTREE_1_2"
 # Invoke @python-developer for story 1.2
+# Store WORKTREE_1_2 path in task state file
 
 # Launch story 1.3 (don't wait)
-cd /path/to/main/repo
-./.claude/agents/lib/git-worktree-manager.sh create "1.3" "nextjs-developer"
-cd .worktrees/agent-nextjs-developer-1.3-*/
+cd "$REPO_ROOT"
+WORKTREE_1_3=$($REPO_ROOT/.claude/agents/lib/git-worktree-manager.sh create "1.3" "nextjs-developer")
+cd "$WORKTREE_1_3"
 # Invoke @nextjs-developer for story 1.3
+# Store WORKTREE_1_3 path in task state file
 
 # NOW wait for all three to complete
 ```
 
 **All stories in wave execute simultaneously in separate worktrees.**
+
+**Path Management:**
+- git-worktree-manager.sh returns ABSOLUTE paths
+- Store absolute paths in task state files
+- Use absolute paths for all subsequent operations (merge, cleanup, review)
+- Never use relative paths like `.worktrees/...`
 
 #### 4.3: Wait for Wave Completion
 
@@ -570,41 +585,111 @@ cd .worktrees/agent-nextjs-developer-1.3-*/
 - ALL fixes must be tested and verified
 - Only then proceed to merge and cleanup
 
-#### 4.5: Merge and Cleanup (Wave-Based)
+#### 4.5: Sequential Merge and Cleanup (Wave-Based)
+
+**🚨 CRITICAL: Merge stories SEQUENTIALLY within each wave to prevent conflicts 🚨**
 
 **After ALL stories in wave are approved:**
 
-**For each approved story in wave:**
+**Sequential Merge Process:**
 
-1. **Merge changes:**
+1. **Get repository root:**
    ```bash
-   ./.claude/agents/lib/git-worktree-manager.sh merge "<worktree-path>"
+   REPO_ROOT=$(git rev-parse --show-toplevel)
    ```
-   - Merges story branch into main
-   - Resolves any conflicts (should be minimal with worktrees)
-   - Verifies merge succeeded
 
-2. **Cleanup worktree:**
-   ```bash
-   ./.claude/agents/lib/git-worktree-manager.sh cleanup "<worktree-path>"
-   ```
-   - Removes worktree directory
-   - Deletes story branch
-   - Frees up disk space
+2. **Sort stories by ID** (1.1, 1.2, 1.3, etc.)
+   - Ensures consistent merge order
+   - Prevents race conditions
+   - Example: `1.1` → `1.2` → `1.3`
 
-3. **Update state:**
-   - Mark story as "Completed" in state file
-   - Record completion time
-   - Update orchestration progress
-   - Update dependency graph (mark as satisfied for dependent stories)
+3. **For EACH approved story in wave (in order):**
+
+   a. **Merge changes:**
+      ```bash
+      $REPO_ROOT/.claude/agents/lib/git-worktree-manager.sh merge "<absolute-worktree-path>"
+      ```
+      - Merges story branch into main
+      - **If conflicts occur:**
+        - STOP immediately
+        - Report conflict to user
+        - Provide conflict resolution instructions:
+          ```
+          CONFLICT in story [story-id]
+
+          To resolve:
+          1. cd <worktree-path>
+          2. git fetch origin main:main
+          3. git rebase main
+          4. Resolve conflicts manually
+          5. git add <resolved-files>
+          6. git rebase --continue
+          7. Return to main agent to retry merge
+          ```
+        - Do NOT proceed to next story
+        - Do NOT cleanup worktree (preserve for conflict resolution)
+
+   b. **Verify merge succeeded:**
+      ```bash
+      cd $REPO_ROOT
+      git log -1 --oneline
+      ```
+      - **MUST show merge commit**
+      - **MUST be on main branch**
+
+   c. **Update main branch in remaining worktrees (CRITICAL):**
+      ```bash
+      # For each remaining story in wave that hasn't been merged yet
+      for remaining_worktree in <remaining-worktrees>; do
+          git -C "$remaining_worktree" fetch origin main:main 2>/dev/null || true
+          git -C "$remaining_worktree" merge main --no-edit 2>/dev/null || {
+              echo "Note: Worktree $remaining_worktree may need manual rebase"
+          }
+      done
+      ```
+      - **This prevents conflicts in subsequent merges**
+      - **Each story gets latest main before its merge**
+      - **Failures are logged but don't stop the process**
+
+   d. **Cleanup worktree:**
+      ```bash
+      $REPO_ROOT/.claude/agents/lib/git-worktree-manager.sh cleanup "<absolute-worktree-path>"
+      ```
+      - Removes worktree directory
+      - Deletes story branch
+      - Frees up disk space
+
+   e. **Update state:**
+      - Mark story as "Completed" in state file
+      - Record completion time
+      - Update orchestration progress
+      - Update dependency graph (mark as satisfied for dependent stories)
 
 4. **Report wave merge completion:**
    ```
    ✅ Wave [N] Merged Successfully
-   - [count] stories merged into main
+   - [count] stories merged into main (sequential)
    - [count] worktrees cleaned up
    - Ready to proceed to Wave [N+1]
    ```
+
+**Why Sequential Merging:**
+- Prevents merge conflicts in shared files (package.json, package-lock.json, etc.)
+- Each story merges against latest main
+- Conflicts are detected and resolved one at a time
+- Simpler conflict resolution (one story at a time)
+- Remaining worktrees updated with latest main before their merge
+
+**Merge Order Example:**
+```
+Wave 1: Stories 1.1, 1.2, 1.3
+
+1. Merge 1.1 → main (main now has 1.1 changes)
+2. Update 1.2 and 1.3 worktrees with latest main
+3. Merge 1.2 → main (main now has 1.1 + 1.2 changes)
+4. Update 1.3 worktree with latest main
+5. Merge 1.3 → main (main now has 1.1 + 1.2 + 1.3 changes)
+```
 
 ### Step 5: Progress to Next Wave
 
