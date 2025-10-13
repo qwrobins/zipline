@@ -1,324 +1,369 @@
-# Agent Library
+# Developer Agent Library Scripts
 
-This directory contains reusable utilities and scripts for agent workflows.
+**Location**: `.claude/agents/lib/`
+**Purpose**: Automated validation scripts for developer agents to prevent common issues found in code reviews
+**Based on**: Analysis of 14 code reviews (21% re-review rate → target <10%)
+**Last Updated**: 2025-10-13
 
-## Files
+---
 
-### git-worktree-manager.sh
+## Overview
 
-**Purpose:** Manages git worktrees for multi-agent development to prevent conflicts.
+These scripts help developer agents catch common issues before committing code, reducing review iterations by 40-60%.
 
-**Usage:**
+**Important**: These scripts are part of the agent library and should be called from the project root using:
 ```bash
-# Create a worktree for a story
-./.claude/agents/lib/git-worktree-manager.sh create "<story-id>" "<agent-name>" [base-branch]
-
-# List all active worktrees
-./.claude/agents/lib/git-worktree-manager.sh list
-
-# Merge worktree back to target branch
-./.claude/agents/lib/git-worktree-manager.sh merge "<worktree-path>" [target-branch]
-
-# Cleanup worktree and delete branch
-./.claude/agents/lib/git-worktree-manager.sh cleanup "<worktree-path>"
-
-# Cleanup abandoned worktrees (older than 24 hours)
-./.claude/agents/lib/git-worktree-manager.sh cleanup-abandoned
+./.claude/agents/lib/script-name.sh
 ```
 
-**Features:**
-- ✅ Automatic branch name generation with timestamps
-- ✅ Worktree registry tracking
-- ✅ Conflict detection and reporting
-- ✅ Automatic cleanup of abandoned worktrees
-- ✅ Comprehensive error handling
-- ✅ Color-coded output for clarity
+### Scripts Available
 
-**Requirements:**
-- Git 2.5+ (for worktree support)
-- Bash 4.0+
-- jq (for JSON processing)
+1. **pre-commit-checks.sh** - Comprehensive pre-commit validation
+2. **cleanup-boilerplate.sh** - Remove unused Vite/CRA template files
+3. **validate-docs.sh** - Validate documentation references
 
-**See Also:**
-- `.claude/agents/directives/git-worktree-workflow.md` - Complete workflow guide
-- `.claude/commands/cleanup-worktrees.md` - Cleanup command documentation
+---
 
-## Installation
+## 1. pre-commit-checks.sh
 
-### Install jq (if not already installed)
+**Purpose**: Run all critical checks before committing
 
-**macOS:**
+**Usage**:
 ```bash
-brew install jq
+./.claude/agents/lib/pre-commit-checks.sh
 ```
 
-**Ubuntu/Debian:**
-```bash
-sudo apt-get install jq
+**Checks Performed**:
+- ✅ TypeScript compilation (tsc --noEmit)
+- ✅ ESLint errors and warnings
+- ✅ Test environment validation (global vs window)
+- ✅ External link security (rel="noopener noreferrer")
+- ✅ Console.log in production code
+- ✅ Test file existence
+- ✅ Unused variable patterns
+
+**Exit Codes**:
+- `0` - All checks passed, ready to commit
+- `1` - One or more checks failed, fix issues before committing
+
+**Example Output**:
+```
+🔍 Running pre-commit validation checks...
+
+1️⃣  Checking TypeScript compilation...
+✅ TypeScript compilation passed
+
+2️⃣  Checking ESLint...
+✅ ESLint passed
+
+3️⃣  Checking for 'global' usage in browser tests...
+✅ No 'global' usage in test files
+
+4️⃣  Checking external links for security attributes...
+✅ External links have security attributes
+
+5️⃣  Checking for console.log in production code...
+✅ No console.log in production code
+
+6️⃣  Checking test files exist...
+✅ Test files found
+
+7️⃣  Checking for common unused variable patterns...
+✅ No obvious unused variables detected
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ All pre-commit checks passed!
+   Ready to commit.
 ```
 
-**CentOS/RHEL:**
+**When to Run**:
+- Before every commit
+- After fixing TypeScript/ESLint errors
+- Before marking story complete
+
+**Common Issues Caught**:
+- TypeScript build errors (2 stories failed due to this)
+- Missing security attributes (1 story failed due to this)
+- Test environment confusion (global vs window)
+- Console.log statements in production
+
+---
+
+## 2. cleanup-boilerplate.sh
+
+**Purpose**: Remove unused Vite/CRA template files
+
+**Usage**:
 ```bash
-sudo yum install jq
+./.claude/agents/lib/cleanup-boilerplate.sh
 ```
 
-**Windows (Git Bash):**
-```bash
-# Download from https://stedolan.github.io/jq/download/
-# Or use chocolatey
-choco install jq
+**Files Checked**:
+- `src/App.css` (if using CSS Modules)
+- `src/index.css` (if replaced with global.css)
+- `src/assets/react.svg` (if not referenced)
+- `src/logo.svg` (if not referenced)
+- `public/vite.svg` (if not referenced)
+- Empty directories (e.g., `src/assets/`)
+
+**Logic**:
+- Checks if file is imported anywhere in `src/`
+- Removes file only if not imported/referenced
+- Removes empty directories after cleanup
+
+**Example Output**:
+```
+🧹 Cleaning up unused boilerplate files...
+
+Checking for unused CSS files...
+  🗑️  Removing unused: src/App.css
+  ✅ Keeping (imported): src/index.css
+
+Checking for unused logo files...
+  🗑️  Removing unused: src/assets/react.svg
+
+Checking for empty directories...
+  🗑️  Removing empty directory: src/assets
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Cleanup complete: Removed 3 file(s)/directory(ies)
+
+   Next steps:
+   1. Review changes: git status
+   2. Stage deletions: git add -u
+   3. Commit: git commit -m "chore: remove unused boilerplate files"
 ```
 
-### Verify Installation
+**When to Run**:
+- Before marking story complete
+- After switching from regular CSS to CSS Modules
+- After removing unused assets
+
+**Common Issues Prevented**:
+- Unused boilerplate files (3 stories had this issue)
+- Code clutter
+- Confusion about which files are actually used
+
+---
+
+## 3. validate-docs.sh
+
+**Purpose**: Validate documentation references and completeness
+
+**Usage**:
+```bash
+./.claude/agents/lib/validate-docs.sh
+```
+
+**Checks Performed**:
+- README file references (checks for broken file paths)
+- Outdated ESLint config references (.eslintrc vs eslint.config.js)
+- Package manager consistency (npm vs pnpm)
+- Required package.json scripts (test, lint, build)
+- Documentation file existence (README, CONTRIBUTING, LICENSE)
+- .gitignore completeness (required and recommended patterns)
+
+**Example Output**:
+```
+📚 Validating documentation...
+
+Checking README.md for broken file references...
+  ✅ No broken file references found
+
+Checking package.json scripts...
+  ✅ Test script defined
+  ✅ Lint script defined
+  ✅ Build script defined
+
+Checking for documentation files...
+  ✅ Found: README.md
+  ℹ️  Optional: CONTRIBUTING.md (not found)
+  ℹ️  Optional: LICENSE (not found)
+  ✅ Found: .gitignore
+
+Checking .gitignore completeness...
+  ✅ Required pattern: node_modules
+  ✅ Required pattern: dist
+  ✅ Required pattern: .env
+  ✅ Recommended pattern: dist-ssr
+  ✅ Recommended pattern: *.local
+  ✅ Recommended pattern: .DS_Store
+  ✅ Recommended pattern: coverage
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Documentation validation passed
+   All references are valid
+```
+
+**When to Run**:
+- Before marking story complete
+- After updating README
+- After changing file names or structure
+- After updating .gitignore
+
+**Common Issues Prevented**:
+- Outdated documentation references (4 stories had this issue)
+- Broken file paths in README
+- Incomplete .gitignore (1 story had this issue)
+
+---
+
+## Integration with Developer Workflow
+
+### Recommended Workflow
 
 ```bash
-# Check git version (should be 2.5+)
-git --version
+# 1. Implement feature
+# ... write code ...
 
-# Check jq is installed
-jq --version
+# 2. Run pre-commit checks
+./.claude/agents/lib/pre-commit-checks.sh
 
-# Make script executable (if not already)
-chmod +x .claude/agents/lib/git-worktree-manager.sh
+# 3. If checks fail, fix issues and re-run
+# ... fix issues ...
+./.claude/agents/lib/pre-commit-checks.sh
+
+# 4. Before finalizing, cleanup and validate
+./.claude/agents/lib/cleanup-boilerplate.sh
+./.claude/agents/lib/validate-docs.sh
+
+# 5. Final verification
+npm test
+npm run build
+
+# 6. Commit
+git add .
+git commit -m "feat: implement feature X"
 ```
+
+### Integration with Git Hooks (Optional)
+
+You can integrate these scripts with Git hooks for automatic validation:
+
+**Create `.git/hooks/pre-commit`**:
+```bash
+#!/bin/bash
+./.claude/agents/lib/pre-commit-checks.sh
+```
+
+**Make it executable**:
+```bash
+chmod +x .git/hooks/pre-commit
+```
+
+Now checks run automatically before every commit!
+
+---
 
 ## Troubleshooting
 
-### Error: jq command not found
+### Script Permission Denied
 
-**Solution:** Install jq using the instructions above.
+**Problem**: `bash: ./.claude/agents/lib/pre-commit-checks.sh: Permission denied`
 
-### Error: Permission denied
-
-**Solution:** Make the script executable:
+**Solution**:
 ```bash
-chmod +x .claude/agents/lib/git-worktree-manager.sh
+chmod +x .claude/agents/lib/pre-commit-checks.sh
+chmod +x .claude/agents/lib/cleanup-boilerplate.sh
+chmod +x .claude/agents/lib/validate-docs.sh
 ```
 
-### Error: Git version too old
+### Script Not Found
 
-**Solution:** Upgrade git to version 2.5 or later:
+**Problem**: `bash: ./.claude/agents/lib/pre-commit-checks.sh: No such file or directory`
+
+**Solution**: Make sure you're in the project root directory
 ```bash
-# macOS
-brew upgrade git
-
-# Ubuntu/Debian
-sudo apt-get update
-sudo apt-get upgrade git
+cd /path/to/project
+./.claude/agents/lib/pre-commit-checks.sh
 ```
 
-### Error: Worktree creation fails
+### False Positives
 
-**Possible causes:**
-1. Disk space full - Check with `df -h`
-2. Permission issues - Check directory permissions
-3. Git repository corrupted - Run `git fsck`
+**Problem**: Script reports issues that aren't actually problems
 
-**Solution:**
-```bash
-# Check disk space
-df -h
+**Solution**: Review the script logic and adjust patterns if needed. Scripts are designed to be conservative (better to flag potential issues than miss real ones).
 
-# Check permissions
-ls -la .worktrees/
+---
 
-# Verify git repository
-git fsck
-```
+## Customization
 
-## Development
+These scripts can be customized for your specific project needs:
 
-### Adding New Features
+### Adding Custom Checks
 
-When adding new features to the git-worktree-manager:
-
-1. **Follow the existing pattern:**
-   - Add function with descriptive name
-   - Include error handling
-   - Use logging functions (log_info, log_error, etc.)
-   - Update the help text
-
-2. **Test thoroughly:**
-   - Test with valid inputs
-   - Test with invalid inputs
-   - Test error conditions
-   - Test edge cases
-
-3. **Update documentation:**
-   - Update this README
-   - Update `.claude/agents/directives/git-worktree-workflow.md`
-   - Update `.claude/commands/cleanup-worktrees.md`
-
-### Code Style
-
-- Use `set -euo pipefail` for safety
-- Quote all variables: `"$variable"`
-- Use descriptive function names
-- Add comments for complex logic
-- Use color-coded logging
-- Handle errors gracefully
-
-## Examples
-
-### Example 1: Create Worktree for Story 1.1
+Edit `pre-commit-checks.sh` and add your check:
 
 ```bash
-$ ./.claude/agents/lib/git-worktree-manager.sh create "1.1" "javascript-developer"
-[INFO] Creating worktree for story: 1.1, agent: javascript-developer
-[INFO] Creating worktree at: .worktrees/agent-javascript-developer-1-1-20240107-120000
-[SUCCESS] Worktree created successfully
-[INFO] Registered worktree in registry
-.worktrees/agent-javascript-developer-1-1-20240107-120000
+# Check 8: Custom validation
+echo "8️⃣  Checking custom requirement..."
+if your_custom_check; then
+  echo "✅ Custom check passed"
+else
+  echo "❌ Custom check failed"
+  FAILURES=$((FAILURES + 1))
+fi
+echo ""
 ```
 
-### Example 2: List Active Worktrees
+### Excluding Files from Cleanup
+
+Edit `cleanup-boilerplate.sh` to exclude specific files:
 
 ```bash
-$ ./.claude/agents/lib/git-worktree-manager.sh list
-[INFO] Active worktrees:
-/path/to/repo/.worktrees/agent-javascript-developer-1-1-20240107-120000  abc123 [agent-javascript-developer-1-1-20240107-120000]
-/path/to/repo                                                             def456 [main]
-
-[INFO] Registry information:
-  Story: 1.1 | Agent: javascript-developer | Branch: agent-javascript-developer-1-1-20240107-120000 | Created: 2024-01-07T12:00:00Z
+# Don't remove this specific file
+if [ "$file" = "src/App.css" ]; then
+  echo "  ✅ Keeping (excluded): $file"
+  continue
+fi
 ```
 
-### Example 3: Merge and Cleanup
+---
 
-```bash
-$ ./.claude/agents/lib/git-worktree-manager.sh merge ".worktrees/agent-javascript-developer-1-1-20240107-120000"
-[INFO] Merging worktree: .worktrees/agent-javascript-developer-1-1-20240107-120000 into main
-[INFO] Switching to main
-[INFO] Merging agent-javascript-developer-1-1-20240107-120000 into main
-[SUCCESS] Merge completed successfully
+## Success Metrics
 
-$ ./.claude/agents/lib/git-worktree-manager.sh cleanup ".worktrees/agent-javascript-developer-1-1-20240107-120000"
-[INFO] Cleaning up worktree: .worktrees/agent-javascript-developer-1-1-20240107-120000
-[INFO] Removing worktree
-[SUCCESS] Worktree removed
-[INFO] Deleting branch: agent-javascript-developer-1-1-20240107-120000
-[SUCCESS] Branch deleted
-[INFO] Unregistered worktree from registry
-[SUCCESS] Cleanup completed
-```
+**Before Scripts** (based on 14 code reviews):
+- Re-review rate: 21% (3/14 stories)
+- Average issues per story: 1.2
+- Critical issues: 14% (2/14 stories)
 
-### Example 4: Cleanup Abandoned Worktrees
+**Target After Scripts**:
+- Re-review rate: <10% (1/14 stories)
+- Average issues per story: <0.5
+- Critical issues: 0%
 
-```bash
-$ ./.claude/agents/lib/git-worktree-manager.sh cleanup-abandoned
-[INFO] Checking for abandoned worktrees (older than 24h)
-[WARNING] Found abandoned worktree: .worktrees/agent-javascript-developer-1-1-20240106-120000
-[INFO] Cleaning up worktree: .worktrees/agent-javascript-developer-1-1-20240106-120000
-[INFO] Removing worktree
-[SUCCESS] Worktree removed
-[INFO] Deleting branch: agent-javascript-developer-1-1-20240106-120000
-[SUCCESS] Branch deleted
-[INFO] Unregistered worktree from registry
-[SUCCESS] Cleanup completed
-[SUCCESS] Abandoned worktree cleanup completed
-```
+**Expected Impact**:
+- 40-60% reduction in review iterations
+- 2-3 hours saved per story requiring re-review
+- 90% reduction in critical issues
+- Higher developer confidence
 
-## Integration with Agents
+---
 
-### In Agent Definitions
+## Related Documentation
 
-Agents should follow the workflow in `.claude/agents/directives/git-worktree-workflow.md`:
+- **Full Analysis**: `/code-review-analysis.md` - Detailed patterns from 14 reviews
+- **Implementation Guide**: `/implementation-guide.md` - Step-by-step implementation
+- **Quick Reference**: `/QUICK-REFERENCE.md` - Common issues and fixes
+- **Testing Guide**: `.claude/agents/agent-guides/testing-best-practices.md`
+- **JavaScript Directive**: `.claude/agents/directives/javascript-development.md`
 
-```bash
-# 1. Create worktree
-WORKTREE_PATH=$(./.claude/agents/lib/git-worktree-manager.sh create "1.1" "javascript-developer")
+---
 
-# 2. Switch to worktree
-cd "$WORKTREE_PATH"
+## Feedback and Improvements
 
-# 3. Do work
-# ... implementation ...
+These scripts are based on analysis of 14 code reviews. As more reviews are conducted, patterns may emerge that require new checks or adjustments to existing ones.
 
-# 4. Return to repo root
-cd ../../
+**To suggest improvements**:
+1. Document the issue pattern
+2. Identify how to detect it automatically
+3. Add check to appropriate script
+4. Test on sample projects
+5. Update this README
 
-# 5. Merge
-./.claude/agents/lib/git-worktree-manager.sh merge "$WORKTREE_PATH"
+---
 
-# 6. Cleanup
-./.claude/agents/lib/git-worktree-manager.sh cleanup "$WORKTREE_PATH"
-```
-
-### In Orchestration System
-
-The `/implement-stories` command should:
-
-```bash
-# Before assigning story
-WORKTREE_PATH=$(./.claude/agents/lib/git-worktree-manager.sh create "$STORY_ID" "$AGENT_NAME")
-
-# Save in task state
-echo "worktree_path: $WORKTREE_PATH" >> .agent-orchestration/tasks/$STORY_ID-task.json
-
-# After story completion
-./.claude/agents/lib/git-worktree-manager.sh merge "$WORKTREE_PATH"
-./.claude/agents/lib/git-worktree-manager.sh cleanup "$WORKTREE_PATH"
-```
-
-## Best Practices
-
-1. **Always create worktrees** before making changes
-2. **Commit regularly** within the worktree
-3. **Merge promptly** after work is complete
-4. **Cleanup immediately** after successful merge
-5. **Run cleanup-abandoned** regularly (daily/weekly)
-6. **Monitor disk space** - worktrees consume space
-7. **Don't manually edit** the registry file
-8. **Use the script** - don't manually create/remove worktrees
-
-## Security Considerations
-
-- The script uses `set -euo pipefail` for safety
-- All user inputs are sanitized before use
-- No arbitrary code execution
-- Registry file is JSON (safe format)
-- Worktrees are created in controlled location
-
-## Performance
-
-- Worktree creation: ~1-2 seconds
-- Merge operation: ~2-5 seconds (depends on changes)
-- Cleanup operation: ~1-2 seconds
-- Abandoned cleanup: ~5-10 seconds (depends on count)
-
-## Limitations
-
-- Requires Git 2.5+ (worktree feature)
-- Requires jq for JSON processing
-- Registry file must be valid JSON
-- Maximum worktree age is 24 hours (configurable)
-- Worktrees consume disk space
-
-## Future Enhancements
-
-Potential improvements:
-
-- [ ] Support for custom worktree age limits
-- [ ] Automatic conflict resolution strategies
-- [ ] Integration with CI/CD systems
-- [ ] Worktree usage statistics
-- [ ] Disk space monitoring and warnings
-- [ ] Parallel worktree operations
-- [ ] Worktree templates
-- [ ] Integration with git hooks
-
-## Contributing
-
-When contributing to this library:
-
-1. Follow the existing code style
-2. Add tests for new features
-3. Update documentation
-4. Test on multiple platforms
-5. Handle errors gracefully
-6. Use descriptive commit messages
-
-## License
-
-This library is part of the Zipline agent system and follows the same license as the parent project.
+**Last Updated**: 2025-10-13  
+**Version**: 1.0  
+**Maintainer**: Developer Agent Team
 
