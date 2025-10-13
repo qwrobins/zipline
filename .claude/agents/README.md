@@ -60,10 +60,30 @@ Planning agents transform product ideas into implementation-ready documentation.
 
 Development agents write and maintain actual code. They implement features from user stories, fix bugs, refactor code, and ensure quality through testing.
 
+#### [kubernetes-operator-developer.md](./kubernetes-operator-developer.md)
+**Purpose**: Builds production-grade Kubernetes operators and custom controllers
+
+**Input**: Operator requirements, CRD specifications, reconciliation logic needs
+**Output**: Custom controllers, CRDs, webhooks, RBAC, tests
+
+**When to Use**:
+- Building Kubernetes operators with Kubebuilder, Operator SDK, or controller-runtime
+- Creating custom resource definitions (CRDs) and controllers
+- Implementing admission webhooks (validating/mutating)
+- Managing stateful applications on Kubernetes
+- Developing operators in Go, Python (Kopf), or Rust (kube-rs)
+
+**Key Capabilities**:
+- Kubebuilder, Operator SDK, controller-runtime expertise
+- CRD design with versioning and conversion webhooks
+- Reconciliation loop patterns and finalizers
+- envtest integration testing and E2E testing
+- Production-ready RBAC, metrics, and observability
+
 #### [javascript-developer.md](./javascript-developer.md)
 **Purpose**: Implements features, fixes bugs, and writes tests for JavaScript/TypeScript projects
 
-**Input**: User stories, bug reports, or feature requests  
+**Input**: User stories, bug reports, or feature requests
 **Output**: Source code, tests, and documentation updates
 
 **When to Use**:

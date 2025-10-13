@@ -18,9 +18,20 @@ These scripts help developer agents catch common issues before committing code, 
 
 ### Scripts Available
 
-1. **pre-commit-checks.sh** - Comprehensive pre-commit validation
-2. **cleanup-boilerplate.sh** - Remove unused Vite/CRA template files
-3. **validate-docs.sh** - Validate documentation references
+#### Pre-Commit Validation (Language-Specific)
+1. **pre-commit-checks.sh** - TypeScript/JavaScript pre-commit validation
+2. **pre-commit-checks-go.sh** - Go pre-commit validation
+3. **pre-commit-checks-python.sh** - Python pre-commit validation
+4. **pre-commit-checks-rust.sh** - Rust pre-commit validation
+
+#### Git Workflow & Conflict Management
+5. **git-worktree-manager.sh** - Git worktree creation, merging, and cleanup
+6. **file-tracker.sh** - File ownership tracking for multi-agent workflows
+7. **conflict-detector.sh** - Detect merge conflicts before attempting merge
+
+#### Code Quality & Documentation
+8. **cleanup-boilerplate.sh** - Remove unused Vite/CRA template files (JS/TS only)
+9. **validate-docs.sh** - Validate documentation references
 
 ---
 
@@ -208,30 +219,179 @@ Checking .gitignore completeness...
 
 ---
 
+## 4. pre-commit-checks-go.sh
+
+**Purpose**: Run all critical checks before committing Go code
+
+**Usage**:
+```bash
+./.claude/agents/lib/pre-commit-checks-go.sh
+```
+
+**Checks Performed**:
+- ✅ Go formatting (gofmt)
+- ✅ Go vet (static analysis)
+- ✅ golangci-lint (comprehensive linting)
+- ✅ Go build (compilation)
+- ✅ Go tests (unit tests)
+- ✅ go.mod tidiness
+- ✅ Unused imports (goimports)
+- ✅ Security vulnerabilities (govulncheck)
+- ✅ Test coverage (optional, set CHECK_COVERAGE=true)
+
+**When to Run**:
+- Before every commit in Go projects
+- After implementing new features
+- After refactoring code
+
+**Common Issues Prevented**:
+- Unformatted code
+- Linting errors
+- Build failures
+- Test failures
+- Untidy go.mod
+
+---
+
+## 5. pre-commit-checks-python.sh
+
+**Purpose**: Run all critical checks before committing Python code
+
+**Usage**:
+```bash
+./.claude/agents/lib/pre-commit-checks-python.sh
+```
+
+**Checks Performed**:
+- ✅ Black formatting
+- ✅ Ruff linting
+- ✅ mypy type checking
+- ✅ isort import sorting
+- ✅ pytest tests
+- ✅ Security issues (bandit)
+- ✅ Dependency conflicts (pip check)
+- ✅ Poetry lock file validation
+- ✅ Test coverage (optional, set CHECK_COVERAGE=true)
+- ✅ print() statements in production code
+
+**Supports Multiple Package Managers**:
+- uv (preferred)
+- poetry
+- pipenv
+- pip
+
+**When to Run**:
+- Before every commit in Python projects
+- After implementing new features
+- After refactoring code
+
+**Common Issues Prevented**:
+- Unformatted code
+- Type errors
+- Linting errors
+- Test failures
+- Security vulnerabilities
+
+---
+
+## 6. pre-commit-checks-rust.sh
+
+**Purpose**: Run all critical checks before committing Rust code
+
+**Usage**:
+```bash
+./.claude/agents/lib/pre-commit-checks-rust.sh
+```
+
+**Checks Performed**:
+- ✅ Rust formatting (rustfmt)
+- ✅ Clippy linting
+- ✅ Cargo check (compilation)
+- ✅ Cargo build
+- ✅ Cargo tests
+- ✅ Cargo.lock up to date
+- ✅ Unused dependencies (cargo-udeps)
+- ✅ Security vulnerabilities (cargo-audit)
+- ✅ Documentation builds
+- ✅ Unsafe code detection (cargo-geiger)
+- ✅ Test coverage (optional, set CHECK_COVERAGE=true)
+- ✅ println! in production code
+
+**When to Run**:
+- Before every commit in Rust projects
+- After implementing new features
+- After refactoring code
+
+**Common Issues Prevented**:
+- Unformatted code
+- Clippy warnings
+- Build failures
+- Test failures
+- Security vulnerabilities
+
+---
+
 ## Integration with Developer Workflow
 
-### Recommended Workflow
+### Recommended Workflow (Multi-Agent with Git Worktrees)
+
+```bash
+# 1. Create isolated worktree
+./.claude/agents/lib/git-worktree-manager.sh create "1.1" "golang-developer"
+cd .worktrees/agent-golang-developer-1-1-<timestamp>
+
+# 2. Register file ownership
+./.claude/agents/lib/file-tracker.sh auto-register "1.1" "golang-developer" "$(pwd)"
+
+# 3. Implement feature
+# ... write code ...
+
+# 4. Run language-specific pre-commit checks
+# For TypeScript/JavaScript:
+./.claude/agents/lib/pre-commit-checks.sh
+# For Go:
+./.claude/agents/lib/pre-commit-checks-go.sh
+# For Python:
+./.claude/agents/lib/pre-commit-checks-python.sh
+# For Rust:
+./.claude/agents/lib/pre-commit-checks-rust.sh
+
+# 5. If checks fail, fix issues and re-run
+# ... fix issues ...
+# Re-run appropriate pre-commit script
+
+# 6. Validate documentation
+./.claude/agents/lib/validate-docs.sh
+
+# 7. Cleanup boilerplate (JS/TS only)
+./.claude/agents/lib/cleanup-boilerplate.sh  # Only for JS/TS projects
+
+# 8. Detect conflicts before merge
+cd ../../
+./.claude/agents/lib/conflict-detector.sh detect ".worktrees/agent-golang-developer-1-1-<timestamp>"
+
+# 9. Merge and cleanup
+./.claude/agents/lib/git-worktree-manager.sh merge ".worktrees/agent-golang-developer-1-1-<timestamp>"
+./.claude/agents/lib/git-worktree-manager.sh cleanup ".worktrees/agent-golang-developer-1-1-<timestamp>"
+./.claude/agents/lib/file-tracker.sh unregister "1.1"
+```
+
+### Simple Workflow (Single Agent, No Worktrees)
 
 ```bash
 # 1. Implement feature
 # ... write code ...
 
-# 2. Run pre-commit checks
-./.claude/agents/lib/pre-commit-checks.sh
+# 2. Run language-specific pre-commit checks
+./.claude/agents/lib/pre-commit-checks-{language}.sh
 
-# 3. If checks fail, fix issues and re-run
-# ... fix issues ...
-./.claude/agents/lib/pre-commit-checks.sh
-
-# 4. Before finalizing, cleanup and validate
-./.claude/agents/lib/cleanup-boilerplate.sh
+# 3. Validate documentation
 ./.claude/agents/lib/validate-docs.sh
 
-# 5. Final verification
-npm test
-npm run build
+# 4. Cleanup (JS/TS only)
+./.claude/agents/lib/cleanup-boilerplate.sh
 
-# 6. Commit
+# 5. Commit
 git add .
 git commit -m "feat: implement feature X"
 ```

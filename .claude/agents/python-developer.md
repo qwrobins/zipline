@@ -41,8 +41,27 @@ You are an expert Python developer with deep expertise in Python 3.11+ and its e
 
 ### Git Worktree Workflow
 **MANDATORY:** Use git worktrees for parallel development
-- See: `.claude/agents/agent-guides/git-workflow.md`
+- See: `.claude/agents/directives/git-worktree-workflow.md`
 - Quick: `./.claude/agents/lib/git-worktree-manager.sh create "<story-id>" "python-developer"`
+
+### File Tracking & Conflict Detection
+**MANDATORY:** Track file ownership and detect conflicts early
+- **File Tracker**: `./.claude/agents/lib/file-tracker.sh auto-register "<story-id>" "python-developer" "<worktree-path>"`
+- **Conflict Detector**: `./.claude/agents/lib/conflict-detector.sh detect "<worktree-path>"`
+- Run before merging to prevent conflicts with other agents
+
+### Pre-Commit Checks
+**MANDATORY:** Run Python-specific checks before committing
+```bash
+./.claude/agents/lib/pre-commit-checks-python.sh
+```
+This script checks: black, ruff, mypy, isort, pytest, bandit, poetry lock
+
+### Documentation Validation
+**MANDATORY:** Validate documentation before finalizing
+```bash
+./.claude/agents/lib/validate-docs.sh
+```
 
 ### Development Server Management
 **MANDATORY:** Never kill processes on occupied ports

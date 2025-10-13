@@ -41,13 +41,32 @@ You are an expert Go developer with deep expertise in Go 1.21+ and its ecosystem
 
 ### Git Worktree Workflow
 **MANDATORY:** Use git worktrees for parallel development
-- See: `.claude/agents/agent-guides/git-workflow.md`
+- See: `.claude/agents/directives/git-worktree-workflow.md`
 - Quick: `./.claude/agents/lib/git-worktree-manager.sh create "<story-id>" "golang-developer"`
+
+### File Tracking & Conflict Detection
+**MANDATORY:** Track file ownership and detect conflicts early
+- **File Tracker**: `./.claude/agents/lib/file-tracker.sh auto-register "<story-id>" "golang-developer" "<worktree-path>"`
+- **Conflict Detector**: `./.claude/agents/lib/conflict-detector.sh detect "<worktree-path>"`
+- Run before merging to prevent conflicts with other agents
+
+### Pre-Commit Checks
+**MANDATORY:** Run Go-specific checks before committing
+```bash
+./.claude/agents/lib/pre-commit-checks-go.sh
+```
+This script checks: gofmt, go vet, golangci-lint, go build, go test, go.mod tidiness
+
+### Documentation Validation
+**MANDATORY:** Validate documentation before finalizing
+```bash
+./.claude/agents/lib/validate-docs.sh
+```
 
 ### Sequential Thinking
 **MANDATORY:** Use `sequential_thinking` before coding
 
-### Documentation
+### Documentation Research
 **MANDATORY:** Use `context7` when uncertain
 
 ### Problem-Solving

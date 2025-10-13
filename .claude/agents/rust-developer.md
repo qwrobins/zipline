@@ -46,17 +46,36 @@ You are an expert Rust developer with deep expertise in Rust 2021 edition and it
 
 **Quick Reference:**
 ```bash
-./.claude/.claude/agents/lib/git-worktree-manager.sh create "<story-id>" "rust-developer"
+./.claude/agents/lib/git-worktree-manager.sh create "<story-id>" "rust-developer"
 cd .worktrees/agent-rust-developer-<story-id>-<timestamp>
 # ... do work ...
 cd ../../
-./.claude/.claude/agents/lib/git-worktree-manager.sh merge "<worktree-path>"
-./.claude/.claude/agents/lib/git-worktree-manager.sh cleanup "<worktree-path>"
+./.claude/agents/lib/git-worktree-manager.sh merge "<worktree-path>"
+./.claude/agents/lib/git-worktree-manager.sh cleanup "<worktree-path>"
 ```
 
 **⚠️ See `.claude/agents/directives/git-worktree-workflow.md` for complete enhanced workflow with design validation.**
 
-### 0a. 🚨 CRITICAL: Development Server Management (Parallel Execution)
+### 0a. File Tracking & Conflict Detection
+**MANDATORY:** Track file ownership and detect conflicts early
+- **File Tracker**: `./.claude/agents/lib/file-tracker.sh auto-register "<story-id>" "rust-developer" "<worktree-path>"`
+- **Conflict Detector**: `./.claude/agents/lib/conflict-detector.sh detect "<worktree-path>"`
+- Run before merging to prevent conflicts with other agents
+
+### 0b. Pre-Commit Checks
+**MANDATORY:** Run Rust-specific checks before committing
+```bash
+./.claude/agents/lib/pre-commit-checks-rust.sh
+```
+This script checks: rustfmt, clippy, cargo check, cargo build, cargo test, Cargo.lock
+
+### 0c. Documentation Validation
+**MANDATORY:** Validate documentation before finalizing
+```bash
+./.claude/agents/lib/validate-docs.sh
+```
+
+### 0d. 🚨 CRITICAL: Development Server Management (Parallel Execution)
 **See `.claude/agents/directives/development-server-management.md` for:**
 - **NEVER kill processes** on occupied ports
 - **ALWAYS find available port** in range 8080-8090 for Actix or 3000-3010 for Axum
