@@ -16,8 +16,6 @@ You are orchestrating the implementation of user stories from the `docs/stories/
 
 **This is NON-NEGOTIABLE. No exceptions. No shortcuts.**
 
-See the "CRITICAL REQUIREMENT - Code Review After Every Story" section below for complete details.
-
 ## USAGE
 
 ```bash
@@ -42,100 +40,21 @@ See the "CRITICAL REQUIREMENT - Code Review After Every Story" section below for
 The command accepts optional `$ARGUMENTS` to scope which stories to implement:
 
 ### **No Arguments** (Default)
-```
-/implement-stories
-```
 Implements ALL stories in `docs/stories/`
 
-### **Range Syntax**
-```
-/implement-stories 1.1-1.5
-```
+### **Range Syntax** (1.1-1.5)
 Implements stories 1.1, 1.2, 1.3, 1.4, 1.5 (inclusive range)
 
-### **Specific Stories**
-```
-/implement-stories 1.1 1.3 1.5
-```
+### **Specific Stories** (1.1 1.3 1.5)
 Implements only the specified stories
 
-### **Epic Scope**
-```
-/implement-stories epic:auth
-```
-Implements all stories tagged with epic "auth". Detects epics from:
-- Epic field in story: `**Epic**: auth`
-- YAML frontmatter: `epic: auth`
-- Directory structure: `docs/stories/epic-auth/`
-- Story ID prefix: `auth-1.1-login.md`
+### **Epic Scope** (epic:auth)
+Implements all stories tagged with epic "auth"
 
-### **Pattern Matching**
-```
-/implement-stories 1.*
-```
-Implements all stories matching the pattern (e.g., all stories starting with "1.")
+### **Pattern Matching** (1.*)
+Implements all stories matching the pattern
 
-## CRITICAL REQUIREMENTS
-
-1. **ALWAYS use git worktrees** for agent isolation to prevent conflicts
-2. **ALWAYS use sequential_thinking** for complex planning and dependency resolution
-3. **ALWAYS use context7** when uncertain about algorithms or best practices
-4. **ALWAYS update state files** in `.agent-orchestration/` to track progress
-5. **NEVER skip dependency checks** - stories must wait for dependencies to be approved
-6. **ALWAYS verify test results** before marking stories as complete
-7. **ALWAYS check for out-of-scope dependencies** and warn the user
-8. **ALWAYS cleanup worktrees** after story completion or failure
-9. **PRIORITIZE PARALLEL EXECUTION** - maximize parallelism by running independent stories simultaneously
-
-## 🚀 CRITICAL REQUIREMENT - Maximize Parallel Execution 🚀
-
-**DEFAULT TO PARALLEL EXECUTION:**
-
-The orchestrator MUST prioritize parallel story implementation as the default approach. Sequential execution should ONLY be used when stories have explicit dependencies.
-
-**Parallel Execution Strategy:**
-
-1. **Analyze Dependencies First:**
-   - Build a dependency graph of all stories
-   - Identify stories with NO dependencies (can start immediately)
-   - Identify stories that only depend on completed stories (can start immediately)
-   - Group independent stories into "waves" that can run in parallel
-
-2. **Launch Multiple Agents Simultaneously:**
-   - For each wave of independent stories, launch ALL agents at once
-   - Example: If Stories 2.1, 2.2, 2.3, 2.4 all depend only on Story 1.x (and not on each other), launch 4 agents in parallel
-   - Do NOT wait for one story to complete before starting the next if they're independent
-
-3. **Only Wait for Dependencies:**
-   - Story B should ONLY wait for Story A if Story B explicitly lists Story A as a dependency
-   - If Story 2.1 and Story 2.2 both depend on Story 1.3 but NOT on each other, they can run in parallel after 1.3 completes
-
-4. **Maximum Parallelism Examples:**
-
-   **CORRECT ✅ (Parallel):**
-   ```
-   Wave 1: Launch Story 1.1 (no dependencies)
-   Wave 2: Launch Stories 1.2, 1.3, 1.4 simultaneously (all depend only on 1.1)
-   Wave 3: Launch Stories 2.1, 2.2, 2.3, 2.4 simultaneously (all depend only on 1.x, not on each other)
-   ```
-
-   **INCORRECT ❌ (Sequential when parallel is possible):**
-   ```
-   Story 1.1 → wait for completion
-   Story 1.2 → wait for completion  ← WRONG! Could run with 1.3, 1.4
-   Story 1.3 → wait for completion  ← WRONG! Could run with 1.2, 1.4
-   Story 1.4 → wait for completion  ← WRONG! Could run with 1.2, 1.3
-   ```
-
-5. **Benefits of Parallel Execution:**
-   - Dramatically faster implementation (4 stories in parallel = 4x faster)
-   - Better resource utilization
-   - Faster feedback cycles
-   - Reduced overall project timeline
-
-**When to Use Sequential Execution:**
-- ONLY when Story B explicitly depends on Story A
-- Example: Story 3.2 (Add Comment) depends on Story 3.1 (View Comments) → must be sequential
+**See `.claude/agents/agent-guides/orchestration-patterns.md` for detailed argument parsing logic.**
 
 ## ⚠️ CRITICAL REQUIREMENT - Git Worktree Isolation ⚠️
 
@@ -165,83 +84,43 @@ When multiple agents work simultaneously, they MUST use isolated git worktrees t
    - Do NOT cleanup worktrees with merge conflicts
    - Provide clear instructions for manual conflict resolution
 
-**See `.claude/agents/directives/git-worktree-workflow.md` for complete workflow details.**
+**See `.claude/agents/agent-guides/git-workflow.md` for complete workflow details.**
 
-## ⚠️ CRITICAL REQUIREMENT - Code Review After Every Story ⚠️
+## CRITICAL REQUIREMENTS
 
-**MANDATORY CODE REVIEW ENFORCEMENT:**
+1. **ALWAYS use git worktrees** for agent isolation to prevent conflicts
+2. **ALWAYS use sequential_thinking** for complex planning and dependency resolution
+3. **ALWAYS use context7** when uncertain about algorithms or best practices
+4. **ALWAYS update state files** in `.agent-orchestration/` to track progress
+5. **NEVER skip dependency checks** - stories must wait for dependencies to be approved
+6. **ALWAYS verify test results** before marking stories as complete
+7. **ALWAYS check for out-of-scope dependencies** and warn the user
+8. **ALWAYS cleanup worktrees** after story completion or failure
+9. **PRIORITIZE PARALLEL EXECUTION** - maximize parallelism by running independent stories simultaneously
 
-After implementing EACH individual story, you MUST:
+**See `.claude/agents/agent-guides/git-workflow.md` for git worktree details.**
+**See `.claude/agents/agent-guides/orchestration-patterns.md` for complete orchestration patterns.**
 
-1. **Immediately trigger a code review** using the `code-reviewer` agent
-2. **Wait for code review completion** before proceeding to the next story
-3. **Address any issues** identified in the code review
-4. **Document the code review** in the story's "Dev Agent Record" section
+## Workflow
 
-**This is NON-NEGOTIABLE and applies to EVERY story without exception.**
+### Step 1: Parse Arguments and Determine Scope
 
-**Workflow Enforcement:**
-- [ ] Story N implemented → STOP
-- [ ] Trigger code review for Story N → WAIT for completion
-- [ ] Address code review feedback for Story N
-- [ ] Document code review results in Story N
-- [ ] ONLY THEN proceed to Story N+1
+**Parse `$ARGUMENTS` to determine which stories to implement:**
+- No arguments → All stories
+- Range syntax → Parse range
+- Specific stories → Parse list
+- Epic scope → Find stories in epic
+- Pattern matching → Match pattern
 
-**Never skip code reviews**, even if:
-- Multiple stories are being implemented in sequence
-- Stories seem simple or small
-- Time pressure exists
-- Previous stories had clean reviews
+**See `.claude/agents/agent-guides/orchestration-patterns.md` for argument parsing details.**
 
-**Code Review Trigger Format:**
-After completing each story implementation, explicitly invoke:
-```
-/agents code-reviewer
-
-Please review the implementation for story [story-id] in [file paths].
-Focus on: [specific areas based on story requirements]
-```
-
-**Verification Checklist:**
-Before moving to the next story, confirm:
-- [ ] Code review was triggered
-- [ ] Code review feedback was received
-- [ ] All issues were addressed or documented
-- [ ] Code review results added to Dev Agent Record
-
-This ensures consistent code quality and prevents technical debt accumulation across multiple story implementations.
-
----
-
-## WORKFLOW PHASES
-
-### Phase 1: Parse Arguments & Determine Scope
-
-1. **Parse `$ARGUMENTS`** to determine which stories to implement:
-   - If empty: scope = "all stories"
-   - If range (e.g., "1.1-1.5"): scope = stories in range
-   - If epic (e.g., "epic:auth"): scope = stories in epic
-   - If pattern (e.g., "1.*"): scope = stories matching pattern
-   - If list (e.g., "1.1 1.3 1.5"): scope = specific stories
-
-2. **Store scope information** for later filtering
-
-3. **Report scope to user**:
-   ```
-   📋 Story Implementation Scope
-
-   Mode: Range
-   Scope: Stories 1.1 through 1.5
-
-   Analyzing stories in docs/stories/...
-   ```
-
-### Phase 2: Load Planning State
+### Step 2: Load Planning State
 
 **🚨 CRITICAL: This phase loads pre-existing planning artifacts created by `/automate-planning`**
 
-1. **Verify orchestration infrastructure exists**:
-   - Check if `.agent-orchestration/` directory exists
+#### 2.1: Verify Orchestration Infrastructure
+
+1. **Check if `.agent-orchestration/` directory exists**
    - If NOT exists:
      ```
      ❌ ERROR: Orchestration infrastructure not found!
@@ -259,8 +138,9 @@ This ensures consistent code quality and prevents technical debt accumulation ac
      ```
      **STOP** - Do not proceed without orchestration infrastructure
 
-2. **Load dependency graph**:
-   - Read `.agent-orchestration/dependency-graph.json`
+#### 2.2: Load Dependency Graph
+
+2. **Read `.agent-orchestration/dependency-graph.json`**
    - Extract:
      - All story nodes
      - Dependency edges
@@ -277,13 +157,9 @@ This ensures consistent code quality and prevents technical debt accumulation ac
      ```
      **STOP** - Do not proceed without dependency graph
 
-3. **Load progress tracking**:
-   - Read `.agent-orchestration/progress.json`
-   - Extract current progress metrics
-   - If file missing, create with default values
+#### 2.3: Load Task State Files
 
-4. **Load task state files**:
-   - Scan `.agent-orchestration/tasks/` directory
+3. **Scan `.agent-orchestration/tasks/` directory**
    - Read all `*-task.json` files
    - Build map of story ID → task state
    - If directory missing or empty:
@@ -296,25 +172,29 @@ This ensures consistent code quality and prevents technical debt accumulation ac
      ```
      **STOP** - Do not proceed without task state files
 
-5. **Load roadmap**:
-   - Read `.agent-orchestration/roadmap.md`
+#### 2.4: Load Roadmap
+
+4. **Read `.agent-orchestration/roadmap.md`**
    - Display roadmap to user for reference
    - If file missing, warn but continue (not critical)
 
-6. **Apply scope filter** (from Phase 1):
+#### 2.5: Apply Scope Filter
+
+5. **Filter based on scope from Step 1:**
    - If scope is "all": use all stories from loaded state
    - If scope is range: filter loaded stories to range
    - If scope is epic: filter loaded stories to epic
    - If scope is pattern: filter loaded stories to pattern
    - If scope is list: filter loaded stories to specific IDs
 
-7. **Filter dependency graph and waves**:
+6. **Filter dependency graph and waves:**
    - Remove out-of-scope stories from dependency graph
    - Recalculate parallel waves for in-scope stories only
    - Update implementation order for filtered set
 
-8. **Check for out-of-scope dependencies**:
-   - For each in-scope story, check if dependencies are also in scope
+#### 2.6: Check Out-of-Scope Dependencies
+
+7. **For each in-scope story, check if dependencies are also in scope**
    - If dependencies are out of scope, warn the user:
      ```
      ⚠️  Warning: Story 1.3 depends on Story 1.1, which is not in scope.
@@ -327,47 +207,40 @@ This ensures consistent code quality and prevents technical debt accumulation ac
      What would you like to do?
      ```
 
-9. **Update task state files** for scope:
-   - Mark in-scope stories: `in_scope: true`
-   - Mark out-of-scope stories: `in_scope: false`
-   - Update progress.json with filtered counts
+#### 2.7: Report Loaded State
 
-10. **Report loaded state**:
-    ```
-    ✅ Planning State Loaded Successfully
+8. **Report loaded state:**
+   ```
+   ✅ Planning State Loaded Successfully
 
-    📊 Orchestration Infrastructure:
-    - Dependency graph: [X] stories, [Y] dependencies
-    - Task state files: [X] stories
-    - Progress tracking: [C] completed, [P] in progress, [N] not started
-    - Roadmap: Available
+   📊 Orchestration Infrastructure:
+   - Dependency Graph: ✅ Loaded
+   - Task State Files: ✅ Loaded ([count] stories)
+   - Roadmap: ✅ Loaded
+   - Parallel Waves: [count] waves identified
+   - Max Parallel Agents: [count]
 
-    🎯 Scope: <scope description>
-    - In-scope stories: [X]
-    - Out-of-scope stories: [Y]
-    - Parallel waves: [Z]
-    - Max concurrent agents: [N]
+   📋 Scope:
+   - Total Stories in Scope: [count]
+   - Out-of-Scope Dependencies: [count] warnings
+   ```
 
-    🚀 Ready to begin implementation!
-    ```
+### Step 3: Git Initialization Check
 
-### Phase 3: Parallel Execution Loop
+**🚨 CRITICAL: Verify git is initialized BEFORE any story implementation begins 🚨**
 
-**🚨 CRITICAL: Git Initialization Check (REQUIRED FIRST STEP) 🚨**
+#### 3.1: Check Git Status
 
-**BEFORE ANY story implementation begins, verify git is initialized:**
-
-1. **Check Git Status:**
+1. **Verify git repository exists:**
    ```bash
    git rev-parse --git-dir 2>/dev/null
    ```
-   - If this command succeeds → Git is initialized, proceed to step 2
-   - If this command fails → Git is NOT initialized, proceed to git initialization
+   - If succeeds → Git is initialized, proceed to Step 4
+   - If fails → Git is NOT initialized, proceed to 3.2
 
-2. **Initialize Git if Missing (MANDATORY):**
+#### 3.2: Initialize Git (If Missing)
 
-   **If git is not initialized, you MUST initialize it before proceeding:**
-
+2. **Initialize git repository (MANDATORY if missing):**
    ```bash
    # Initialize git repository
    git init
@@ -391,7 +264,7 @@ This ensures consistent code quality and prevents technical debt accumulation ac
    git add .
    git commit -m "Initial commit"
 
-   # Set default branch to "main" (modern best practice)
+   # Set default branch to "main"
    git branch -M main
 
    # Verify initialization succeeded
@@ -404,13 +277,12 @@ This ensures consistent code quality and prevents technical debt accumulation ac
    - If verification fails → STOP and report: "Git initialization verification failed. Please initialize git manually."
 
    **After successful initialization:**
-   - Report to user: "✅ Git repository initialized successfully. Proceeding with worktree workflow."
-   - Continue to step 3
+   - Report: "✅ Git repository initialized successfully. Proceeding with worktree workflow."
+   - Continue to Step 4
 
-3. **Enforce Worktree Workflow (MANDATORY - NO EXCEPTIONS):**
+#### 3.3: Enforce Worktree Workflow
 
-   **⚠️ CRITICAL: The git worktree workflow is MANDATORY for ALL story implementations.**
-
+3. **⚠️ CRITICAL: The git worktree workflow is MANDATORY for ALL story implementations.**
    - There are NO exceptions to using git worktrees
    - Even if git was just initialized, worktrees MUST be used
    - NEVER proceed with story implementation without worktrees
@@ -420,6 +292,8 @@ This ensures consistent code quality and prevents technical debt accumulation ac
    - STOP and report the error to the user
    - Do NOT attempt to work without worktrees
    - Provide troubleshooting guidance
+
+### Step 4: Execute Stories in Waves (Parallel Execution)
 
 **🚀 CRITICAL: Execute stories in PARALLEL waves, not sequentially! 🚀**
 
@@ -433,580 +307,480 @@ This ensures consistent code quality and prevents technical debt accumulation ac
    - Wait for ALL stories in the wave to complete and pass code review
    - Only then proceed to the next wave
 
-2. **Wave-Based Execution Example:**
-   ```
-   Wave 1: Launch agents for Stories 1.1 and 1.5 simultaneously
-   → Wait for BOTH to complete and pass code review
+2. **NEVER process stories one-by-one if they can run in parallel**
+   - This defeats the purpose of the parallel execution architecture
+   - Always check if multiple stories can run simultaneously
+   - Maximize parallelism to minimize total implementation time
 
-   Wave 2: Launch agents for Stories 1.2 and 1.3 simultaneously
-   → Wait for BOTH to complete and pass code review
+**For each wave:**
 
-   Wave 3: Launch agent for Story 1.4
-   → Wait for completion and code review
-   ```
+#### 4.1: Identify Stories in Current Wave
 
-**For each wave of stories:**
-
-1. **Identify Ready Stories**:
-   - Find all stories where ALL dependencies have `status: "done"` and `review_status: "Approved"`
+1. **Determine which stories can run now:**
+   - Stories with NO dependencies (Wave 0)
+   - Stories whose dependencies are ALL completed and approved
    - Group these stories into the current wave
-   - **Launch ALL agents for this wave simultaneously**
 
-2. **Check Dependencies for Each Story in Wave**:
-   - Read task state files for all dependencies
-   - Verify ALL dependencies have `status: "done"` and `review_status: "Approved"`
-   - If dependencies not met, story is not ready for this wave
+2. **Report wave composition:**
+   ```
+   🚀 Wave [N]: [count] stories ready for parallel execution
+   - Story [id]: [title] (@[agent])
+   - Story [id]: [title] (@[agent])
+   - Story [id]: [title] (@[agent])
+   ```
 
-3. **Verify Git Initialization Before Wave Execution (MANDATORY CHECK)**:
+#### 4.2: Launch All Stories in Wave (Parallel)
 
-   **Before launching ANY agents, verify git is initialized:**
+**🚨 CRITICAL: You MUST create worktrees and invoke agents for ALL stories in the wave 🚨**
 
+**For EACH story in current wave, execute these steps:**
+
+**Step 1: Create git worktree (MANDATORY)**
+
+Execute the worktree creation script:
+```bash
+./.claude/agents/lib/git-worktree-manager.sh create "<story-id>" "<agent-name>"
+```
+
+Example:
+```bash
+# For story 1.1 assigned to nextjs-developer
+./.claude/agents/lib/git-worktree-manager.sh create "1.1" "nextjs-developer"
+
+# For story 1.2 assigned to python-developer
+./.claude/agents/lib/git-worktree-manager.sh create "1.2" "python-developer"
+```
+
+This script will:
+- Create a new branch: `story/<story-id>`
+- Create worktree directory: `.worktrees/agent-<agent-name>-<story-id>-<timestamp>/`
+- Return the worktree path
+- Initialize the worktree with main branch code
+
+**Step 2: Save worktree path**
+
+Capture the worktree path returned by the script and save it to the task state file:
+```json
+{
+  "storyId": "1.1",
+  "status": "In Progress",
+  "agent": "nextjs-developer",
+  "worktree": ".worktrees/agent-nextjs-developer-1.1-20250112143022/",
+  "dependencies": ["0.1"],
+  "startTime": "2025-01-12T14:30:22Z"
+}
+```
+
+**Step 3: Invoke agent in worktree**
+
+Switch to the worktree directory and invoke the agent:
+```bash
+cd <worktree-path>
+
+# Invoke the agent with the story file
+# Example: @nextjs-developer, please implement story 1.1
+# Story file: docs/stories/1.1-user-authentication.md
+```
+
+The agent will:
+- Read the story file and acceptance criteria
+- Implement the required functionality
+- Write and run tests (ALL tests must pass)
+- Update story file with Dev Agent Record
+- Change story status to "Ready for Review"
+
+**Step 4: Track progress**
+
+Update state file in `.agent-orchestration/tasks/<story-id>-task.json`:
+- Set status to "In Progress"
+- Record start time
+- Record worktree path
+- Record agent name
+
+**🚨 CRITICAL: Launch ALL stories in the wave BEFORE waiting for any to complete 🚨**
+
+**🚨 CRITICAL: Always use absolute paths for worktree operations 🚨**
+
+**Parallel Execution Pattern:**
+```bash
+# Get repository root for absolute paths
+REPO_ROOT=$(git rev-parse --show-toplevel)
+
+# Wave 1 has stories 1.1, 1.2, 1.3 (all independent)
+
+# Launch story 1.1 (don't wait)
+# create_worktree returns ABSOLUTE path
+WORKTREE_1_1=$($REPO_ROOT/.claude/agents/lib/git-worktree-manager.sh create "1.1" "nextjs-developer")
+cd "$WORKTREE_1_1"
+# Invoke @nextjs-developer for story 1.1
+# Store WORKTREE_1_1 path in task state file
+
+# Launch story 1.2 (don't wait)
+cd "$REPO_ROOT"
+WORKTREE_1_2=$($REPO_ROOT/.claude/agents/lib/git-worktree-manager.sh create "1.2" "python-developer")
+cd "$WORKTREE_1_2"
+# Invoke @python-developer for story 1.2
+# Store WORKTREE_1_2 path in task state file
+
+# Launch story 1.3 (don't wait)
+cd "$REPO_ROOT"
+WORKTREE_1_3=$($REPO_ROOT/.claude/agents/lib/git-worktree-manager.sh create "1.3" "nextjs-developer")
+cd "$WORKTREE_1_3"
+# Invoke @nextjs-developer for story 1.3
+# Store WORKTREE_1_3 path in task state file
+
+# NOW wait for all three to complete
+```
+
+**All stories in wave execute simultaneously in separate worktrees.**
+
+**Path Management:**
+- git-worktree-manager.sh returns ABSOLUTE paths
+- Store absolute paths in task state files
+- Use absolute paths for all subsequent operations (merge, cleanup, review)
+- Never use relative paths like `.worktrees/...`
+
+#### 4.3: Wait for Wave Completion
+
+**Monitor all stories in wave:**
+
+1. **Wait for ALL agents in wave to complete:**
+   - Monitor each agent's progress
+   - Collect test results as they complete
+   - Track completion status in state files
+
+2. **Check for failures:**
+   - If any story fails:
+     - Mark story as "Failed" in state file
+     - Cleanup failed story worktree
+     - Continue monitoring other stories
+     - Report failure at end
+   - If all stories succeed:
+     - Mark stories as "Ready for Review"
+     - Proceed to code review phase
+
+3. **Report wave completion:**
+   ```
+   ✅ Wave [N] Implementation Complete
+   - [count] stories completed successfully
+   - [count] stories failed
+   - Ready for code review
+   ```
+
+#### 4.4: Code Review (MANDATORY - Wave-Based)
+
+**🚨 CRITICAL: Review ALL stories in wave before proceeding to next wave 🚨**
+
+**For EACH completed story in wave:**
+
+1. **Trigger code review:**
    ```bash
-   # Verify git is initialized
-   if ! git rev-parse --git-dir >/dev/null 2>&1; then
-     echo "ERROR: Git is not initialized. This should have been caught in Phase 3 initialization."
-     echo "Please ensure git is initialized before proceeding."
-     exit 1
-   fi
+   /review-story <story-id>
    ```
 
-   **If verification fails:**
-   - STOP immediately
-   - Report: "CRITICAL ERROR: Git not initialized. Cannot proceed with worktree workflow."
-   - Do NOT attempt to launch any agents
-   - Return to Phase 3 git initialization step
-
-4. **Start Wave Implementation (Launch ALL agents simultaneously)**:
-
-   **For EACH story in the current wave, launch its agent in parallel:**
-
-   - Update task state: `status: "in_progress"`, `started_at: <timestamp>`
-   - Update progress.json counters
-   - **Create Git Worktree** for the agent (MANDATORY):
-     ```bash
-     WORKTREE_PATH=$(./.claude/agents/lib/git-worktree-manager.sh create "{story_id}" "{assigned_agent}")
-
-     # Verify worktree creation succeeded
-     if [ -z "$WORKTREE_PATH" ] || [ ! -d "$WORKTREE_PATH" ]; then
-       echo "ERROR: Failed to create worktree for story {story_id}"
-       echo "Worktree workflow is MANDATORY. Cannot proceed without it."
-       exit 1
-     fi
-     ```
-   - Save the worktree path in task state: `worktree_path: "$WORKTREE_PATH"`
-   - **Register Files for Tracking** (optional, for conflict prevention):
-     ```bash
-     # Auto-register files after agent makes changes
-     ./.claude/agents/lib/file-tracker.sh auto-register "{story_id}" "{assigned_agent}" "$WORKTREE_PATH"
-     ```
-   - Invoke appropriate dev agent:
-
-   **CRITICAL: Do NOT wait for one agent to complete before launching the next agent in the same wave. Launch ALL agents for the wave at once.**
-     ```
-     @agent-{assigned_agent}, please implement story {story_id}.
-
-     Story file: {story_file}
-
-     🚨 CRITICAL: Git worktree workflow is MANDATORY - NO EXCEPTIONS 🚨
-
-     Git has been initialized and your isolated worktree has been created at: {worktree_path}
-
-     ⚠️ YOU MUST work in the worktree - NEVER work directly in the main repository.
-     ⚠️ The worktree workflow is REQUIRED for conflict prevention.
-     ⚠️ There are NO exceptions to this requirement.
-
-     🚨 CRITICAL: DO NOT MERGE OR CLEANUP - Code review happens FIRST 🚨
-
-     ⚠️ You will implement the story and commit changes to your worktree
-     ⚠️ The orchestrator will trigger code review BEFORE merging
-     ⚠️ You will be re-invoked after code review to merge (if approved) or fix issues
-     ⚠️ DO NOT merge or cleanup the worktree in this phase
-
-     Follow these steps EXACTLY:
-     1. **Design Planning**: Create visual mockups in docs/stories/{story_id}/design/
-     2. **Reference Analysis**: Compare with professional applications (btop, etc.)
-     3. **Switch to worktree** (MANDATORY): cd {worktree_path}
-     4. **Verify you're in worktree**: pwd (should show .worktrees/agent-...)
-     5. **Design-First Implementation**: Implement visuals before functionality
-     6. **Progressive Validation**: Test visual appearance at each milestone
-     7. **Commit all changes** with design quality checkpoints
-     8. **Return to repo root**: cd ../../
-     9. **Design Quality Gate**: Verify professional appearance and accessibility
-     10. **Update story status to "Ready for Review"**
-     11. **Add Dev Agent Record** documenting implementation and design decisions
-     12. **STOP HERE** - Do NOT merge or cleanup worktree
-
-     ⚠️ LEAVE THE WORKTREE INTACT - The orchestrator will handle merge after code review
-
-     See .claude/agents/directives/git-worktree-workflow.md for complete enhanced workflow.
-
-     **If you encounter ANY issues with the worktree workflow:**
-     - STOP immediately
-     - Report the error to the orchestrator
-     - Do NOT attempt to work without the worktree
-
-     **Design Quality Requirements:**
-     - Visual design must match professional standards for the application type
-     - Web apps: Responsive design, browser compatibility, Core Web Vitals compliance
-     - Desktop apps: DPI scaling, native platform feel, smooth performance
-     - CLI apps: Terminal compatibility, color degradation, ASCII fallbacks
-     - All apps: WCAG 2.1 Level AA accessibility compliance
-     - Consistent design system usage across all components
-
-     **Project Dependencies (Story 1.1 ONLY):**
-     - If this is Story 1.1 (Project Initialization), install ALL core project dependencies
-     - Include: package managers, frameworks, testing libraries, linting tools, etc.
-     - Commit package.json and lock files to enable efficient dependency installation in later stories
-     - Document all installed dependencies in the Dev Agent Record
-
-     **Project Dependencies (Stories 1.2+):**
-     - Check if dependencies already exist in package.json/lock file before installing
-     - If dependencies exist, run install command (npm install, pip install -r, etc.)
-     - Only add new dependencies if they are NOT already in the lock file
-     - This saves tokens and ensures consistent dependency versions
-
-     When complete, update the story status to "Ready for Review" and add
-     a Dev Agent Record section documenting your implementation AND design decisions.
-
-     Then STOP and return control to the orchestrator for code review.
-     ```
-
-4. **Monitor Wave for Completion**:
-   - Wait for ALL agents in the wave to complete their work
-   - For each story in the wave:
-     - Verify story status changed to "Ready for Review"
-     - Verify Dev Agent Record section was added
-     - Verify worktree is still intact (NOT merged or cleaned up)
-     - Update task state: `status: "ready_for_review"`
-   - **Do NOT proceed to code review until ALL stories in the wave are complete**
-
-   **Verification Checkpoint:**
-   - [ ] All stories in wave have status "Ready for Review"
-   - [ ] All Dev Agent Records are present
-   - [ ] All worktrees are intact (not merged yet)
-   - [ ] Ready to proceed to code review phase
-
-5. **⚠️ MANDATORY CODE REVIEW - DO NOT SKIP ⚠️**:
-
-   **🚨 CRITICAL: Code review happens BEFORE merge - worktrees are still intact 🚨**
-
-   **For each story in the wave:**
-
-   - Update task state: `status: "in_review"`
-   - **IMMEDIATELY** invoke code reviewer (no exceptions):
-     ```
-     @agent-code-reviewer, please review the implementation for story {story_id}.
-
-     Story file: {story_file}
-     Worktree path: {worktree_path}
-     Files modified: [list all modified files from Dev Agent Record]
-
-     🚨 IMPORTANT: The changes are in the worktree and have NOT been merged yet.
-     Review the code in the worktree before it gets merged to main.
-
-     Please perform a comprehensive code review following your agent definition,
-     focusing on:
-     - Code quality and best practices
-     - Test coverage and correctness
-     - Security vulnerabilities
-     - Performance considerations
-     - Adherence to acceptance criteria
-     - Design quality and accessibility
-
-     Save the review to docs/code_reviews/{story_id}-code-review.md
-
-     Include in your review:
-     - Overall assessment (Approved / Changes Requested / Rejected)
-     - Critical issues (must fix before merge)
-     - High-priority issues (should fix before merge)
-     - Medium/low-priority issues (can fix later)
-     - Positive observations
-     ```
-
-   **Verification Checkpoint:**
-   - [ ] Code review agent invoked for each story in wave
-   - [ ] Waiting for ALL code reviews to complete
-   - [ ] Worktrees are still intact (not merged)
-   - [ ] DO NOT proceed until ALL reviews are complete
-
-6. **Process Review Results**:
-
-   **For each story in the wave:**
-
-   - **WAIT** for review completion (do not proceed without it)
-   - Read review file from `docs/code_reviews/{story_id}-code-review.md`
-   - Extract review status (Approved / Changes Requested / Rejected)
-   - Update task state with `review_status` and `review_file` path
-
-   **Verification Checkpoint:**
-   - [ ] All review files exist and were read
-   - [ ] All review statuses extracted
-   - [ ] All task states updated with review information
-   - [ ] Ready to handle review outcomes
-
-7. **Handle Review Outcomes and Merge (NEW PHASE)**:
-
-   **🚨 CRITICAL: Developer agents are re-invoked to handle review results and merge 🚨**
-
-   **For each story in the wave, based on review outcome:**
-
-   **If Review APPROVED:**
-
-   - Update task state: `status: "merging"`
-   - **Re-invoke developer agent to merge**:
-     ```
-     @agent-{assigned_agent}, congratulations! The code review for story {story_id} has been APPROVED.
-
-     Story file: {story_file}
-     Review file: {review_file}
-     Worktree path: {worktree_path}
-
-     ✅ Your implementation passed code review!
-
-     Now you must merge your changes to the main branch:
-
-     1. **Review the code review feedback** (even if approved, there may be notes)
-     2. **Return to repo root**: cd {project_root}
-     3. **Detect potential conflicts**:
-        ```bash
-        CONFLICT_RESULT=$(./.claude/agents/lib/conflict-detector.sh detect "{worktree_path}")
-        ```
-     4. **If conflicts detected**:
-        - Report conflicts to orchestrator
-        - Wait for conflict resolution guidance
-     5. **If no conflicts OR conflicts resolved**:
-        - **Merge worktree**: ./.claude/agents/lib/git-worktree-manager.sh merge "{worktree_path}"
-        - **Unregister files**: ./.claude/agents/lib/file-tracker.sh unregister "{story_id}"
-        - **Cleanup worktree**: ./.claude/agents/lib/git-worktree-manager.sh cleanup "{worktree_path}"
-     6. **Update story status to "Done"**
-     7. **Document merge in Dev Agent Record**:
-        - Add code review status (Approved)
-        - Link to review file
-        - Note merge timestamp
-        - Note any follow-up items from review
-
-     When complete, report back to orchestrator that merge is complete.
-     ```
-
-   - **Wait for developer agent to complete merge**
-   - **Verify merge completed successfully**:
-     - [ ] Worktree merged to main
-     - [ ] Worktree cleaned up
-     - [ ] Story status updated to "Done"
-     - [ ] Dev Agent Record updated with review results
-
-   - Update task state: `status: "done"`, `completed_at: <timestamp>`
-   - Update progress.json counters
-   - Update roadmap.md to check off the story
-
-   **Verification Checkpoint:**
-   - [ ] Developer agent re-invoked for merge
-   - [ ] Merge completed successfully
-   - [ ] Worktree cleaned up
-   - [ ] Story marked as done
-   - [ ] Progress tracking updated
-   - [ ] Ready to proceed to next wave
-
-   **If Review CHANGES REQUESTED:**
-
-   - Update task state: `status: "in_progress"`, `iteration_count: +1`
-   - **DO NOT merge - worktree stays intact**
-   - **Re-invoke developer agent to fix issues**:
-     ```
-     @agent-{assigned_agent}, the code review for story {story_id} found issues
-     that need to be addressed before merging.
-
-     Story file: {story_file}
-     Review file: {review_file}
-     Worktree path: {worktree_path}
-
-     ⚠️ Your implementation requires changes before it can be merged.
-
-     Critical issues to address:
-     [List critical and high-priority issues from review]
-
-     Please:
-     1. **Read the complete code review**: {review_file}
-     2. **Switch to your worktree**: cd {worktree_path}
-     3. **Address ALL critical and high-priority issues**
-     4. **Commit your fixes** with clear commit messages
-     5. **Return to repo root**: cd ../../
-     6. **Update story status back to "Ready for Review"**
-     7. **Update Dev Agent Record** with fixes made
-
-     ⚠️ DO NOT merge or cleanup the worktree - keep it intact for re-review
-
-     IMPORTANT: You must address these issues before this story can be merged
-     and before we can proceed to the next wave.
-     ```
-
-   - **Wait for developer agent to complete fixes**
-   - Return to step 4 (Monitor for Completion)
-   - **REPEAT code review process** (step 5) after fixes are complete
-   - **REPEAT this merge phase** (step 7) after re-review
-
-   **Verification Checkpoint:**
-   - [ ] Developer agent re-invoked with feedback
-   - [ ] Waiting for fixes to be completed
-   - [ ] Worktree still intact (not merged)
-   - [ ] Will trigger another code review after fixes
-   - [ ] NOT proceeding to next wave until approved and merged
-
-   **If Review REJECTED:**
-
-   - Update task state: `status: "blocked"`, `blocked_reason: "Code review rejected"`
-   - **STOP and escalate to user**:
-     ```
-     ⚠️ CRITICAL: Code review for story {story_id} was REJECTED
-
-     Review file: {review_file}
-     Reason: [Extract rejection reason from review]
-
-     This story cannot proceed without significant changes or re-scoping.
-
-     Options:
-     1. Re-scope the story and restart implementation
-     2. Abandon this story and update roadmap
-     3. Escalate for manual review and decision
-
-     Please review the code review and decide how to proceed.
-     ```
-
-   - **Wait for user decision**
-   - **Do NOT proceed to next wave until resolved**
-
-   **Verification Checkpoint:**
-   - [ ] User notified of rejection
-   - [ ] Waiting for user decision
-   - [ ] Story blocked until resolved
-   - [ ] NOT proceeding to next wave
-
-**CRITICAL ENFORCEMENT RULES:**
-- ❌ **NEVER skip code review** for any story
-- ❌ **NEVER merge before code review** is approved
-- ❌ **NEVER proceed to next wave** without approved code reviews and successful merges
-- ❌ **NEVER mark story as done** without code review documentation
-- ✅ **ALWAYS wait** for code review completion before merge
-- ✅ **ALWAYS re-invoke developer agent** to handle merge after approval
-- ✅ **ALWAYS address** code review feedback before proceeding
-- ✅ **ALWAYS document** code review results in story file
-- ✅ **ALWAYS keep worktree intact** until after code review approval
-
-### Phase 4: Conflict Detection and Resolution (When Needed)
-
-**This phase is triggered when a developer agent reports conflicts during merge attempt.**
-
-**When developer agent reports conflicts:**
-
-1. **Extract Conflict Information**:
-   - Read conflict detection result from developer agent
-   - Identify conflicting files
-   - Determine severity level (low/medium/high/critical)
-
-2. **For Low/Medium Severity Conflicts**:
-   - Invoke conflict-resolver agent:
-     ```
-     @agent-conflict-resolver, please analyze and resolve the following conflicts:
-
-     Story: {story_id}
-     Worktree: {worktree_path}
-     Conflicting files: {list_of_files}
-     Severity: {severity_level}
-
-     Please:
-     1. Analyze both versions of the conflicting code
-     2. Understand the intent of each change
-     3. Propose an intelligent resolution
-     4. Provide reasoning and confidence level
-     5. Suggest alternative resolutions if applicable
-
-     Context:
-     - Story description: {story_description}
-     - Files modified: {modified_files}
-     - Recent changes in main: {recent_main_changes}
-     ```
-
-   - **Wait for conflict-resolver analysis**
-   - **Automatically apply** proposed resolution (low/medium severity)
-   - **Notify developer agent** to retry merge
-
-3. **For High/Critical Severity Conflicts**:
-   - Invoke conflict-resolver agent (same as above)
-   - **Present proposed resolution to user**:
-     ```
-     ## High-Severity Conflict Resolution Proposal
-
-     Story: {story_id}
-     Severity: {severity_level}
-
-     {conflict_resolver_analysis}
-
-     Proposed Resolution:
-     {proposed_resolution}
-
-     Reasoning:
-     {reasoning}
-
-     Confidence Level: {confidence}
-
-     Alternative Resolutions:
-     {alternatives}
-
-     Options:
-     1. Accept proposed resolution (recommended)
-     2. Choose alternative resolution
-     3. Manually resolve conflicts
-     4. Abort merge and re-implement story
-
-     Please review and choose an option.
-     ```
-
-   - **Wait for user decision**
-   - **Apply approved resolution**
-   - **Notify developer agent** to retry merge
-
-4. **After Conflict Resolution**:
-   - Developer agent retries merge with resolved conflicts
-   - If merge succeeds, proceed with cleanup
-   - If merge still fails, escalate to user for manual resolution
-
-**Verification Checkpoint:**
-- [ ] Conflicts detected and analyzed
-- [ ] Resolution proposed and applied
-- [ ] Developer agent notified to retry
-- [ ] Merge completed successfully after resolution
-
-### Phase 5: Completion & Reporting
-
-When all stories are done:
-
-1. **Verify Code Review Compliance**:
-   - Confirm ALL stories have `review_status: "Approved"`
-   - Verify ALL stories have code review documentation
-   - Check that ALL review files exist in `docs/code_reviews/`
-   - **If any story lacks code review, STOP and require review**
-
-2. **Generate final report**:
-   ```markdown
-   # Story Implementation Complete! 🎉
-
-   **Total Stories**: X
-   **Successfully Completed**: Y
-   **Total Iterations**: Z (including review cycles)
-   **Time Span**: <start> to <end>
-
-   ## Code Review Compliance ✅
-   - **Total Code Reviews**: X (one per story)
-   - **First-Pass Approvals**: Y stories
-   - **Required Revisions**: Z stories
-   - **Average Review Cycles**: N per story
-   - **Code Review Coverage**: 100% (MANDATORY)
-
-   ## Summary
-   - All stories implemented and approved
-   - All code reviews passed (100% coverage)
-   - All acceptance criteria met
-   - All review documentation complete
-
-   ## Code Review Files
-   [List all code review files in docs/code_reviews/]
-
-   ## Next Steps
-   - Run full test suite
-   - Deploy to staging environment
-   - Prepare for QA testing (when QA agent is available)
+2. **Wait for review completion:**
+   - Review checks code quality
+   - Review verifies tests pass
+   - Review checks acceptance criteria met
+   - Review validates no regressions
+
+3. **If issues found:**
+
+   **🚨 CRITICAL: Main agent MUST NOT fix issues directly 🚨**
+
+   **Required workflow for fixes:**
+
+   a. **Identify the original developer agent:**
+      - Read task state file: `.agent-orchestration/tasks/<story-id>-task.json`
+      - Extract `agent` field (e.g., "nextjs-developer", "python-developer")
+      - Extract `worktree_path` field (existing worktree location)
+
+   b. **Hand story back to ORIGINAL developer agent:**
+      ```bash
+      # Switch to the existing worktree
+      cd <worktree_path>
+
+      # Invoke the SAME developer agent that did original implementation
+      # Pass code review feedback to the agent
+      # Agent name from task state file (e.g., @nextjs-developer)
+      ```
+
+   c. **Developer agent fixes issues in EXISTING worktree:**
+      - Developer agent reads code review feedback
+      - Fixes issues in the worktree (NOT main branch)
+      - Re-runs tests to verify fixes
+      - Updates story file in worktree (NOT main branch)
+      - Marks story as "Ready for Re-Review"
+
+   d. **Re-invoke code-reviewer agent (NOT self-review):**
+      ```bash
+      /review-story <story-id>
+      ```
+      - Code-reviewer agent reviews the fixes
+      - If still has issues: repeat steps a-d
+      - If approved: proceed to step 4
+
+   **🚨 NEVER allow:**
+   - Main agent fixing code directly
+   - Creating new worktree for fixes (use existing worktree)
+   - Self-review (agent reviewing its own fixes)
+   - Updating story files on main branch
+
+4. **Document review results (after approval):**
+   - Add review results to story file (in worktree)
+   - Update story status to "Approved" in state file
+   - Record review completion time
+
+5. **Track wave review progress:**
+   ```
+   📋 Wave [N] Code Review Progress:
+   - Story [id]: ✅ Approved
+   - Story [id]: ✅ Approved
+   - Story [id]: 🔄 In Review
+   - Story [id]: ❌ Issues Found (fixing...)
    ```
 
-3. **Update progress.json** with final metrics including:
-   - Total code reviews performed
-   - Average review cycles per story
-   - Stories requiring revisions
-   - Code review compliance: 100%
+#### 4.4.1: Parallel Fix Execution (If Multiple Stories Have Issues)
 
-4. **Archive roadmap** with completion timestamp
+**If multiple stories in wave have review issues:**
 
-5. **Verify Code Review Artifacts**:
-   - All review files saved in `docs/code_reviews/`
-   - All stories have review documentation
-   - All review statuses are "Approved"
+1. **Identify all stories needing fixes:**
+   - Collect all story IDs with review issues
+   - Read task state files for each story
+   - Extract agent name and worktree path for each
 
----
+2. **Hand ALL stories back to their developer agents IN PARALLEL:**
+   ```bash
+   # For each story with issues, invoke its developer agent simultaneously
+   # Story 1.1 → @nextjs-developer in worktree-1
+   # Story 1.2 → @python-developer in worktree-2
+   # Story 1.3 → @nextjs-developer in worktree-3
+   # All agents work in parallel in separate worktrees
+   ```
 
-## ERROR HANDLING
+3. **Wait for ALL developer agents to complete fixes:**
+   - Monitor all agents in parallel
+   - Track completion status for each
+   - Collect test results from each
 
-**Circular Dependencies Detected:**
-- Report which stories form the cycle
-- Suggest breaking the cycle
-- Stop execution until resolved
+4. **Re-review ALL fixed stories IN PARALLEL:**
+   ```bash
+   # Invoke code-reviewer for all fixed stories simultaneously
+   /review-story 1.1
+   /review-story 1.2
+   /review-story 1.3
+   ```
 
-**Missing Dependencies:**
-- Report which story depends on non-existent story
-- List all missing story IDs
-- Stop execution until resolved
+5. **If any still have issues:**
+   - Repeat parallel fix process for remaining issues
+   - Continue until ALL stories approved
 
-**Agent Not Found:**
-- Report which agent is missing
-- Suggest using fallback agent
-- Ask user for confirmation before proceeding
+**🚨 CRITICAL: Maintain parallel execution even during fix cycles 🚨**
 
-**Story File Not Found:**
-- Report which story file is missing
-- Skip the story and continue
-- Log warning in progress.json
+**🚨 CRITICAL: Do NOT proceed to next wave until ALL stories in current wave are reviewed and approved 🚨**
 
-**Review Never Completes:**
-- If story stuck in "in_review" for too long
-- Prompt user to check what happened
-- Offer to retry review
-- **CRITICAL**: Do NOT proceed to next story until review completes
+**Wave Review Completion:**
+- ALL stories must be approved
+- NO stories can have pending issues
+- ALL fixes must be tested and verified
+- Only then proceed to merge and cleanup
 
-**Code Review Skipped (CRITICAL ERROR):**
-- If attempting to proceed to next story without code review
-- **IMMEDIATELY STOP** the workflow
-- Report critical error to user
-- Require explicit confirmation to continue
-- Log violation in progress.json
+#### 4.5: Sequential Merge and Cleanup (Wave-Based)
 
-**Code Review Not Documented:**
-- If story marked "done" without code review documentation
-- **IMMEDIATELY STOP** the workflow
-- Require code review documentation before proceeding
-- Update story file with review information
-- Verify review file exists
+**🚨 CRITICAL: Merge stories SEQUENTIALLY within each wave to prevent conflicts 🚨**
 
-**Proceeding Without Approval:**
-- If attempting to start next story while current story has "Changes Requested"
-- **IMMEDIATELY STOP** the workflow
-- Report that current story must be fixed and re-reviewed
-- Do not allow next story to start
+**After ALL stories in wave are approved:**
 
----
+**Sequential Merge Process:**
 
-## RESUME CAPABILITY
+1. **Get repository root:**
+   ```bash
+   REPO_ROOT=$(git rev-parse --show-toplevel)
+   ```
 
-If this workflow is interrupted:
+2. **Sort stories by ID** (1.1, 1.2, 1.3, etc.)
+   - Ensures consistent merge order
+   - Prevents race conditions
+   - Example: `1.1` → `1.2` → `1.3`
 
-1. **Read existing state** from `.agent-orchestration/`
-2. **Identify current position**:
-   - Find stories with `status: "in_progress"` or `status: "in_review"`
-   - Check last_updated timestamps
-3. **Resume from last checkpoint**:
-   - Continue with in-progress story
-   - Or move to next story if previous was completed
-4. **Report resume status** to user
+3. **For EACH approved story in wave (in order):**
 
----
+   a. **Merge changes:**
+      ```bash
+      $REPO_ROOT/.claude/agents/lib/git-worktree-manager.sh merge "<absolute-worktree-path>"
+      ```
+      - Merges story branch into main
+      - **If conflicts occur:**
+        - STOP immediately
+        - Report conflict to user
+        - Provide conflict resolution instructions:
+          ```
+          CONFLICT in story [story-id]
 
-## USAGE
+          To resolve:
+          1. cd <worktree-path>
+          2. git fetch origin main:main
+          3. git rebase main
+          4. Resolve conflicts manually
+          5. git add <resolved-files>
+          6. git rebase --continue
+          7. Return to main agent to retry merge
+          ```
+        - Do NOT proceed to next story
+        - Do NOT cleanup worktree (preserve for conflict resolution)
 
-Simply invoke this command:
+   b. **Verify merge succeeded:**
+      ```bash
+      cd $REPO_ROOT
+      git log -1 --oneline
+      ```
+      - **MUST show merge commit**
+      - **MUST be on main branch**
+
+   c. **Update main branch in remaining worktrees (CRITICAL):**
+      ```bash
+      # For each remaining story in wave that hasn't been merged yet
+      for remaining_worktree in <remaining-worktrees>; do
+          git -C "$remaining_worktree" fetch origin main:main 2>/dev/null || true
+          git -C "$remaining_worktree" merge main --no-edit 2>/dev/null || {
+              echo "Note: Worktree $remaining_worktree may need manual rebase"
+          }
+      done
+      ```
+      - **This prevents conflicts in subsequent merges**
+      - **Each story gets latest main before its merge**
+      - **Failures are logged but don't stop the process**
+
+   d. **Cleanup worktree:**
+      ```bash
+      $REPO_ROOT/.claude/agents/lib/git-worktree-manager.sh cleanup "<absolute-worktree-path>"
+      ```
+      - Removes worktree directory
+      - Deletes story branch
+      - Frees up disk space
+
+   e. **Update state:**
+      - Mark story as "Completed" in state file
+      - Record completion time
+      - Update orchestration progress
+      - Update dependency graph (mark as satisfied for dependent stories)
+
+4. **Report wave merge completion:**
+   ```
+   ✅ Wave [N] Merged Successfully
+   - [count] stories merged into main (sequential)
+   - [count] worktrees cleaned up
+   - Ready to proceed to Wave [N+1]
+   ```
+
+**Why Sequential Merging:**
+- Prevents merge conflicts in shared files (package.json, package-lock.json, etc.)
+- Each story merges against latest main
+- Conflicts are detected and resolved one at a time
+- Simpler conflict resolution (one story at a time)
+- Remaining worktrees updated with latest main before their merge
+
+**Merge Order Example:**
 ```
-/implement-stories
+Wave 1: Stories 1.1, 1.2, 1.3
+
+1. Merge 1.1 → main (main now has 1.1 changes)
+2. Update 1.2 and 1.3 worktrees with latest main
+3. Merge 1.2 → main (main now has 1.1 + 1.2 changes)
+4. Update 1.3 worktree with latest main
+5. Merge 1.3 → main (main now has 1.1 + 1.2 + 1.3 changes)
 ```
 
-The workflow will guide you through the entire process, invoking the appropriate
-agents at each step and tracking progress in state files.
+### Step 5: Progress to Next Wave
 
-You can pause at any time (press Escape) and resume later. The state files
-ensure no progress is lost.
+**After current wave is complete:**
+- Verify all stories approved
+- Check no merge conflicts
+- Proceed to next wave
+- Repeat Step 4 for next wave
+
+**Continue until all waves complete.**
+
+### Step 6: Final Summary
+
+**After all stories complete:**
+
+```
+✅ Story Implementation Complete
+
+Total Stories: [count]
+✅ Completed: [count]
+❌ Failed: [count]
+⏭️  Skipped: [count]
+
+Failed Stories:
+  - [story-id]: [reason]
+
+Next Steps:
+  1. Review failed stories
+  2. Fix issues and re-run
+  3. All stories ready for deployment
+```
+
+## State Management
+
+**Track orchestration state in `.agent-orchestration/`:**
+
+**Story state file:** `.agent-orchestration/story-<story-id>.json`
+```json
+{
+  "storyId": "1.1",
+  "status": "In Progress",
+  "agent": "python-developer",
+  "worktree": ".worktrees/agent-python-developer-1.1-...",
+  "dependencies": ["0.1"],
+  "startTime": "2025-01-12T14:30:22Z"
+}
+```
+
+**Orchestration state:** `.agent-orchestration/orchestration-state.json`
+```json
+{
+  "totalStories": 15,
+  "completed": 3,
+  "inProgress": 5,
+  "pending": 7,
+  "currentWave": 2
+}
+```
+
+**See `.claude/agents/agent-guides/orchestration-patterns.md` for complete state management patterns.**
+
+## Error Handling
+
+### Story Failure
+- Mark story as "Failed"
+- Cleanup worktree
+- Continue with other stories
+- Report at end
+
+### Dependency Failure
+- Mark dependent stories as "Blocked"
+- Skip blocked stories
+- Report to user
+
+### Agent Failure
+- Capture error output
+- Cleanup worktree
+- Mark story as "Failed"
+- Continue with other stories
+
+**See `.claude/agents/agent-guides/orchestration-patterns.md` for error handling patterns.**
+
+## Best Practices
+
+1. **Maximize parallel execution** - Default to parallel, only sequential when dependencies require
+2. **Always use git worktrees** - Prevents conflicts, enables true parallelism
+3. **Verify dependencies** - Never skip dependency checks
+4. **Monitor progress** - Update state files, provide real-time feedback
+5. **Handle failures gracefully** - Isolate failures, continue with independent stories
+6. **Mandatory code review** - Review EVERY story before proceeding
+7. **Cleanup resources** - Always cleanup worktrees after completion
+
+**See `.claude/agents/agent-guides/orchestration-patterns.md` for complete best practices and patterns.**
 

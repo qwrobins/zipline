@@ -41,659 +41,341 @@ Wait for user response before proceeding to Step 2.
 
 **ONLY execute this step if AI features are detected in the product brief.**
 
-### 2.1: Detect AI Requirements and Extract Configuration
+### 2.1: Detect AI Requirements
 
-**Step 2.1a: Scan for AI-related keywords and concepts:**
+**Scan for AI-related keywords:**
+- See `.claude/agents/agent-guides/ai-framework-selection.md` for complete detection patterns
+- Conversational AI, Content Generation, Code Analysis, NLP, AI-Powered Features, Model Integration
 
-**Conversational AI patterns**:
-- "chatbot", "AI assistant", "virtual assistant", "conversational interface"
-
-**Content Generation patterns**:
-- "content generation", "text generation", "writing assistant", "summarization"
-
-**Code Analysis patterns**:
-- "code analysis", "code review", "code generation", "AI-powered IDE"
-
-**Natural Language Processing patterns**:
-- "NLP", "natural language", "sentiment analysis", "text classification"
-
-**AI-Powered Features patterns**:
-- "AI-powered", "machine learning", "intelligent", "smart recommendations"
-
-**Model Integration patterns**:
-- "LLM", "language model", "GPT", "Claude", "AI model"
-
-**Step 2.1b: Extract existing AI configuration from product brief:**
-
-**Framework Detection patterns**:
-- "Claude Agent SDK", "Anthropic Claude", "claude-agent-sdk"
-- "Mastra", "Mastra AI", "multi-provider AI", "provider fallback"
-- "OpenAI", "GPT-4", "gpt-4o", "ChatGPT"
-- "Google Gemini", "Gemini Pro", "Google AI"
-
-**Model Detection patterns**:
-- "claude-3-5-sonnet", "claude-3-5-haiku", "claude-3-opus"
-- "gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "gpt-3.5-turbo"
-- "gemini-pro", "gemini-pro-vision", "gemini-ultra"
-
-**Configuration Detection patterns**:
-- Temperature settings: "temperature 0.7", "temp=0.5"
-- Provider preferences: "primary provider", "fallback to", "backup provider"
-- Cost considerations: "cost optimization", "budget constraints", "cheaper models"
-- Multi-agent: "different models for different tasks", "specialized agents"
-
-**Examples of Complete Configuration in Product Brief:**
-
-```
-Example 1 (Claude Agent SDK):
-"The application will use Claude Agent SDK with claude-3-5-sonnet-20241022
-as the primary model at temperature 0.7. We need custom MCP tools for file
-system access and code analysis."
-
-Example 2 (Mastra Framework):
-"We want to use Mastra AI Framework with OpenAI gpt-4o as primary provider
-and Anthropic claude-3-5-haiku as fallback for cost optimization. The system
-needs multi-agent workflows with different models for research vs writing tasks."
-
-Example 3 (Partial Configuration):
-"The app needs AI capabilities using OpenAI models for content generation."
-→ Framework not specified, model not specific, temperature not mentioned
-→ Prompt user for: Framework choice, specific model, temperature, fallback strategy
-```
+**Extract existing configuration from product brief:**
+- Framework preferences (Claude Agent SDK, Mastra AI)
+- Model specifications (claude-3-5-sonnet, gpt-4o, gemini-pro)
+- Configuration settings (temperature, providers, fallbacks)
 
 ### 2.2: Determine Configuration Approach
 
-**If AI requirements are detected**, determine the configuration approach:
+**If complete AI configuration found in product brief:**
+- Extract and validate configuration
+- Skip interactive prompts
+- Proceed to Step 2.5 (Validate and Store)
 
-**Option A: Configuration Already Specified in Product Brief**
-- If framework, models, and configuration are already specified in the product brief
-- Extract and validate the configuration
-- Skip user prompts and proceed to Step 2.5 (Store AI Configuration)
+**If partial or no AI configuration found:**
+- Proceed to Step 2.3 (Interactive Configuration)
 
-**Option B: Partial Configuration in Product Brief**
-- If some AI configuration is specified but incomplete
-- Extract what's available
-- Only prompt user for missing information
-
-**Option C: No Configuration in Product Brief**
-- If AI features are mentioned but no specific configuration provided
-- Present full framework selection workflow to user
-
-### 2.3: Present Framework Options (If Configuration Needed)
-
-**If configuration is needed from user**, present this prompt:
-
-```
-🤖 AI Integration Detected
-
-Your project needs AI capabilities. I'll help you choose the right framework:
-
-**Option 1: Claude Agent SDK** (Recommended for most projects)
-✅ **Pros:** Simple setup, excellent AI quality, great for teams new to AI
-💰 **Cost:** Moderate (Anthropic Claude models)
-📋 **Best for:** Most business applications, content generation, analysis tasks
-
-**Option 2: Mastra AI Framework** (For advanced needs)
-✅ **Pros:** Multiple AI providers, cost optimization, high availability
-💰 **Cost:** Variable (can optimize across providers)
-📋 **Best for:** Large-scale apps, cost-sensitive projects, complex AI workflows
-
-**Quick Decision:**
-- Choose **Option 1** if you want simplicity and excellent AI quality
-- Choose **Option 2** if you need cost optimization or provider flexibility
-- **Not sure?** Type "recommend" for a personalized suggestion
-
-Enter your choice (1, 2, or "recommend"):
-```
-
-Wait for user response before proceeding.
-
-### 2.4A: Claude Agent SDK Configuration (If Option 1 Selected)
+### 2.3: Interactive AI Framework Configuration
 
 **Only prompt for information not already specified in the product brief.**
 
-**Model Selection (if not specified):**
+#### Framework Selection
+
+**If framework not specified, ask:**
 
 ```
-📋 Claude Model Selection
+🤖 AI Framework Selection
 
-Choose your Claude model (we recommend option 1 for most projects):
+Choose your AI integration approach:
 
-1. **Claude Sonnet** (RECOMMENDED) ⭐
-   - Best overall performance for most tasks
-   - Excellent at reasoning, coding, and analysis
-   - Cost: ~$3 per 1M tokens
+1. **Claude Agent SDK** (Simpler, single-provider)
+   - Best for: Straightforward AI needs, new to AI development
+   - Provider: Anthropic Claude only
 
-2. **Claude Haiku** (Budget-friendly)
-   - Fast and cost-effective
-   - Good for simple tasks and high-volume usage
-   - Cost: ~$0.25 per 1M tokens
+2. **Mastra AI Framework** (Flexible, multi-provider)
+   - Best for: High availability, cost optimization, multi-agent workflows
+   - Providers: OpenAI, Anthropic, Google (with fallbacks)
 
-**For reference:** 1M tokens ≈ 750,000 words of text
-
-Enter your choice (1-2, or press Enter for recommended):
+Enter your choice (1-2, or 'help' for recommendations):
 ```
 
-**Additional Configuration (only ask if not specified in product brief):**
-
-**Temperature Setting (if not specified):**
-```
-🎛️ AI Response Style (Optional)
-
-How creative should the AI responses be?
-
-1. **Focused** (Recommended) - Consistent, predictable responses
-2. **Balanced** - Mix of consistency and creativity
-3. **Creative** - More varied and creative responses
-
-This is optional - press Enter to use the recommended setting.
-Enter your choice (1-3, or press Enter for default):
-```
-
-**Custom Tools (if not specified):**
-```
-🔧 Custom Capabilities (Optional)
-
-Do you need the AI to access external tools like:
-- File systems or databases
-- APIs or web services
-- Custom business logic
-
-Most projects don't need this initially.
-
-Add custom tools? (y/N - press Enter for No):
-```
-
-### 2.4B: Mastra AI Framework Configuration (If Option 2 Selected)
-
-**Only prompt for information not already specified in the product brief.**
-
-**Provider Selection (if not specified):**
-
-```
-📋 Primary AI Provider Selection
-
-Choose your main AI provider:
-
-1. **OpenAI** (Most popular)
-   - Strengths: Coding, general tasks, multimodal (text + images)
-   - Cost: Moderate, good performance/price ratio
-
-2. **Anthropic (Claude)** (Best reasoning)
-   - Strengths: Complex reasoning, analysis, safety-focused
-   - Cost: Moderate to high, excellent quality
-
-3. **Google (Gemini)** (Most affordable)
-   - Strengths: Fast responses, cost-effective, good for simple tasks
-   - Cost: Low, great for high-volume usage
-
-**Recommendation:** Choose OpenAI (1) for most business applications
-
-Enter your choice (1-3, or press Enter for recommended):
-```
-
-**After primary provider selection, show provider-specific models:**
-
-**If OpenAI selected:**
-```
-📋 OpenAI Model Selection
-
-Choose your OpenAI model (we recommend option 1 for most projects):
-
-1. **GPT-4o** (RECOMMENDED) ⭐
-   - Best overall performance, handles text and images
-   - Excellent for complex reasoning and coding
-   - Cost: ~$2.50 per 1M tokens
-
-2. **GPT-4o Mini** (Budget-friendly)
-   - Fast and cost-effective
-   - Good for most business tasks
-   - Cost: ~$0.15 per 1M tokens
-
-**For reference:** 1M tokens ≈ 750,000 words of text
-
-Enter your choice (1-2, or press Enter for recommended):
-```
-
-**If Anthropic selected:**
-```
-📋 Anthropic Model Selection
-
-Choose your Claude model (we recommend option 1 for most projects):
-
-1. **Claude Sonnet** (RECOMMENDED) ⭐
-   - Best overall performance for most tasks
-   - Excellent at reasoning, coding, and analysis
-   - Cost: ~$3 per 1M tokens
-
-2. **Claude Haiku** (Budget-friendly)
-   - Fast and cost-effective
-   - Good for simple tasks and high-volume usage
-   - Cost: ~$0.25 per 1M tokens
-
-**For reference:** 1M tokens ≈ 750,000 words of text
-
-Enter your choice (1-2, or press Enter for recommended):
-```
-
-**If Google selected:**
-```
-📋 Google Model Selection
-
-Choose your Gemini model (we recommend option 1 for most projects):
-
-1. **Gemini Pro** (RECOMMENDED) ⭐
-   - Best overall performance for most tasks
-   - Good balance of capability and cost
-   - Cost: ~$0.50 per 1M tokens
-
-2. **Gemini Pro Vision** (Multimodal)
-   - Handles text and images
-   - Good for visual analysis tasks
-   - Cost: ~$0.50 per 1M tokens
-
-**For reference:** 1M tokens ≈ 750,000 words of text
-
-Enter your choice (1-2, or press Enter for recommended):
-```
-
-**Additional Configuration (only ask if not specified in product brief):**
-
-**Fallback Provider (if not specified):**
-```
-🛡️ Backup Provider (Recommended for production)
-
-If your primary AI provider has issues, should we automatically switch to a backup?
-
-This prevents downtime but adds complexity.
-
-Configure backup provider? (Y/n - press Enter for Yes):
-```
-
-**Multi-Agent Workflows (if not specified):**
-```
-🤖 Multi-Agent Setup (Optional)
-
-Do you need different AI models for different tasks? For example:
-- Research agent using one model
-- Writing agent using another model
-- Analysis agent using a third model
-
-Most projects start simple with one model.
-
-Set up multi-agent workflows? (y/N - press Enter for No):
-```
-
-**Priority Setting (if not specified):**
-```
-🎯 Project Priority (Optional)
-
-What's most important for your project?
-
-1. **Cost optimization** - Minimize AI expenses
-2. **Performance** - Best possible AI quality
-3. **Reliability** - Maximum uptime and availability
-
-This helps optimize your configuration.
-
-Enter your priority (1-3, or press Enter to skip):
-```
-
-### 2.4: Provide Recommendations (If User Is Unsure)
-
-If the user responds with "I'm not sure" or "What do you recommend?", provide a recommendation based on these criteria:
-
-**Recommend Claude Agent SDK when:**
-- Project is relatively simple with straightforward AI needs
-- Team is new to AI development and wants simpler setup
-- Project specifically requires Anthropic/Claude features
-- Single-provider approach is acceptable
-- Budget allows for Claude pricing
-
-**Recommend Mastra AI Framework when:**
-- Project requires high availability and needs provider fallbacks
-- Cost optimization is a priority (can switch to cheaper providers for simple tasks)
-- Project needs multi-agent workflows with different models
-- Team wants flexibility to switch providers in the future
-- Project has complex AI orchestration requirements
-
-**Example recommendation response:**
-```
-💡 Recommendation: [Framework Name]
-
-Based on your project, I recommend **[Framework Name]** because:
-
-✅ **Perfect fit:** [Primary reason based on project needs]
-💰 **Cost-effective:** [Cost consideration]
-⚡ **Easy to implement:** [Implementation benefit]
-
-This choice will work well for your project and you can always adjust later as your needs evolve.
-
-Proceed with this recommendation? (Y/n - press Enter for Yes):
-```
-
-### 2.5: Validate and Store AI Configuration
-
-**Step 2.5a: Validate Configuration**
-
-Validate the AI configuration (whether extracted from product brief or collected from user):
-
-**Framework Validation:**
-- Ensure framework choice is valid (Claude Agent SDK or Mastra AI Framework)
-- Verify model names are current and available
-- Check provider/model compatibility (e.g., don't use GPT models with Claude Agent SDK)
-
-**Configuration Completeness:**
-- Framework: Must be specified
-- Primary model: Must be specified
-- Temperature: Default to 0.7 if not specified
-- Fallback provider: Optional but recommended for production
-- Multi-agent setup: Optional, document if specified
-
-**Step 2.5b: Store Configuration**
-
-Store the validated AI framework configuration for use in subsequent planning steps. This will be included in architecture documents and PRDs.
+**If user requests help:**
+- See `.claude/agents/agent-guides/ai-framework-selection.md` for recommendation criteria
+- Provide tailored recommendation based on project needs
+
+#### Provider and Model Selection
+
+**For Claude Agent SDK:**
+- Default to claude-3-5-sonnet-20241022
+- Ask for temperature (default 0.7)
+- Ask about custom tools (default No)
+
+**For Mastra AI Framework:**
+- Prompt for primary provider (OpenAI, Anthropic, Google)
+- Show provider-specific model options (see guide for details)
+- Ask about fallback provider (recommended for production)
+- Ask about multi-agent workflows (optional)
+- Ask about priority (cost, performance, reliability)
+
+**All provider/model details:** See `.claude/agents/agent-guides/ai-framework-selection.md`
+
+### 2.4: Validate and Store AI Configuration
+
+**Validate configuration:**
+- Framework choice is valid
+- Model names are current and available
+- Provider/model compatibility
+- Configuration completeness
+
+**Store configuration for use in subsequent planning steps.**
 
 **Required AI Configuration Documentation:**
 
 ```markdown
-## AI Integration [Architecture/Requirements]
+## AI Integration
 
-### Framework Selection
-- **Framework**: [Claude Agent SDK / Mastra AI Framework]
-- **Rationale**: [Brief explanation based on project needs]
-
-### Model Configuration
-- **Primary Provider**: [OpenAI / Anthropic / Google]
-- **Primary Model**: [specific model name]
-- **Temperature**: [0.0-1.0]
-- **Fallback Provider** (if applicable): [provider name]
-- **Fallback Model** (if applicable): [model name]
-
-### Multi-Agent Configuration (if applicable)
-[Document different agent roles and their assigned models]
-
-### Cost Considerations
-- **Estimated Monthly Cost**: [based on expected usage]
-- **Cost Optimization Strategy**: [e.g., use cheaper models for simple tasks]
-
-### Security Requirements
-- API key management strategy
-- Input validation and sanitization requirements
-- Output filtering requirements
-- Rate limiting configuration
-
-### Testing Strategy
-- Unit testing approach for AI tools
-- Integration testing with mocked responses
-- E2E testing budget and approach
-- Evaluation metrics for AI quality
-
-### References
-- **Main Framework Guide**: `agents/directives/[claude-agent-sdk.md / mastra-ai-framework.md]`
-- **Security Guidelines**: `agents/directives/[claude-agent-security.md / mastra-ai-security.md]`
-- **Testing Patterns**: `agents/directives/[claude-agent-testing.md / mastra-ai-testing.md]`
+**Framework**: [Claude Agent SDK | Mastra AI Framework]
+**Primary Model**: [model-name]
+**Temperature**: [0.0-1.0]
+**Fallback Provider**: [provider-name | None]
+**Multi-Agent**: [Yes | No]
+**Custom Tools**: [Yes | No]
 ```
 
-**If no AI requirements detected**, skip this entire step and proceed directly to Step 3.
+## Step 3: Generate Architecture Document (Conditional)
 
-## Step 3: Execute Planning Workflow (Sequential)
+**Execute if user selected option 1 or 3 in Step 1.2**
 
-Once you have the product brief, user preferences, and AI configuration (if applicable), execute the following steps in sequence:
+### 3.1: Invoke Architecture Agent
 
-### 2.1: Generate PRD
+**Call the architecture agent:**
+- Provide product brief content
+- Include AI configuration (if applicable)
+- Request architecture document generation
 
-**Use the same functionality as the `/create-prd` slash command**:
+**Expected output:**
+- `docs/architecture/architecture.md`
+- System architecture overview
+- Technology stack decisions
+- Component architecture
+- Data flow diagrams
+- Deployment architecture
+- AI integration architecture (if applicable)
 
-1. **Analyze Requirements** using `sequential_thinking` tool:
-   - Product vision and goals
-   - Target users and their needs
-   - Key features and functionality
-   - Technical constraints and assumptions
-   - Success metrics and acceptance criteria
-   - **AI integration requirements** (if AI framework was selected)
+### 3.2: Verify Architecture Document
 
-2. **Research Best Practices** using `context7` tools:
-   ```
-   resolve-library-id: "product requirements document best practices"
-   get-library-docs: [Use the library ID from resolve-library-id]
-   
-   resolve-library-id: "[product domain] requirements"
-   get-library-docs: [Use the library ID from resolve-library-id]
-   
-   resolve-library-id: "[technology stack] best practices"
-   get-library-docs: [Use the library ID from resolve-library-id]
-   ```
+**Validate output:**
+- File exists at correct location
+- Contains all required sections
+- AI configuration properly documented (if applicable)
+- No placeholder content
 
-3. **Create PRD** using `save-file` tool:
-   - Save to `docs/prd.md`
-   - Include all 15 essential PRD sections (including Implementation Phasing)
-   - **Include AI Integration Requirements section** (if AI framework was selected)
-   - Base content on analysis and research
-   - **🚨 CRITICAL: Follow feature phasing rules from `.claude/agents/directives/prd-feature-phasing.md`**
+## Step 4: Generate Frontend Design Specification (Conditional)
 
-4. **Validate Feature Phasing** (CRITICAL):
-   - ✅ All user-facing features in Pre-Launch phase
-   - ✅ Theme switching (light/dark mode) is Pre-Launch
-   - ✅ Accessibility features are Pre-Launch
-   - ✅ Responsive design is Pre-Launch
-   - ✅ Only deployment/operations infrastructure is Post-Launch
-   - ✅ No functionality gaps requiring rework
+**Execute if user selected option 2 or 3 in Step 1.2**
 
-5. **Report PRD completion**:
-   ```
-   ✅ PRD Created: docs/prd.md
-   - [X] epics created
-   - [X] user stories created
-   - Key features: [list]
-   - ✅ Feature phasing validated (all user-facing features Pre-Launch)
-   ```
+### 4.1: Invoke Frontend Design Agent
 
-### 2.2: Generate Architecture Document (Conditional)
+**Call the frontend-design agent:**
+- Provide product brief content
+- Request design specification generation
 
-**If user requested architecture document**:
+**Expected output:**
+- `docs/design/frontend-design-spec.md`
+- Design system (colors, typography, spacing)
+- Component specifications
+- User flows
+- Accessibility requirements
+- Responsive design guidelines
 
-Invoke the `software-architect` agent approach:
+### 4.2: Verify Design Specification
 
-1. **Analyze PRD Requirements** using `sequential_thinking` tool:
-   - Review functional and non-functional requirements
-   - Identify technical constraints and assumptions
-   - Determine scalability and performance needs
-   - Understand integration requirements
-   - **Review AI integration requirements** (if AI framework was selected)
+**Validate output:**
+- File exists at correct location
+- Contains all required sections
+- Design system fully defined
+- Component specs complete
 
-2. **Research Technologies** using `context7` tools:
-   ```
-   resolve-library-id: "[framework name]"
-   get-library-docs: [Use the library ID from resolve-library-id]
-   
-   resolve-library-id: "architecture patterns"
-   get-library-docs: [Use the library ID from resolve-library-id]
-   ```
+## Step 5: Generate Product Requirements Document
 
-3. **Create Architecture Document** using `save-file` tool:
-   - Save to `docs/architecture.md`
-   - Follow Phase 1 approach (1000-1500 lines maximum)
-   - Include all 12 essential architecture sections
-   - **Include AI Integration Architecture section** (if AI framework was selected)
+### 5.1: Invoke PRD Agent
 
-4. **Report Architecture completion**:
-   ```
-   ✅ Architecture Document Created: docs/architecture.md
-   - Technology stack: [list]
-   - Key patterns: [list]
-   - Phase 2 expansions available on request
-   ```
+**Call the PRD creation agent:**
+- Provide product brief content
+- Include architecture document (if generated)
+- Include design specification (if generated)
+- Include AI configuration (if applicable)
 
-### 2.3: Generate Frontend Design Spec (Conditional)
+**Expected output:**
+- `docs/requirements/prd.md`
+- Product overview
+- User personas
+- Feature requirements
+- Technical requirements
+- Success metrics
+- Timeline and milestones
 
-**If user requested frontend design specification**:
+### 5.2: Verify PRD
 
-Invoke the `frontend-design` agent approach:
+**Validate output:**
+- File exists at correct location
+- Contains all required sections
+- References architecture and design docs (if applicable)
+- AI requirements documented (if applicable)
 
-1. **Analyze Design Requirements** using `sequential_thinking` tool:
-   - Product vision and user experience goals
-   - Target users and their design needs
-   - Key features requiring UI/UX design
-   - Brand personality and design principles
+## Step 6: Shard Large Documents (Conditional)
 
-2. **Research Design Best Practices** using `context7` tools:
-   ```
-   resolve-library-id: "design system best practices"
-   get-library-docs: [Use the library ID from resolve-library-id]
-   
-   resolve-library-id: "WCAG accessibility guidelines"
-   get-library-docs: [Use the library ID from resolve-library-id]
-   ```
+**🚨 CRITICAL: Shard large documents to enable efficient consumption by scrum-master agent 🚨**
 
-3. **Create Design Specification** using `save-file` tool:
-   - Save modular files to `docs/design/` directory:
-     - `docs/design/README.md` (overview and navigation)
-     - `docs/design/design-system.md` (tokens and foundations)
-     - `docs/design/components.md` (component specifications)
-     - `docs/design/implementation.md` (technical guidelines)
+This step uses document sharding to break large planning documents into focused, digestible sections.
 
-4. **Report Design Spec completion**:
-   ```
-   ✅ Frontend Design Specification Created: docs/design/
-   - [X] components specified
-   - Design principles: [list]
-   - Accessibility: WCAG 2.1 AA compliant
-   ```
+### 6.1: Check Document Sizes
 
-### 2.4: Shard Documents
+**Check line counts for generated documents:**
 
-**Use the `planning-analyst` agent functionality**:
+```bash
+# Count lines in each document
+wc -l docs/requirements/prd.md
+wc -l docs/architecture/architecture.md
+wc -l docs/design/frontend-design-spec.md
+```
 
-For each large document created (PRD, Architecture), if it's over 500 lines:
+**Determine which documents need sharding:**
+- **PRD**: If > 500 lines → Shard into `docs/requirements/prd/`
+- **Architecture**: If > 500 lines → Shard into `docs/architecture/`
+- **Design Spec**: If > 500 lines → Shard into `docs/design/`
 
-1. **Analyze Document Structure** using `sequential_thinking` tool:
-   - Identify document type and structure
-   - Verify level 2 headings for major sections
+### 6.2: Shard Documents Using md-tree
+
+**For each document that exceeds 500 lines:**
+
+#### PRD Sharding
+
+**If PRD > 500 lines:**
+
+1. **Analyze PRD structure** using `sequential_thinking`:
+   - Identify level 2 headings (## sections)
+   - Verify sections are properly structured
    - Plan output directory structure
 
-2. **Use md-tree to explode documents**:
+2. **Shard PRD using md-tree:**
    ```bash
-   # For PRD (if large)
-   md-tree explode docs/prd.md docs/prd
-   
-   # For Architecture (if large)
-   md-tree explode docs/architecture.md docs/architecture
+   md-tree explode docs/requirements/prd.md docs/requirements/prd
    ```
 
-3. **Verify sharding results**:
-   - Check all sections were extracted correctly
-   - Verify index.md files have proper links
+3. **Verify sharding results:**
+   - Check `docs/requirements/prd/` directory created
+   - Verify `index.md` exists with navigation links
+   - Verify all sections extracted correctly
    - Ensure no content was lost
 
-4. **Report sharding completion**:
+4. **Expected structure:**
    ```
-   ✅ Documents Sharded:
-   - docs/prd/ directory created with [X] sections
-   - docs/architecture/ directory created with [X] sections
-   - Navigation indexes created
-   ```
-
-### 2.5: Create Epics and Stories
-
-**Use the `scrum-master` agent functionality**:
-
-1. **Detect Project State** (CRITICAL - FIRST STEP):
-   - Check for package.json, node_modules, next.config.ts, app/ directory
-   - Determine if Story 0.0 (Project Initialization) is needed
-   - Document decision in stories README.md
-
-2. **Analyze Planning Documents** using `sequential_thinking` tool:
-   - Read PRD (sharded or monolithic)
-   - Read Architecture document (if exists)
-   - Read Design specification (if exists)
-   - Identify all epics and stories from PRD
-
-3. **Research Agile Best Practices** using `context7` tools:
-   ```
-   resolve-library-id: "agile user stories best practices"
-   get-library-docs: [Use the library ID from resolve-library-id]
-
-   resolve-library-id: "acceptance criteria patterns"
-   get-library-docs: [Use the library ID from resolve-library-id]
+   docs/requirements/prd/
+   ├── index.md                    # Navigation index
+   ├── overview.md                 # Executive summary, goals, scope
+   ├── epic-1-foundation.md        # Epic 1 requirements
+   ├── epic-2-user-profiles.md     # Epic 2 requirements
+   ├── epic-3-features.md          # Epic 3 requirements
+   └── non-functional.md           # NFRs, constraints
    ```
 
-4. **Create Foundation Stories** using `save-file` tool:
-   - **Story 0.0** (if needed): Project Initialization
-   - **Story 0.1** (always): Design System Foundation Setup
-     - Extract ALL CSS variables from design-system.md
-     - Include exact HSL values in acceptance criteria
-   - **Story 0.2+** (as needed): Other infrastructure
+#### Architecture Sharding
 
-5. **Create Feature Stories** using `save-file` tool:
-   - Create `docs/stories/README.md` with overview and project state detection
-   - Create individual story files: `docs/stories/[epic].[story].[title].md`
-   - **CRITICAL**: One file per story (not per epic)
-   - Include all required sections per story template
-   - Add foundation story dependencies to ALL feature stories
-   - Use specific design tokens in acceptance criteria (not generic descriptions)
+**If Architecture > 500 lines:**
 
-6. **Report Stories completion**:
-   ```
-   ✅ User Stories Created: docs/stories/
-   - Story 0.0: [GENERATED/SKIPPED] - Project Initialization
-   - Story 0.1: GENERATED - Design System Foundation Setup
-   - [X] epics created
-   - [X] individual story files created
-   - Dependencies mapped (all feature stories depend on foundation stories)
-   - Design tokens extracted into acceptance criteria
-   - Ready for implementation
-   ```
-
-### 2.6: Initialize Orchestration Infrastructure
-
-**Create the orchestration directory structure and state files**:
-
-1. **Create orchestration directory structure** if it doesn't exist:
+1. **Shard architecture using md-tree:**
    ```bash
-   mkdir -p .agent-orchestration/tasks
+   md-tree explode docs/architecture/architecture.md docs/architecture/
    ```
 
-2. **Count total stories** by scanning `docs/stories/` directory:
-   - Count all `.md` files except `README.md`
-   - Extract story IDs from filenames
-
-3. **Initialize progress.json** using `save-file` tool:
-   ```json
-   {
-     "initialized_at": "<current timestamp>",
-     "last_updated": "<current timestamp>",
-     "scope": "all stories",
-     "total_stories": <count>,
-     "completed": 0,
-     "in_progress": 0,
-     "blocked": 0,
-     "not_started": <count>
-   }
+2. **Expected structure:**
    ```
-   Save to: `.agent-orchestration/progress.json`
-
-4. **Initialize worktree registry** using `save-file` tool:
-   ```json
-   {
-     "active_worktrees": [],
-     "last_updated": "<current timestamp>"
-   }
-   ```
-   Save to: `.agent-orchestration/worktree-registry.json`
-
-5. **Report infrastructure initialization**:
-   ```
-   ✅ Orchestration Infrastructure Initialized:
-   - Directory: .agent-orchestration/
-   - Progress tracking: progress.json
-   - Worktree registry: worktree-registry.json
-   - Total stories: [X]
+   docs/architecture/
+   ├── index.md                    # Navigation index
+   ├── overview.md                 # System overview
+   ├── technology-stack.md         # Tech stack decisions
+   ├── component-architecture.md   # Component design
+   ├── data-flow.md               # Data flow diagrams
+   └── deployment.md              # Deployment architecture
    ```
 
-### 2.7: Analyze Story Dependencies
+#### Design Spec Sharding
+
+**If Design Spec > 500 lines:**
+
+1. **Shard design spec using md-tree:**
+   ```bash
+   md-tree explode docs/design/frontend-design-spec.md docs/design/
+   ```
+
+2. **Expected structure:**
+   ```
+   docs/design/
+   ├── index.md                    # Navigation index
+   ├── design-system.md            # Colors, typography, spacing
+   ├── components.md               # Component specifications
+   ├── user-flows.md              # User flow diagrams
+   └── accessibility.md           # Accessibility requirements
+   ```
+
+### 6.3: Report Sharding Results
+
+**Report which documents were sharded:**
+
+```
+✅ Document Sharding Complete
+
+Documents Sharded:
+  ✅ PRD: docs/requirements/prd/ ([X] sections)
+  ✅ Architecture: docs/architecture/ ([X] sections)
+  ✅ Design Spec: docs/design/ ([X] sections)
+
+Documents Not Sharded (under 500 lines):
+  ℹ️  PRD: 450 lines (no sharding needed)
+  ℹ️  Architecture: 380 lines (no sharding needed)
+
+Benefits:
+  - Scrum master can read focused sections incrementally
+  - Reduces context window usage
+  - Improves story generation accuracy
+  - Enables parallel document consumption
+```
+
+### 6.4: Update References
+
+**If documents were sharded, update references:**
+
+- Scrum master will read from sharded directories
+- Use `docs/requirements/prd/index.md` as entry point
+- Read individual sections as needed
+- Avoid loading entire large documents at once
+
+## Step 7: Generate Epics and Stories
+
+### 7.1: Invoke Scrum Master Agent
+
+**Call the scrum-master agent:**
+- Provide PRD content (sharded or monolithic)
+- Provide architecture document (sharded or monolithic, if generated)
+- Provide design specification (sharded or monolithic, if generated)
+- Request epic and story generation
+
+**If documents were sharded:**
+- Scrum master will read from sharded directories
+- Use `docs/requirements/prd/index.md` as entry point
+- Read individual sections incrementally
+- Avoid loading entire large documents at once
+
+**Expected output:**
+- `docs/stories/README.md` (Epic overview with project state detection)
+- `docs/stories/0.0.project-initialization.md` (if no codebase detected)
+- `docs/stories/0.1.design-system-foundation-setup.md` (always)
+- `docs/stories/[epic].[story].[title].md` (Feature stories)
+
+### 7.2: Verify Stories
+
+**Validate output:**
+- README.md exists with epic overview
+- Foundation stories generated correctly
+- All feature stories have:
+  - Clear acceptance criteria
+  - Proper dependencies
+  - Appropriate sizing
+  - Design tokens (for UI stories)
+
+## Step 7: Analyze Story Dependencies
 
 **Build dependency graph and identify parallel execution opportunities**:
+
+### 7.1: Scan Story Dependencies
 
 1. **Scan all story files** in `docs/stories/`:
    - Read each story file
@@ -708,121 +390,79 @@ For each large document created (PRD, Architecture), if it's over 500 lines:
    - Validate no circular dependencies exist
    - If circular dependencies found, report error and stop
 
-3. **Identify Parallel Execution Waves**:
+### 7.2: Identify Parallel Execution Waves
+
+1. **Identify Parallel Execution Waves**:
    - **Wave 0**: Stories with NO dependencies (can start immediately)
    - **Wave 1**: Stories that depend only on Wave 0 stories
    - **Wave 2**: Stories that depend only on Wave 0 or Wave 1 stories
    - Continue until all stories are assigned to waves
    - **CRITICAL**: All stories in the same wave can run in PARALLEL
 
-4. **Perform topological sort** to determine implementation order:
+2. **Perform topological sort** to determine implementation order:
    - Use context7 if uncertain about topological sort algorithm
    - Generate ordered list of stories
    - Prioritize grouping independent stories into waves
 
-5. **Calculate Parallel Opportunities**:
+3. **Calculate Parallel Opportunities**:
    - For each wave, count how many stories can run simultaneously
    - Estimate time savings from parallel execution
    - Identify maximum parallel agents needed
 
-6. **Save dependency graph** using `save-file` tool to `.agent-orchestration/dependency-graph.json`:
-   ```json
-   {
-     "scope": "all stories",
-     "nodes": ["0.0", "0.1", "1.1", "1.2", ...],
-     "edges": [
-       {"from": "0.0", "to": "0.1"},
-       {"from": "0.1", "to": "1.1"},
-       ...
-     ],
-     "implementation_order": ["0.0", "0.1", "1.1", "1.2", ...],
-     "parallel_waves": [
-       {"wave": 0, "stories": ["0.0"], "can_run_parallel": false},
-       {"wave": 1, "stories": ["0.1"], "can_run_parallel": false},
-       {"wave": 2, "stories": ["1.1", "1.2", "1.3"], "can_run_parallel": true},
-       ...
-     ],
-     "parallel_opportunities": [
-       ["1.1", "1.2", "1.3"],
-       ["2.1", "2.2"],
-       ...
-     ],
-     "max_parallel_agents": 3,
-     "estimated_time_savings": "40% faster with parallel execution"
-   }
-   ```
+### 7.3: Save Dependency Graph
 
-7. **Generate Dependency Graph Mermaid Diagram** using `save-file` tool to `docs/dependency-graph.mmd`:
-   ```mermaid
-   flowchart TD
-       %% Story Dependencies and Parallel Execution Waves
+**Save dependency graph** using `save-file` tool to `.agent-orchestration/dependency-graph.json`:
 
-       %% Wave 0 - Foundation
-       S0_0["0.0: Project Initialization<br/>👤 nextjs-developer"]
+```json
+{
+  "scope": "all stories",
+  "nodes": ["0.0", "0.1", "1.1", "1.2", ...],
+  "edges": [
+    {"from": "0.0", "to": "0.1"},
+    {"from": "0.1", "to": "1.1"},
+    ...
+  ],
+  "implementation_order": ["0.0", "0.1", "1.1", "1.2", ...],
+  "parallel_waves": [
+    {"wave": 0, "stories": ["0.0"], "can_run_parallel": false},
+    {"wave": 1, "stories": ["0.1"], "can_run_parallel": false},
+    {"wave": 2, "stories": ["1.1", "1.2", "1.3"], "can_run_parallel": true},
+    ...
+  ],
+  "parallel_opportunities": [
+    ["1.1", "1.2", "1.3"],
+    ["2.1", "2.2"],
+    ...
+  ],
+  "max_parallel_agents": 3,
+  "estimated_time_savings": "40% faster with parallel execution"
+}
+```
 
-       %% Wave 1 - Design System
-       S0_1["0.1: Design System Foundation<br/>👤 nextjs-developer"]
+### 7.4: Report Dependency Analysis
 
-       %% Wave 2 - Core Features (Parallel)
-       S1_1["1.1: User Authentication<br/>👤 nextjs-developer"]
-       S1_2["1.2: User Profile<br/>👤 nextjs-developer"]
-       S1_3["1.3: Dashboard<br/>👤 nextjs-developer"]
+```
+✅ Dependency Analysis Complete:
+- Total stories: [X]
+- Dependency edges: [Y]
+- Parallel waves: [Z]
+- Max parallel agents: [N]
+- Estimated time savings: [P]% with parallel execution
+- No circular dependencies detected ✓
+```
 
-       %% Dependencies
-       S0_0 --> S0_1
-       S0_1 --> S1_1
-       S0_1 --> S1_2
-       S0_1 --> S1_3
-
-       %% Wave styling
-       classDef wave0 fill:#e1f5fe,stroke:#01579b,stroke-width:2px
-       classDef wave1 fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
-       classDef wave2 fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
-
-       class S0_0 wave0
-       class S0_1 wave1
-       class S1_1,S1_2,S1_3 wave2
-
-       %% Parallel execution indicators
-       subgraph "Wave 0 (Sequential)"
-           S0_0
-       end
-
-       subgraph "Wave 1 (Sequential)"
-           S0_1
-       end
-
-       subgraph "Wave 2 (Parallel - 3 agents)"
-           S1_1
-           S1_2
-           S1_3
-       end
-   ```
-
-8. **Render Dependency Graph Diagram** using `render-mermaid` tool:
-   - Read the Mermaid content from `docs/dependency-graph.mmd`
-   - Render with title "Project Dependency Graph"
-   - This creates an interactive visualization for immediate viewing
-
-7. **Report dependency analysis**:
-   ```
-   ✅ Dependency Analysis Complete:
-   - Total stories: [X]
-   - Dependency edges: [Y]
-   - Parallel waves: [Z]
-   - Max parallel agents: [N]
-   - Estimated time savings: [P]% with parallel execution
-   - No circular dependencies detected ✓
-   ```
-
-### 2.8: Match Stories to Agents
+## Step 8: Match Stories to Agents
 
 **Determine appropriate development agent for each story**:
+
+### 8.1: Scan Available Agents
 
 1. **Scan available agents**:
    - List all files in `.claude/agents/` directory
    - Filter for agent definition files (*.md)
    - Read each agent's YAML frontmatter to understand capabilities
+
+### 8.2: Match Stories to Agents
 
 2. **For each story**, determine the appropriate development agent:
    - Read story file
@@ -838,409 +478,185 @@ For each large document created (PRD, Architecture), if it's over 500 lines:
      - **Backend/API** → Check for framework-specific agent first
      - **Default** → `typescript-developer`
 
+### 8.3: Create Task State Files
+
 3. **Create task state file** for each story using `save-file` tool:
    Save to: `.agent-orchestration/tasks/{story-id}-task.json`
+
    ```json
    {
      "story_id": "1.1",
-     "story_file": "docs/stories/1.1-user-authentication.md",
-     "epic": "auth",
-     "status": "not_started",
-     "assigned_agent": "nextjs-developer",
+     "story_file": "docs/stories/1.1.user-authentication.md",
+     "agent": "nextjs-developer",
+     "status": "pending",
      "dependencies": ["0.1"],
-     "tech_stack": ["Next.js", "TypeScript", "React"],
+     "wave": 2,
+     "can_run_parallel_with": ["1.2", "1.3"],
+     "assigned_at": null,
      "started_at": null,
      "completed_at": null,
-     "review_status": null,
-     "review_file": null,
-     "iteration_count": 0,
-     "last_updated": "<timestamp>",
-     "in_scope": true,
-     "worktree_path": null
+     "worktree_path": null,
+     "branch_name": null
    }
    ```
 
-4. **Report agent matching**:
-   ```
-   ✅ Agent Matching Complete:
-   - Total stories: [X]
-   - nextjs-developer: [N] stories
-   - python-developer: [M] stories
-   - rust-developer: [K] stories
-   - Task state files created: .agent-orchestration/tasks/
-   ```
-
-### 2.9: Generate Implementation Roadmap
+## Step 9: Generate Implementation Roadmap
 
 **Create human-readable implementation plan**:
 
-1. **Generate roadmap content** using the dependency graph and task state files
+### 9.1: Generate Roadmap Content
 
-2. **Create roadmap.md** using `save-file` tool to `.agent-orchestration/roadmap.md`:
-   ```markdown
-   # Story Implementation Roadmap
+**Create roadmap.md** using `save-file` tool to `.agent-orchestration/roadmap.md`:
 
-   **Generated**: <timestamp>
-   **Scope**: All stories
-   **Total Stories**: X
-   **Parallel Execution**: Y stories can run simultaneously
-   **Estimated Time Savings**: Z% faster with parallel execution
+```markdown
+# Story Implementation Roadmap
 
-   ## 🚀 Parallel Execution Strategy
+**Generated**: <timestamp>
+**Scope**: All stories
+**Total Stories**: X
+**Parallel Execution**: Y stories can run simultaneously
+**Estimated Time Savings**: Z% faster with parallel execution
 
-   **CRITICAL: The orchestrator will launch multiple agents simultaneously for independent stories.**
+## 🚀 Parallel Execution Strategy
 
-   ### Wave 0 (Foundation) - **1 agent (sequential)**
-   - [ ] Story 0.0: Project Initialization (@agent-nextjs-developer)
+**CRITICAL: The orchestrator will launch multiple agents simultaneously for independent stories.**
 
-   **Action**: Launch agent. Wait for completion and code review before Wave 1.
+### Wave 0 (Foundation) - **1 agent (sequential)**
+- [ ] Story 0.0: Project Initialization (@nextjs-developer)
 
-   ### Wave 1 (Design System) - **1 agent (sequential)**
-   - [ ] Story 0.1: Design System Foundation Setup (@agent-nextjs-developer) - Depends on: 0.0
+**Action**: Launch agent. Wait for completion and code review before Wave 1.
 
-   **Action**: After Wave 0 completes, launch agent. Wait for completion and code review before Wave 2.
+### Wave 1 (Design System) - **1 agent (sequential)**
+- [ ] Story 0.1: Design System Foundation Setup (@nextjs-developer) - Depends on: 0.0
 
-   ### Wave 2 (Core Features) - **3 agents in parallel**
-   - [ ] Story 1.1: User Authentication (@agent-nextjs-developer) - Depends on: 0.1
-   - [ ] Story 1.2: User Profile (@agent-nextjs-developer) - Depends on: 0.1
-   - [ ] Story 1.3: Dashboard (@agent-nextjs-developer) - Depends on: 0.1
+**Action**: After Wave 0 completes, launch agent. Wait for completion and code review before Wave 2.
 
-   **Action**: After Wave 1 completes, launch ALL 3 agents simultaneously. Wait for ALL to complete and pass code review before Wave 3.
+### Wave 2 (Core Features) - **3 agents in parallel**
+- [ ] Story 1.1: User Authentication (@nextjs-developer) - Depends on: 0.1
+- [ ] Story 1.2: User Profile (@nextjs-developer) - Depends on: 0.1
+- [ ] Story 1.3: Dashboard (@nextjs-developer) - Depends on: 0.1
 
-   [Continue for all waves...]
+**Action**: After Wave 1 completes, launch ALL 3 agents simultaneously. Wait for ALL to complete and pass code review before Wave 3.
 
-   ## Dependency Graph
+[Continue for all waves...]
 
-   ```
-   Wave 0:     0.0
-                ↓
-   Wave 1:     0.1
-                ↓
-   Wave 2:     1.1 ── 1.2 ── 1.3 (parallel)
-                ↓      ↓      ↓
-   Wave 3:     2.1 ── 2.2 (parallel)
-   ```
-
-   ## Parallel Execution Benefits
-
-   - **Without Parallelism**: X stories × 4 hours = Y hours total
-   - **With Parallelism**: Wave times sum = Z hours total
-   - **Time Savings**: P% faster (Q hours saved)
-
-   ## Notes
-   - **🚀 DEFAULT: Stories in the same wave WILL be implemented in parallel automatically**
-   - **⚠️ CRITICAL: Each story MUST pass code review before proceeding to the next wave**
-   - Code reviews are MANDATORY and CANNOT be skipped under any circumstances
-   - Parallel execution uses git worktrees to prevent conflicts
-   ```
-
-3. **Generate Roadmap Mermaid Diagram** using `save-file` tool to `docs/roadmap.mmd`:
-   ```mermaid
-   gantt
-       title Project Implementation Roadmap
-       dateFormat  YYYY-MM-DD
-       section Foundation
-       Project Initialization    :milestone, m1, 2024-01-01, 0d
-       Story 0.0 Implementation  :active, s0_0, 2024-01-01, 4h
-       Code Review & Merge       :crit, cr0_0, after s0_0, 1h
-
-       section Design System
-       Design System Foundation  :s0_1, after cr0_0, 4h
-       Code Review & Merge       :crit, cr0_1, after s0_1, 1h
-
-       section Core Features (Parallel)
-       User Authentication       :s1_1, after cr0_1, 4h
-       User Profile             :s1_2, after cr0_1, 4h
-       Dashboard                :s1_3, after cr0_1, 4h
-       Code Review & Merge      :crit, cr1_all, after s1_1 s1_2 s1_3, 2h
-
-       section Advanced Features
-       Feature 2.1              :s2_1, after cr1_all, 4h
-       Feature 2.2              :s2_2, after cr1_all, 4h
-       Final Code Review        :crit, cr2_all, after s2_1 s2_2, 2h
-
-       section Deployment
-       Production Deployment    :milestone, deploy, after cr2_all, 0d
-   ```
-
-4. **Render Roadmap Diagram** using `render-mermaid` tool:
-   - Read the Mermaid content from `docs/roadmap.mmd`
-   - Render with title "Project Implementation Roadmap"
-   - This creates an interactive Gantt chart for immediate viewing
-
-5. **Report roadmap generation**:
-   ```
-   ✅ Implementation Roadmap Generated:
-   - File: .agent-orchestration/roadmap.md
-   - Visual Dependency Graph: docs/dependency-graph.mmd (rendered)
-   - Visual Roadmap: docs/roadmap.mmd (rendered)
-   - Parallel waves: [X]
-   - Max concurrent agents: [Y]
-   - Ready for /implement-stories command
-   ```
-
-## Step 3: Final Summary
-
-Provide a comprehensive summary of all generated documents:
+## Dependency Graph
 
 ```
-🎉 Planning Process Complete!
-
-📋 Generated Documents:
-✅ PRD: docs/prd.md ([X] lines)
-[✅/❌] Architecture: docs/architecture.md ([X] lines)
-[✅/❌] Design Spec: docs/design/ ([X] files)
-[✅/❌] Sharded PRD: docs/prd/ ([X] sections)
-[✅/❌] Sharded Architecture: docs/architecture/ ([X] sections)
-✅ User Stories: docs/stories/ ([X] stories across [X] epics)
-
-📊 Orchestration Infrastructure:
-✅ Dependency Graph: .agent-orchestration/dependency-graph.json
-✅ Progress Tracking: .agent-orchestration/progress.json
-✅ Task State Files: .agent-orchestration/tasks/ ([X] files)
-✅ Implementation Roadmap: .agent-orchestration/roadmap.md
-✅ Worktree Registry: .agent-orchestration/worktree-registry.json
-
-🎨 Visual Diagrams:
-✅ Dependency Graph Visualization: docs/dependency-graph.mmd (rendered)
-✅ Roadmap Gantt Chart: docs/roadmap.mmd (rendered)
-
-🚀 Parallel Execution Analysis:
-- Total stories: [X]
-- Parallel waves: [Y]
-- Max concurrent agents: [Z]
-- Estimated time savings: [P]% with parallel execution
-
-🚀 Next Steps:
-1. Review generated documents for accuracy
-2. Review visual diagrams: dependency graph and roadmap (already rendered above)
-3. Review implementation roadmap: .agent-orchestration/roadmap.md
-4. Run /implement-stories to begin development (all stories)
-5. Or run /implement-stories [scope] to implement specific stories
-6. Use /story-status to track progress
-
-📁 All planning documents are organized in the docs/ directory
-🎨 Visual diagrams are saved as .mmd files and can be edited/re-rendered as needed
-📁 All orchestration state is in the .agent-orchestration/ directory
+Wave 0:     0.0
+             ↓
+Wave 1:     0.1
+             ↓
+Wave 2:  1.1  1.2  1.3  (parallel)
+          ↓    ↓    ↓
+Wave 3:     2.1  2.2     (parallel)
 ```
+
+## Implementation Order
+
+1. Story 0.0 (Wave 0)
+2. Story 0.1 (Wave 1)
+3. Stories 1.1, 1.2, 1.3 (Wave 2 - parallel)
+4. Stories 2.1, 2.2 (Wave 3 - parallel)
+[...]
+
+## Agent Assignments
+
+- **nextjs-developer**: Stories 0.0, 0.1, 1.1, 1.2, 1.3, ...
+- **python-developer**: Stories 2.1, 2.2, ...
+- **rust-developer**: Stories 3.1, ...
+
+## Parallel Execution Commands
+
+### Wave 2 (Example)
+```bash
+# Launch all Wave 2 stories in parallel
+/implement-stories --stories 1.1,1.2,1.3 --parallel
+```
+
+### Wave 3 (Example)
+```bash
+# Launch all Wave 3 stories in parallel
+/implement-stories --stories 2.1,2.2 --parallel
+```
+```
+
+## Step 10: Summary and Next Steps
+
+### 10.1: Display Planning Summary
+
+**Show user what was generated:**
+
+```
+✅ Planning Complete
+
+Documents Generated:
+  ✅ Architecture Document: docs/architecture/architecture.md
+  ✅ Design Specification: docs/design/frontend-design-spec.md
+  ✅ Product Requirements: docs/requirements/prd.md
+  ✅ Epic Overview: docs/stories/README.md
+  ✅ Stories: [count] stories in docs/stories/
+
+Document Sharding:
+  ✅ PRD Sharded: docs/requirements/prd/ ([X] sections)
+  ✅ Architecture Sharded: docs/architecture/ ([X] sections)
+  ℹ️  Design Spec: Not sharded (under 500 lines)
+
+Orchestration Files:
+  ✅ Dependency Graph: .agent-orchestration/dependency-graph.json
+  ✅ Implementation Roadmap: .agent-orchestration/roadmap.md
+  ✅ Task State Files: .agent-orchestration/tasks/*.json
+
+AI Configuration:
+  Framework: [framework-name]
+  Primary Model: [model-name]
+  Temperature: [value]
+
+Parallel Execution:
+  Max Parallel Agents: [N]
+  Parallel Waves: [Z]
+  Estimated Time Savings: [P]%
+
+Next Steps:
+  1. Review generated documents (sharded for easy navigation)
+  2. Review implementation roadmap
+  3. Run /implement-stories to begin parallel development
+```
+
+### 10.2: Suggest Next Actions
+
+**Recommend next steps:**
+- Review all generated documents
+- Review dependency graph and roadmap
+- Make any necessary adjustments
+- Run `/story-status` to see story overview
+- Run `/implement-stories` to begin parallel implementation
+- Run `/next-story` to implement stories one at a time (sequential mode)
 
 ## Error Handling
 
-**Missing product brief**:
-```
-Error: No product brief provided.
+### Missing Product Brief
+- Prompt user for product brief
+- Validate input before proceeding
+- Provide clear error messages
 
-Please provide either:
-1. A file path to an existing product brief document, OR
-2. A text description of your project/feature requirements
+### Agent Failures
+- Capture error output
+- Report which step failed
+- Suggest manual intervention
+- Provide recovery options
 
-Example: /automate-planning docs/product-brief.md
-```
+### Validation Failures
+- Report missing or incomplete sections
+- Suggest corrections
+- Allow user to retry or proceed
 
-**File not found**:
-```
-Error: Product brief file not found at [path].
+## Best Practices
 
-Please check the file path and try again, or provide the requirements as text.
-```
+1. **Always validate inputs** before calling agents
+2. **Check outputs** after each agent completes
+3. **Provide clear progress updates** to user
+4. **Handle errors gracefully** with recovery options
+5. **Store AI configuration** for use across all planning documents
+6. **Reference guide files** for detailed information instead of embedding verbose content
 
-**Agent failures**:
-- If any step fails, report the specific error
-- Provide guidance on manual completion
-- Suggest running individual commands (e.g., /create-prd)
-
-## Usage Examples
-
-```bash
-# With product brief file
-/automate-planning docs/product-brief.md
-
-# Without arguments (will prompt for input)
-/automate-planning
-```
-
-This command is useful when:
-- Starting a new project from scratch
-- Want complete planning automation
-- Need consistent document structure
-- Working with multiple planning documents
-- Want to ensure all planning steps are completed
-
-# Critical Requirements
-
-**YOU MUST**:
-- ✅ Execute steps in the exact sequence specified
-- ✅ Wait for user input before proceeding to Step 2
-- ✅ Use the same quality standards as individual commands
-- ✅ Preserve all existing functionality from referenced commands
-- ✅ Handle conditional steps based on user preferences
-- ✅ Provide clear progress updates throughout the process
-
-**DO NOT**:
-- ❌ Skip any required steps
-- ❌ Proceed without user confirmation on preferences
-- ❌ Create documents in wrong locations
-- ❌ Combine multiple stories into single files
-- ❌ Skip research and analysis phases
-
-## Implementation Notes
-
-### Workflow Orchestration
-This command acts as a workflow orchestrator, calling the same functionality used by existing agents and commands:
-
-- **PRD Generation**: Uses `/create-prd` command logic
-- **Architecture**: Uses `software-architect` agent methodology
-- **Design Spec**: Uses `frontend-design` agent methodology
-- **Document Sharding**: Uses `planning-analyst` agent functionality
-- **Story Creation**: Uses `scrum-master` agent functionality
-
-### Conditional Execution
-- Architecture and design steps only execute if user requests them
-- Document sharding only occurs for large documents (>500 lines)
-- All generated documents are saved to appropriate `docs/` subdirectories
-
-### Quality Assurance
-Each step includes the same quality checks as the individual commands:
-- Required use of `sequential_thinking` for analysis
-- Required use of `context7` for research
-- Proper file locations and naming conventions
-- Complete content generation (no partial implementations)
-
-### Progress Tracking
-The command provides clear progress updates:
-- Step completion confirmations
-- Document creation notifications
-- Error handling with specific guidance
-- Final comprehensive summary
-
-### Integration with Existing Workflow
-Generated documents integrate seamlessly with existing development workflow:
-- Stories are ready for `/implement-stories` command
-- Architecture supports development agent implementations
-- Design specs provide developer handoff documentation
-- All documents follow established conventions
-
-## Command Arguments
-
-**Syntax**: `/automate-planning [product-brief-path]`
-
-**Arguments**:
-- `product-brief-path` (optional): Path to existing product brief file
-
-**Examples**:
-```bash
-# With product brief file
-/automate-planning docs/product-brief.md
-
-# Without arguments (interactive mode)
-/automate-planning
-```
-
-## Expected Output Structure
-
-After successful completion, the workspace will contain:
-
-```
-docs/
-├── prd.md                          # Product Requirements Document
-├── prd/                            # Sharded PRD (if large)
-│   ├── index.md
-│   ├── goals-and-background-context.md
-│   ├── requirements.md
-│   ├── epic-1-[name].md
-│   └── epic-2-[name].md
-├── architecture.md                 # Architecture Document (if requested)
-├── architecture/                   # Sharded Architecture (if large)
-│   ├── index.md
-│   ├── high-level-architecture.md
-│   ├── tech-stack.md
-│   └── api-specification.md
-├── design/                         # Design Specification (if requested)
-│   ├── README.md
-│   ├── design-system.md
-│   ├── components.md
-│   └── implementation.md
-├── stories/                        # User Stories
-│   ├── README.md
-│   ├── 0.0-project-initialization.md
-│   ├── 0.1-design-system-foundation.md
-│   ├── 1.1-[feature-name].md
-│   └── [additional story files]
-├── dependency-graph.mmd            # Visual dependency graph (Mermaid)
-└── roadmap.mmd                     # Visual roadmap timeline (Mermaid)
-
-.agent-orchestration/
-├── README.md                       # Orchestration system documentation
-├── progress.json                   # Overall progress tracking
-├── dependency-graph.json           # Story dependencies and parallel waves
-├── roadmap.md                      # Human-readable implementation plan
-├── worktree-registry.json          # Active worktree tracking
-└── tasks/                          # Individual task state files
-    ├── 0.0-task.json
-    ├── 0.1-task.json
-    ├── 1.1-task.json
-    └── [additional task files]
-```
-
-## Validation Checklist
-
-Before completing, verify:
-
-**Planning Documents:**
-- [ ] Product brief was successfully read or provided
-- [ ] User preferences were collected for architecture and design
-- [ ] PRD was created with all required sections
-- [ ] Architecture document created (if requested)
-- [ ] Design specification created (if requested)
-- [ ] Large documents were sharded appropriately
-- [ ] User stories created with individual files per story
-- [ ] All documents saved to correct locations
-
-**Orchestration Infrastructure:**
-- [ ] .agent-orchestration/ directory created
-- [ ] progress.json initialized with correct story counts
-- [ ] worktree-registry.json created
-- [ ] dependency-graph.json created with all stories
-- [ ] No circular dependencies detected
-- [ ] Parallel waves identified correctly
-- [ ] Task state files created for all stories
-- [ ] All stories matched to appropriate agents
-- [ ] roadmap.md generated with parallel execution strategy
-
-**Visual Diagrams:**
-- [ ] dependency-graph.mmd created and rendered
-- [ ] roadmap.mmd created and rendered
-- [ ] Both diagrams are viewable and accurate
-
-**Quality Checks:**
-- [ ] Progress updates provided throughout process
-- [ ] Final summary includes all generated documents
-- [ ] Final summary includes orchestration infrastructure
-- [ ] Final summary includes visual diagrams
-- [ ] Ready for /implement-stories command
-
-## Troubleshooting
-
-**Common Issues**:
-
-1. **md-tree command not found**:
-   ```bash
-   npm install -g @kayvan/markdown-tree-parser
-   ```
-
-2. **Large document token limits**:
-   - Documents are automatically sharded if over 500 lines
-   - Use Phase 1 approach for architecture documents
-
-3. **Missing dependencies**:
-   - Ensure all required tools are available
-   - Check file permissions for document creation
-
-4. **Incomplete story generation**:
-   - Verify PRD contains all epics and stories
-   - Check that scrum-master creates individual files per story
-
-**Recovery Options**:
-- Run individual commands if automation fails
-- Use existing agents directly for specific steps
-- Check generated documents for completeness
