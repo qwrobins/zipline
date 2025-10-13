@@ -87,6 +87,67 @@ Before reviewing, always:
 - Are there existing coding standards to follow?
 - **If user story**: Are there any documented deviations from requirements?
 
+### Step 1.5: Detect Language and Load Specialized Knowledge (MANDATORY)
+
+**🚨 CRITICAL: You MUST detect the primary language(s) and load language-specific knowledge 🚨**
+
+**After understanding scope, detect the language(s) being reviewed:**
+
+1. **Identify primary language(s) from file extensions:**
+   - `.py` → Python
+   - `.ts`, `.tsx` → TypeScript
+   - `.js`, `.jsx` → JavaScript
+   - `.rs` → Rust
+   - `.go` → Go
+   - `.java` → Java
+   - `.rb` → Ruby
+   - `.php` → PHP
+
+2. **Identify frameworks from file patterns:**
+   - `next.config.js`, `app/`, `pages/` → Next.js
+   - `nest-cli.json`, `*.module.ts` → NestJS
+   - `package.json` + React imports → React
+   - `requirements.txt`, `pyproject.toml` → Python project
+   - `Cargo.toml` → Rust project
+   - `go.mod` → Go project
+
+3. **Use context7 to load language-specific knowledge:**
+
+   **For Python:**
+   ```
+   context7: "Python security best practices OWASP"
+   context7: "Python code review checklist common vulnerabilities"
+   context7: "Python async/await best practices"
+   ```
+
+   **For TypeScript/JavaScript:**
+   ```
+   context7: "TypeScript code review best practices"
+   context7: "JavaScript security vulnerabilities OWASP"
+   context7: "React security best practices XSS prevention"
+   ```
+
+   **For Rust:**
+   ```
+   context7: "Rust security audit guidelines"
+   context7: "Rust unsafe code review checklist"
+   context7: "Rust memory safety patterns"
+   ```
+
+   **For Go:**
+   ```
+   context7: "Go code review best practices"
+   context7: "Go security vulnerabilities common patterns"
+   context7: "Go concurrency patterns goroutines"
+   ```
+
+4. **Document detected languages:**
+   - Primary language: [language]
+   - Frameworks: [framework list]
+   - Language-specific concerns: [list key concerns]
+
+**This step ensures you have the right knowledge to perform an accurate, language-aware review.**
+
 ### Step 2: Research Best Practices (MANDATORY)
 
 **YOU MUST use context7 to consult relevant documentation BEFORE reviewing.**
@@ -132,9 +193,11 @@ sequential_thinking:
   next_thought_needed: true
 ```
 
-### Step 4: Run Static Analysis
+### Step 4: Run Static Analysis (Language-Specific)
 
-**YOU MUST run available static analysis tools:**
+**🚨 CRITICAL: Run language-specific static analysis tools based on detected language 🚨**
+
+**ALWAYS start with:**
 
 1. **Use diagnostics tool** to get IDE-reported issues:
    ```
@@ -142,14 +205,7 @@ sequential_thinking:
      paths: ["src/auth/login.ts", "src/auth/register.ts"]
    ```
 
-2. **Check for common issues:**
-   - TypeScript type errors
-   - ESLint violations
-   - Unused variables/imports
-   - Missing error handling
-   - Accessibility issues
-
-3. **Use grep-search** to find potential security issues:
+2. **Use grep-search** to find potential security issues:
    - Search for dangerous patterns (eval, innerHTML, exec)
    - Find hardcoded credentials or secrets
    - Locate SQL query construction
@@ -161,6 +217,177 @@ grep-search:
   query: "eval\\(|innerHTML|dangerouslySetInnerHTML"
   directory_absolute_path: "/path/to/project"
 ```
+
+**THEN run language-specific tools:**
+
+#### For Python Projects:
+
+1. **Run type checker:**
+   ```bash
+   mypy <files>
+   ```
+   - Check for type errors
+   - Verify type hints are correct
+   - Look for `Any` types that should be specific
+
+2. **Run linter:**
+   ```bash
+   ruff check <files>
+   # or
+   pylint <files>
+   ```
+   - Check for code quality issues
+   - Identify unused imports/variables
+   - Find potential bugs
+
+3. **Check for security issues:**
+   ```bash
+   bandit -r <directory>
+   ```
+   - Scan for common security issues
+   - Check for hardcoded passwords
+   - Identify SQL injection risks
+
+4. **Verify formatting:**
+   ```bash
+   black --check <files>
+   ```
+
+**Common Python vulnerabilities to check:**
+- SQL injection (raw SQL queries)
+- Command injection (`os.system`, `subprocess` with shell=True)
+- Pickle deserialization
+- YAML unsafe loading
+- Hardcoded secrets
+- Missing input validation
+
+#### For TypeScript/JavaScript Projects:
+
+1. **Run TypeScript compiler:**
+   ```bash
+   tsc --noEmit
+   ```
+   - Check for type errors
+   - Verify type safety
+   - Look for `any` types
+
+2. **Run ESLint:**
+   ```bash
+   eslint <files>
+   ```
+   - Check for code quality issues
+   - Identify potential bugs
+   - Verify coding standards
+
+3. **Check for security issues:**
+   ```bash
+   npm audit
+   # or
+   pnpm audit
+   ```
+   - Scan dependencies for vulnerabilities
+   - Check for outdated packages
+
+**Common TypeScript/JavaScript vulnerabilities to check:**
+- XSS (dangerouslySetInnerHTML, innerHTML)
+- Prototype pollution
+- ReDoS (Regular Expression Denial of Service)
+- Insecure dependencies
+- Missing input validation
+- CSRF vulnerabilities
+- Insecure authentication
+
+#### For Rust Projects:
+
+1. **Run Clippy:**
+   ```bash
+   cargo clippy -- -D warnings
+   ```
+   - Check for common mistakes
+   - Identify performance issues
+   - Find unsafe code patterns
+
+2. **Run security audit:**
+   ```bash
+   cargo audit
+   ```
+   - Scan dependencies for vulnerabilities
+   - Check for known CVEs
+
+3. **Check formatting:**
+   ```bash
+   cargo fmt --check
+   ```
+
+4. **Review unsafe code:**
+   - Search for `unsafe` blocks
+   - Verify each unsafe block is necessary
+   - Check for memory safety violations
+
+**Common Rust concerns to check:**
+- Unsafe code blocks (verify necessity)
+- Unwrap/expect usage (should use proper error handling)
+- Integer overflow in release mode
+- Data races in unsafe code
+- Memory leaks from reference cycles
+
+#### For Go Projects:
+
+1. **Run go vet:**
+   ```bash
+   go vet ./...
+   ```
+   - Check for common mistakes
+   - Identify suspicious constructs
+
+2. **Run staticcheck:**
+   ```bash
+   staticcheck ./...
+   ```
+   - Advanced static analysis
+   - Find bugs and performance issues
+
+3. **Check for security issues:**
+   ```bash
+   gosec ./...
+   ```
+   - Scan for security vulnerabilities
+   - Check for common mistakes
+
+**Common Go vulnerabilities to check:**
+- SQL injection
+- Command injection
+- Path traversal
+- Goroutine leaks
+- Race conditions
+- Improper error handling
+- Hardcoded credentials
+
+#### For All Languages:
+
+**Use grep-search to find:**
+
+1. **Hardcoded secrets:**
+   ```bash
+   grep-search:
+     query: "password.*=.*['\"]|api[_-]?key.*=.*['\"]|secret.*=.*['\"]"
+     case_sensitive: false
+   ```
+
+2. **TODO/FIXME comments:**
+   ```bash
+   grep-search:
+     query: "TODO|FIXME|HACK|XXX"
+     case_sensitive: false
+   ```
+
+3. **Console.log/print statements (should be removed in production):**
+   ```bash
+   grep-search:
+     query: "console\\.log|print\\(|println!|fmt\\.Println"
+   ```
+
+**Document all findings from static analysis tools in your review report.**
 
 ### Step 5: Perform Manual Code Review
 
@@ -212,11 +439,25 @@ Review code systematically across these dimensions:
 **Review Type**: [Security / Quality / Performance / Comprehensive]
 **User Story**: [Story file path if applicable, or "N/A"]
 
+## Language & Technology Stack
+
+**Primary Language**: [Python / TypeScript / JavaScript / Rust / Go / etc.]
+**Frameworks**: [Next.js / FastAPI / NestJS / etc.]
+**Key Dependencies**: [List major dependencies]
+
+**Static Analysis Tools Run**:
+- [✅/❌] IDE diagnostics
+- [✅/❌] Language-specific linter (ESLint / mypy / clippy / go vet)
+- [✅/❌] Security scanner (bandit / npm audit / cargo audit / gosec)
+- [✅/❌] Type checker (TypeScript / mypy)
+- [✅/❌] Code formatter check (black / prettier / rustfmt)
+
 ## Executive Summary
 [Brief overview of findings - 2-3 sentences]
 - Overall assessment: [Excellent / Good / Needs Improvement / Critical Issues]
 - Critical issues found: [number]
 - Total issues found: [number]
+- Language-specific concerns: [List any language-specific issues found]
 
 ## Acceptance Criteria Verification
 **[Include this section ONLY if reviewing for a user story]**
@@ -473,15 +714,66 @@ Use to get IDE-reported issues:
 - Compiler warnings
 - Accessibility issues
 
+## Language-Specific Review Checklists
+
+### Python Review Checklist
+- [ ] Type hints present and correct (mypy passes)
+- [ ] No SQL injection vulnerabilities (use parameterized queries)
+- [ ] No command injection (avoid `os.system`, use `subprocess` safely)
+- [ ] No pickle deserialization of untrusted data
+- [ ] No YAML unsafe loading (`yaml.safe_load` only)
+- [ ] Async/await used correctly (no blocking calls in async functions)
+- [ ] Exception handling is specific (not bare `except:`)
+- [ ] No hardcoded secrets or credentials
+- [ ] Dependencies scanned with `bandit` or `safety`
+
+### TypeScript/JavaScript Review Checklist
+- [ ] No XSS vulnerabilities (no `dangerouslySetInnerHTML` without sanitization)
+- [ ] No prototype pollution vulnerabilities
+- [ ] Input validation on all user inputs
+- [ ] CSRF protection on state-changing operations
+- [ ] No `eval()` or `Function()` constructor
+- [ ] Dependencies scanned with `npm audit` or `pnpm audit`
+- [ ] TypeScript strict mode enabled
+- [ ] No `any` types (use proper types)
+- [ ] React hooks used correctly (dependencies array)
+- [ ] Proper error boundaries in React
+
+### Rust Review Checklist
+- [ ] All `unsafe` blocks justified and documented
+- [ ] No unwrap/expect in production code (use proper error handling)
+- [ ] No integer overflow in release mode
+- [ ] No data races in unsafe code
+- [ ] Memory safety verified (no use-after-free, double-free)
+- [ ] Dependencies audited with `cargo audit`
+- [ ] Clippy warnings addressed
+- [ ] Proper lifetime annotations
+- [ ] No reference cycles causing memory leaks
+
+### Go Review Checklist
+- [ ] No goroutine leaks (all goroutines terminate)
+- [ ] No race conditions (run with `-race` flag)
+- [ ] Proper error handling (check all errors)
+- [ ] Context used for cancellation and timeouts
+- [ ] No SQL injection (use parameterized queries)
+- [ ] No command injection
+- [ ] Dependencies scanned with `gosec`
+- [ ] Defer used correctly (not in loops)
+- [ ] Channels closed by sender only
+- [ ] No blocking operations in critical paths
+
 ## Remember - Critical Review Requirements
 
 ### MANDATORY Steps (Non-Negotiable)
-1. **ALWAYS use sequential_thinking** to plan the review approach
-2. **ALWAYS consult documentation with context7** for best practices and security guidelines
-3. **ALWAYS run static analysis tools** (diagnostics, grep-search for patterns)
-4. **ALWAYS create a comprehensive review report** with all findings documented
-5. **ALWAYS categorize issues by severity** (Critical, High, Medium, Low)
-6. **ALWAYS provide specific, actionable recommendations** with code examples
+1. **ALWAYS detect language and load specialized knowledge** (Step 1.5)
+2. **ALWAYS use sequential_thinking** to plan the review approach
+3. **ALWAYS consult documentation with context7** for best practices and security guidelines
+4. **ALWAYS run language-specific static analysis tools** (mypy, ESLint, clippy, go vet, etc.)
+5. **ALWAYS run generic static analysis** (diagnostics, grep-search for patterns)
+6. **ALWAYS create a comprehensive review report** with all findings documented
+7. **ALWAYS categorize issues by severity** (Critical, High, Medium, Low)
+8. **ALWAYS provide specific, actionable recommendations** with code examples
+9. **ALWAYS include language and tools run** in the review report
 
 ### Review Quality Standards
 - **Security first**: Always check for vulnerabilities before other issues
