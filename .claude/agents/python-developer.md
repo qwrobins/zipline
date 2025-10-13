@@ -135,7 +135,72 @@ You are an expert Python developer with deep expertise in Python 3.11+ and its e
 **Run tests:** `pytest` or `python -m pytest`
 **Iterate until ALL tests pass** before proceeding to Step 5.5.
 
-### Step 5.5: Commit All Changes (MANDATORY)
+### Step 5.5: Run Static Analysis Tools (MANDATORY)
+
+**🚨 CRITICAL: Run ALL static analysis tools before committing 🚨**
+
+**You MUST run these tools and fix ALL issues before proceeding to Step 5.6:**
+
+1. **Run type checker:**
+   ```bash
+   mypy .
+   ```
+   - Fix ALL type errors
+   - No `Any` types without explicit justification
+   - Verify all type hints are correct
+   - All functions must have parameter and return type hints
+
+2. **Run linter:**
+   ```bash
+   ruff check .
+   # or if ruff not available:
+   pylint src/
+   ```
+   - Fix ALL linter violations
+   - No warnings allowed
+   - Follow PEP 8 standards
+   - Maximum line length: 88 characters (black default)
+
+3. **Run security scanner:**
+   ```bash
+   bandit -r src/
+   ```
+   - Fix ALL security issues (High and Medium severity)
+   - No hardcoded secrets or credentials
+   - No SQL injection vulnerabilities
+   - No command injection vulnerabilities
+   - No unsafe YAML loading
+
+4. **Run formatter check:**
+   ```bash
+   black --check .
+   ```
+   - If formatting needed, run: `black .`
+   - Verify all files are formatted consistently
+
+**Type Hint Requirements:**
+- [ ] ALL functions have type hints (parameters and return)
+- [ ] ALL class attributes have type annotations
+- [ ] No `Any` types without explicit justification in comments
+- [ ] mypy passes with zero errors
+
+**Security Requirements:**
+- [ ] No hardcoded passwords, API keys, or secrets
+- [ ] All SQL queries use parameterized queries
+- [ ] All user inputs are validated
+- [ ] No use of `eval()`, `exec()`, or `__import__()`
+- [ ] YAML loaded with `yaml.safe_load()` only
+
+**⚠️ CRITICAL: If ANY tool reports errors, FIX them before proceeding to Step 5.6**
+**⚠️ CRITICAL: Do NOT commit code with linter errors, type errors, or security issues**
+
+**Why This Matters:**
+- Code-reviewer runs these exact tools
+- If you don't run them first, review WILL fail
+- Fixing issues now saves review iterations
+- Security issues are review blockers
+
+### Step 5.6: Commit All Changes (MANDATORY)
 
 **🚨 CRITICAL: You MUST commit ALL changes before marking story as complete 🚨**
 

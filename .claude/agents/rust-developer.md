@@ -248,15 +248,76 @@ criterion_group!(benches, benchmark_cache_operations);
 criterion_main!(benches);
 ```
 
-**You MUST run tests and ensure they pass** before proceeding to Step 6.
+**You MUST run tests and ensure they pass** before proceeding to Step 5.5.
 
 **Testing Workflow:**
 1. Run the test suite: `cargo test`
 2. If tests fail, use the Problem-Solving Protocol (see below) to fix them
 3. Iterate until ALL tests pass
-4. Only proceed to Step 6 when the build is clean and all tests are passing
+4. Only proceed to Step 5.5 when the build is clean and all tests are passing
 
-### Step 6: Update User Story Status (If Applicable)
+### Step 5.5: Run Static Analysis Tools (MANDATORY)
+
+**🚨 CRITICAL: Run ALL static analysis tools before committing 🚨**
+
+**You MUST run these tools and fix ALL issues before proceeding to Step 5.6:**
+
+1. **Run Clippy with pedantic lints:**
+   ```bash
+   cargo clippy --all-targets --all-features -- -D warnings -W clippy::pedantic
+   ```
+   - Fix ALL clippy warnings (including pedantic)
+   - Justify any `#[allow(clippy::...)]` attributes with comments
+   - No warnings allowed in final code
+
+2. **Run security audit:**
+   ```bash
+   cargo audit
+   ```
+   - Fix ALL vulnerabilities
+   - Update dependencies to secure versions
+   - Document any vulnerabilities that cannot be fixed
+
+3. **Run formatter check:**
+   ```bash
+   cargo fmt --check
+   ```
+   - If formatting needed, run: `cargo fmt`
+   - Verify all files are formatted consistently
+
+4. **Check for unsafe code:**
+   ```bash
+   rg "unsafe" --type rust
+   ```
+   - Review each `unsafe` block
+   - Justify why each unsafe block is necessary
+   - Document safety invariants in comments
+   - Minimize unsafe code surface area
+
+**Rust Quality Requirements:**
+- [ ] Clippy passes with pedantic lints (zero warnings)
+- [ ] All `unsafe` blocks have justification comments
+- [ ] No unwrap() or expect() in production code (use proper error handling)
+- [ ] All errors use Result types with proper error types
+- [ ] rustfmt applied to all files
+
+**Security Requirements:**
+- [ ] All `unsafe` blocks reviewed for memory safety
+- [ ] No integer overflow in release mode
+- [ ] No data races in unsafe code
+- [ ] All FFI boundaries are safe
+- [ ] cargo audit passes with zero vulnerabilities
+
+**⚠️ CRITICAL: If ANY tool reports errors, FIX them before proceeding to Step 5.6**
+**⚠️ CRITICAL: Do NOT commit code with clippy warnings or security vulnerabilities**
+
+**Why This Matters:**
+- Code-reviewer runs these exact tools
+- If you don't run them first, review WILL fail
+- Unsafe code requires extra scrutiny
+- Security issues are review blockers
+
+### Step 5.6: Update User Story Status (If Applicable)
 **⚠️ CRITICAL: Only proceed with this step if ALL tests are passing and the build is successful.**
 
 **If you implemented a feature from a user story in `docs/stories/`, you MUST:**
