@@ -201,7 +201,10 @@ lighthouse-report.json
 
 ## Code Quality Configuration
 
-### ESLint Configuration (.eslintrc.js)
+### ESLint Configuration (.eslintrc.js or eslint.config.js)
+
+**Enhanced with Security Rules** (based on code review analysis)
+
 ```javascript
 module.exports = {
   root: true,
@@ -221,15 +224,33 @@ module.exports = {
   parser: '@typescript-eslint/parser',
   plugins: ['react-refresh'],
   rules: {
+    // React rules
     'react-refresh/only-export-components': [
       'warn',
       { allowConstantExport: true },
     ],
     'react/react-in-jsx-scope': 'off',
     'react/prop-types': 'off',
-    '@typescript-eslint/no-unused-vars': 'error',
+
+    // TypeScript rules
+    '@typescript-eslint/no-unused-vars': ['error', {
+      argsIgnorePattern: '^_',
+      varsIgnorePattern: '^_'
+    }],
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
+
+    // Security rules (CRITICAL - prevents review failures)
+    'react/jsx-no-target-blank': ['error', {
+      allowReferrer: false,
+      enforceDynamicLinks: 'always'
+    }],
+    'no-eval': 'error',
+    'no-implied-eval': 'error',
+    'no-new-func': 'error',
+    'no-console': ['warn', {
+      allow: ['warn', 'error']
+    }],
   },
   settings: {
     react: {
@@ -238,6 +259,12 @@ module.exports = {
   },
 };
 ```
+
+**Key Security Rules Added:**
+- `react/jsx-no-target-blank`: Prevents tabnabbing attacks (1 story failed without this)
+- `no-eval`: Prevents code injection vulnerabilities
+- `no-console`: Warns about console.log in production code
+- `@typescript-eslint/no-unused-vars`: Catches unused variables (2 stories had this issue)
 
 ### Prettier Configuration (.prettierrc)
 ```json
@@ -409,11 +436,33 @@ type EventHandler<T = HTMLElement> = (event: React.SyntheticEvent<T>) => void;
 - If you don't run them first, review WILL fail
 - Fixing issues during implementation saves 40-60% of review iterations
 - Security issues are review blockers
+- **Analysis of 14 reviews**: 21% required re-review due to preventable issues
+
+### Quick Pre-Commit Check (Recommended)
+
+```bash
+# Run automated pre-commit validation script
+./.claude/agents/lib/pre-commit-checks.sh
+```
+
+This script checks:
+- ✅ TypeScript compilation
+- ✅ ESLint errors
+- ✅ Test environment issues (global vs window)
+- ✅ External link security
+- ✅ Console.log in production
+- ✅ Test file existence
+
+**If script passes, proceed to commit. If it fails, fix issues below.**
+
+---
 
 ### Step 1: Run TypeScript Compiler (MANDATORY)
 
 ```bash
 tsc --noEmit
+# or
+npm run build
 ```
 
 **Requirements:**
@@ -429,6 +478,29 @@ tsc --noEmit
 - [ ] All return types explicit
 - [ ] tsc --noEmit passes with zero errors
 
+**🚨 CRITICAL: Test Environment Validation**
+
+**Common Issue**: Using `global` instead of `window` in browser tests (2 stories failed due to this)
+
+```bash
+# Check for incorrect global usage in test files
+grep -r "global\." src/ tests/ e2e/ --include="*.test.ts" --include="*.test.tsx" --include="*.spec.ts"
+```
+
+**If found, fix immediately:**
+```typescript
+// ❌ WRONG - Causes TypeScript errors in browser tests
+vi.spyOn(global, 'clearInterval')
+vi.spyOn(global, 'setInterval')
+
+// ✅ CORRECT - Use window for browser environment
+vi.spyOn(window, 'clearInterval')
+vi.spyOn(window, 'setInterval')
+
+// ✅ CORRECT - Use globalThis for cross-environment
+vi.spyOn(globalThis, 'clearInterval')
+```
+
 ### Step 2: Run ESLint (MANDATORY)
 
 ```bash
@@ -441,9 +513,15 @@ yarn lint
 
 **Requirements:**
 - [ ] Fix ALL linting errors
-- [ ] No warnings allowed
+- [ ] Fix ALL warnings (warnings are not allowed)
 - [ ] Follow project ESLint configuration
 - [ ] No disabled rules without justification
+
+**Common ESLint Issues to Check:**
+- Unused variables in test files
+- Missing dependencies in useEffect
+- Incorrect hook usage
+- Missing accessibility attributes
 
 ### Step 3: Run Prettier Check (MANDATORY)
 
@@ -479,6 +557,47 @@ pnpm audit
 - [ ] Update dependencies to secure versions
 - [ ] No hardcoded secrets or API keys
 
+**🚨 CRITICAL: Security Validation Checks**
+
+**1. External Link Security** (1 story failed due to this)
+
+```bash
+# Check for target="_blank" without security attributes
+grep -r 'target="_blank"' src/ --include="*.tsx" --include="*.jsx" | grep -v 'rel="noopener noreferrer"'
+```
+
+**If found, fix immediately:**
+```tsx
+// ❌ WRONG - Security vulnerability (tabnabbing)
+<a href="https://external.com" target="_blank">Link</a>
+
+// ✅ CORRECT - Prevents tabnabbing and performance issues
+<a href="https://external.com" target="_blank" rel="noopener noreferrer">Link</a>
+```
+
+**2. No Hardcoded Secrets**
+
+```bash
+# Check for potential secrets
+grep -r "api[_-]key\|secret\|password\|token" src/ --include="*.ts" --include="*.tsx" | grep -v "// Example\|//"
+```
+
+**3. No Console Logs in Production**
+
+```bash
+# Check for console.log in production code
+grep -r "console\.log\|console\.debug" src/ --include="*.ts" --include="*.tsx" --exclude="*.test.*" --exclude="*.spec.*"
+```
+
+**Security Checklist:**
+- [ ] All external links have `rel="noopener noreferrer"`
+- [ ] No hardcoded API keys or secrets
+- [ ] No console.log in production code
+- [ ] No eval() or Function() constructor
+- [ ] No dangerouslySetInnerHTML without sanitization
+- [ ] All user inputs validated
+- [ ] HTTPS used for all API calls
+
 ### Step 5: Run Tests with Coverage (MANDATORY)
 
 ```bash
@@ -493,6 +612,43 @@ pnpm test --coverage
 - [ ] All acceptance criteria have tests
 - [ ] Edge cases tested
 - [ ] Error conditions tested
+
+**🚨 CRITICAL: Acceptance Criteria to Test Mapping**
+
+**Problem**: 3 stories (21%) had test configuration issues or missing tests
+
+**Solution**: Create AC-to-Test mapping BEFORE writing tests
+
+**See `.claude/agents/agent-guides/testing-best-practices.md` for complete guide**
+
+**Quick Checklist:**
+1. **Extract all ACs** from story file
+2. **Map each AC to test cases** (test name, file, type, assertions)
+3. **Verify mapping**:
+   - [ ] Every AC has at least one test
+   - [ ] Integration ACs have integration tests (not just unit tests)
+   - [ ] Test assertions match AC requirements exactly
+4. **Write tests** following the mapping
+5. **Validate coverage** (>90% target)
+
+**Example Mapping:**
+```markdown
+- [ ] AC1: Time updates automatically every 1000ms
+  - Test: "should update time every 1000ms"
+  - File: src/hooks/useCurrentTime.test.ts
+  - Type: Unit
+
+- [ ] AC2: Hook integrated in App component
+  - Test: "should render current time from hook"
+  - File: src/App.test.tsx
+  - Type: Integration  ← IMPORTANT: Integration test required!
+```
+
+**Common Test Mistakes to Avoid:**
+- ❌ Missing integration tests for "integrated in" ACs
+- ❌ Testing wrong compliance level (AAA vs AA)
+- ❌ Unused variables in test files
+- ❌ Using `global` instead of `window` in browser tests
 
 ### Security Requirements Checklist
 
@@ -517,6 +673,94 @@ pnpm test --coverage
 
 **⚠️ If ANY check fails, FIX it before committing**
 **⚠️ Do NOT commit code with type errors, linter errors, or security vulnerabilities**
+
+**💡 TIP: Use the automated script**
+```bash
+./.claude/agents/lib/pre-commit-checks.sh
+```
+
+---
+
+## 🧹 Finalization: Cleanup Before Marking Complete
+
+**Problem**: 3 stories (21%) had unused boilerplate files
+
+**Before marking story complete, run cleanup:**
+
+### Step 1: Remove Unused Boilerplate Files
+
+```bash
+# Automated cleanup script
+./.claude/agents/lib/cleanup-boilerplate.sh
+```
+
+**Manual Cleanup Checklist:**
+- [ ] Remove unused CSS files (App.css, index.css if using CSS Modules)
+- [ ] Remove unused logo files (react.svg, vite.svg if not referenced)
+- [ ] Remove TODO/FIXME comments
+- [ ] Remove commented-out code
+- [ ] Remove unused imports (ESLint should catch these)
+
+### Step 2: Validate Documentation
+
+```bash
+# Check documentation references
+./.claude/agents/lib/validate-docs.sh
+```
+
+**Documentation Checklist:**
+- [ ] README references correct file names
+- [ ] No references to deleted files
+- [ ] Package.json scripts are documented
+- [ ] .gitignore is comprehensive
+
+**Common .gitignore patterns to include:**
+```gitignore
+# Dependencies
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Testing
+coverage
+.nyc_output
+```
+
+### Step 3: Final Verification
+
+```bash
+# Run all checks one more time
+./.claude/agents/lib/pre-commit-checks.sh
+
+# Verify tests pass
+npm test
+
+# Verify build succeeds
+npm run build
+```
+
+**Final Checklist:**
+- [ ] All pre-commit checks pass
+- [ ] All tests pass
+- [ ] Build succeeds
+- [ ] No unused files
+- [ ] Documentation is accurate
+- [ ] .gitignore is complete
+
+---
 
 ## Quality Standards
 

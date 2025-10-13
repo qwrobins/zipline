@@ -1,15 +1,19 @@
 # Mini Social Feed — Product Brief (Next.js + TypeScript + Tailwind + shadcn/ui)
 
-> **Goal:** A realistic “Twitter/Reddit-style” app powered only by JSONPlaceholder.  
-> **No database. No authentication. 100% public and anonymous.**  
+> **Goal:** A realistic “Twitter/Reddit-style” app powered only by JSONPlaceholder.
+>
+> **No database. No authentication. 100% public and anonymous.**
+>
 > All write operations are mocked with optimistic UI.
 
 ---
 
 ## 1) Purpose
 
-Build a non-trivial web app to test AI development workflows: requirements → user stories → implementation → tests.  
-The app consumes only **JSONPlaceholder** (`posts`, `users`, `comments`, `todos`) and performs **mock CRUD** (POST/PUT/PATCH/DELETE) with optimistic UI.  
+Build a non-trivial web app to test AI development workflows: requirements → user stories → implementation → tests.
+
+The app consumes only **JSONPlaceholder** (`posts`, `users`, `comments`, `todos`) and performs **mock CRUD** (POST/PUT/PATCH/DELETE) with optimistic UI.
+
 No persistence, no auth, no secrets.
 
 ---
