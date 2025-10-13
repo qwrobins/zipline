@@ -1,268 +1,299 @@
-# Zipline: AI-Powered Development Workflow System
+# Zipline - AI Agent Orchestration Framework
 
-A comprehensive ecosystem for AI-driven software development, featuring specialized agents, automated orchestration, and production-ready workflows. This repository demonstrates how to build complex applications using AI agents that handle everything from requirements gathering to code implementation.
+> **A powerful multi-agent orchestration system for Claude Code that enables parallel development workflows, automated story implementation, and intelligent agent coordination.**
 
-## 🎯 Project Overview
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Zipline is a complete AI development workflow system that transforms product ideas into production-ready applications through a coordinated team of specialized AI agents. The system includes:
-
-- **Specialized AI Agents** for planning, architecture, development, and code review
-- **Git Worktree Multi-Agent Development** for conflict-free parallel work (NEW!)
-- **Automated Story Orchestration** for managing complex development workflows
-- **Production-Ready Agent Collection** (ACCA) with 100+ specialized agents
-- **Slash Commands** for rapid workflow automation
-- **Example Implementation** of a Mini Social Feed application
-
-## 🏗️ Architecture
-
-### Core Components
-
-```
-zipline/
-├── agents/                    # Specialized AI agent definitions
-│   ├── definitions/          # Agent specifications and prompts
-│   ├── guides/              # Usage guides and tutorials
-│   └── conventions/         # Development standards
-├── acca/                     # Augment Claude Code Agents collection
-│   └── categories/          # 100+ production-ready agents
-├── .claude/commands/         # Slash commands for automation
-├── docs/                     # Comprehensive documentation
-├── examples/                 # Sample PRDs, architecture, and stories
-└── .agent-orchestration/     # Runtime state management
-```
-
-### Agent Workflow
-
-```
-Product Brief → [product-manager] → PRD
-     ↓
-[software-architect] → Architecture Document  
-     ↓
-[scrum-master] → User Stories
-     ↓
-[orchestrator] → Automated Implementation
-     ↓
-[javascript-developer] → Code Implementation
-     ↓
-[code-reviewer] → Quality Assurance
-     ↓
-Production Ready Application
-```
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- Claude Code IDE with agent support
-- Node.js 18+ (for example projects)
-- pnpm package manager (recommended)
-- Git 2.5+ (for worktree support)
-- jq (for JSON processing)
-
-### Getting Started
-
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd zipline
-   ```
-
-2. **Explore available agents**
-   ```bash
-   # View all agent definitions
-   ls agents/definitions/
-   
-   # Browse ACCA collection
-   ls acca/categories/
-   ```
-
-3. **Use slash commands for rapid development**
-   ```bash
-   # Automate complete planning process
-   /automate-planning docs/product-brief.md
-
-   # Create a PRD from a product brief
-   /create-prd docs/product-brief.md
-
-   # Implement user stories automatically
-   /implement-stories
-
-   # Check progress
-   /story-status
-   ```
-
-4. **Invoke agents directly**
-   ```
-   /agents software-architect
-   Please create the architecture document based on the PRD at docs/prd.md
-   ```
-
-## 🤖 Available Agents
-
-### Planning Agents
-- **product-manager**: Transform product briefs into comprehensive PRDs
-- **software-architect**: Create technical architecture documents
-- **scrum-master**: Generate user stories from requirements
-- **planning-analyst**: Segment large documents for better organization
-
-### Development Agents
-- **javascript-developer**: Implement JavaScript/TypeScript features
-- **python-developer**: Build Python applications and APIs
-- **rust-developer**: Create high-performance Rust applications
-- **code-reviewer**: Perform comprehensive code reviews
-- **conflict-resolver**: AI-assisted merge conflict resolution (NEW!)
-
-### Design Agents
-- **v0-frontend-design**: Generate designs using v0.dev integration
-
-### Orchestration
-- **orchestrator**: Coordinate multi-agent workflows
-- **agent-organizer**: Optimize team assembly and task distribution
-
-## ⚡ Slash Commands
-
-### Planning & Requirements
-- `/automate-planning [product-brief-path]` - Automate complete planning process from requirements to stories
-- `/create-prd [product-brief-path]` - Transform product brief into comprehensive PRD
-- `/create-design-spec [prd-or-brief-path]` - Create frontend design specification
-
-### Story Orchestration
-- `/implement-stories [scope]` - Full automated implementation workflow
-- `/next-story` - Start the next available story
-- `/review-story [story-id]` - Trigger code review for specific story
-- `/story-status` - Show comprehensive progress report
-
-### Git Worktree Management
-- `/cleanup-worktrees list` - List all active worktrees
-- `/cleanup-worktrees auto` - Cleanup abandoned worktrees (older than 24h)
-- `/cleanup-worktrees <path>` - Cleanup specific worktree
-- `/cleanup-worktrees force` - Force cleanup all worktrees (use with caution)
-
-## 📚 Documentation
-
-### Core Documentation
-- [Agent System Overview](agents/README.md) - Complete guide to the agent ecosystem
-- [Orchestration System](docs/orchestration-system.md) - Automated workflow coordination
-- [Slash Commands Guide](.claude/commands/README.md) - Command usage and examples
-- [Quick Start Guide](agents/guides/QUICK_START.md) - Get up and running quickly
-
-### Git Worktree Multi-Agent Development
-- [Git Worktree Quick Start](docs/git-worktree-quick-start.md) - 5-minute setup guide
-- [Git Worktree Multi-Agent Guide](docs/git-worktree-multi-agent-guide.md) - Complete workflow guide
-- [Git Worktree Workflow Directive](agents/directives/git-worktree-workflow.md) - Mandatory agent workflow
-- [Git Worktree Manager](agents/lib/README.md) - Core utility documentation
-
-### Conflict Prevention and Resolution (NEW!)
-- [Conflict Resolution Design](docs/conflict-prevention-and-resolution-design.md) - System architecture
-- [Conflict Resolution Summary](docs/conflict-resolution-implementation-summary.md) - Implementation guide
-- [Conflict-Resolver Agent](agents/definitions/conflict-resolver.md) - AI-assisted conflict resolution
-
-### Example Project
-The repository includes a complete example implementation of a Mini Social Feed application:
-- [Product Requirements](examples/prd.md) - Comprehensive PRD
-- [Architecture Document](examples/architecture.md) - Technical specifications  
-- [User Stories](examples/stories/) - Implementation-ready stories
-- [Development Workflow](examples/architecture/development-workflow.md) - Setup and commands
-
-## 🎨 ACCA Collection
-
-The **Augment Claude Code Agents** (ACCA) collection provides 100+ production-ready agents across 9 categories:
-
-- **Core Development** - Essential coding agents
-- **Specialized Languages** - Language-specific experts  
-- **Testing & QA** - Quality assurance specialists
-- **DevOps & Infrastructure** - Deployment and operations
-- **Data & Analytics** - Data processing and analysis
-- **Security** - Security-focused agents
-- **Developer Experience** - Tooling and productivity
-- **Design & UX** - User experience specialists
-- **Meta-Orchestration** - Advanced coordination agents
-
-Browse the full collection in the [acca/](acca/) directory.
-
-## 🛠️ Technology Stack
-
-The example implementation demonstrates modern web development practices:
-
-- **Frontend**: Next.js 15, TypeScript, Tailwind CSS, shadcn/ui
-- **State Management**: TanStack Query (React Query)
-- **Forms**: React Hook Form with Zod validation
-- **Testing**: Jest, React Testing Library, Playwright
-- **Code Quality**: ESLint, Prettier, TypeScript strict mode
-- **Package Manager**: pnpm
-- **Deployment**: Vercel (optimized for Next.js)
-
-## 🔄 Development Workflow
-
-### Automated Approach (Recommended)
-```bash
-# Start full workflow
-/implement-stories
-
-# Monitor progress  
-/story-status
-
-# Resume if interrupted
-/implement-stories
-```
-
-### Manual Control
-```bash
-# Initialize analysis
-/implement-stories  # Press Escape after analysis
-
-# Work on stories individually
-/next-story
-/review-story 1.1
-
-# Continue step by step
-/next-story
-```
-
-## 📁 Project Structure
-
-```
-zipline/
-├── agents/                    # AI agent ecosystem
-│   ├── definitions/          # Agent specifications
-│   ├── guides/              # Usage documentation
-│   └── conventions/         # Development standards
-├── acca/                     # Production agent collection
-│   └── categories/          # Organized by domain
-├── .claude/commands/         # Workflow automation
-├── docs/                     # System documentation
-├── examples/                 # Sample implementation
-│   ├── prd.md               # Product requirements
-│   ├── architecture.md      # Technical design
-│   └── stories/             # User stories
-└── .agent-orchestration/     # Runtime state
-    ├── progress.json        # Overall metrics
-    ├── dependency-graph.json # Story relationships
-    └── tasks/               # Individual story state
-```
-
-## 🤝 Contributing
-
-We welcome contributions to expand the agent ecosystem:
-
-1. **Add new agents** - Create agent definitions in `agents/definitions/`
-2. **Improve documentation** - Enhance guides and examples
-3. **Submit ACCA agents** - Contribute to the production collection
-4. **Report issues** - Help us improve the system
-
-See individual directories for specific contribution guidelines.
-
-## 📄 License
-
-This project is open source. See individual components for specific licensing terms.
-
-## 🔗 Related Projects
-
-- [VoltAgent](https://github.com/voltagent/voltagent) - Open-source AI agent framework
-- [Claude Code](https://claude.ai/code) - AI-powered development environment
+> ⚠️ **WORK IN PROGRESS**: This documentation is currently being updated. The Installation and Quick Start sections contain placeholder information and may not be accurate. Please check back soon for updated instructions.
 
 ---
 
-**Built with ❤️ by the AI development community**
+## 🚀 What is Zipline?
 
-Transform your development workflow with AI agents. Start building smarter, ship faster.
+Zipline is an advanced agent orchestration framework designed for developers who want to leverage AI agents for complex software development workflows. It provides:
+
+- **Multi-Agent Coordination**: Orchestrate multiple specialized AI agents working in parallel
+- **Git Worktree Integration**: Isolated development environments for concurrent story implementation
+- **Automated Story Implementation**: From PRD to tested code with minimal human intervention
+- **Extensible Agent System**: Create and customize agents for your specific development needs
+- **Intelligent Conflict Resolution**: Automatic detection and resolution of cross-agent conflicts
+
+---
+
+## 📦 What's Included
+
+### 1. **Agent Orchestration System**
+Coordinate multiple AI agents working on different stories simultaneously using git worktrees for isolation.
+
+**Key Features:**
+- Parallel story execution across multiple agents
+- Dependency-aware task scheduling
+- Automated code review and quality gates
+- Progress tracking and state management
+
+**Documentation:** [`docs/orchestration-system.md`](docs/orchestration-system.md)
+
+### 2. **Agent Definitions**
+Pre-configured agent definitions for common development tasks, stored in `.claude/agents/`.
+
+**Included Agents:**
+- Development agents (React, Next.js, Python, Go, TypeScript, etc.)
+- Coordination agents (Scrum Master, Product Manager, Architect)
+- Quality agents (Code Reviewer, QA Expert, Security Engineer)
+- Specialized agents (Frontend Design, DevOps, etc.)
+
+**Location:** [`.claude/agents/`](.claude/agents/)
+
+### 3. **Development Workflow Tools**
+Scripts and utilities to streamline your development process.
+
+**Available Tools:**
+- Design validation and visual testing
+- Web testing setup automation
+- Terminal testing utilities
+- Pre-commit quality checks
+
+**Location:** [`scripts/`](scripts/)
+
+---
+
+## 🎯 Quick Start
+
+### Prerequisites
+- [Claude Code](https://claude.ai/code) installed
+- Git 2.25+ (for worktree support)
+- Node.js 18+ (for JavaScript/TypeScript projects)
+
+### Installation
+
+1. **Clone the repository:**
+```bash
+git clone https://github.com/yourusername/zipline.git
+cd zipline
+```
+
+2. **Copy agents to your project:**
+```bash
+# Copy all agents to your project
+cp -r .claude/agents /path/to/your/project/.claude/
+
+# Or copy specific agents
+cp .claude/agents/react-developer.md /path/to/your/project/.claude/agents/
+```
+
+3. **Start using agents:**
+```bash
+# In Claude Code, agents are automatically detected
+# Just reference them in your conversations:
+"Have the react-developer agent implement this feature"
+```
+
+### Using the Orchestration System
+
+1. **Create a Product Requirements Document (PRD):**
+```bash
+# See examples/product-brief.md for template
+```
+
+2. **Generate user stories:**
+```bash
+# Use the scrum-master agent to break down PRD into stories
+```
+
+3. **Automate implementation:**
+```bash
+# Use the orchestrator to implement stories in parallel
+# See docs/orchestrator-quick-reference.md
+```
+
+---
+
+## 📚 Documentation
+
+### Getting Started
+- **[Orchestration System Overview](docs/orchestration-system.md)** - Understanding the multi-agent workflow
+- **[Git Worktree Quick Start](docs/git-worktree-quick-start.md)** - Setting up isolated development environments
+- **[Orchestrator Quick Reference](docs/orchestrator-quick-reference.md)** - Command reference and usage
+
+### Guides
+- **[Git Worktree Multi-Agent Guide](docs/git-worktree-multi-agent-guide.md)** - Advanced parallel development patterns
+- **[Orchestrator Workflow Quick Reference](docs/orchestrator-workflow-quick-reference.md)** - Step-by-step workflow guide
+- **[JavaScript Agent Selection Guide](docs/javascript-agent-selection-guide.md)** - Choosing the right JS/TS agent
+- **[Git Workflow Checklist](docs/orchestrator-git-workflow-checklist.md)** - Best practices for git operations
+
+### Reference
+- **[Design System](docs/design-system.md)** - Design principles and component guidelines
+- **[Dev Server Quick Reference](docs/dev-server-quick-reference.md)** - Development server management
+
+---
+
+## 🎨 Example Workflow
+
+Here's a typical workflow using Zipline:
+
+```bash
+# 1. Create a product brief
+cat > product-brief.md << EOF
+# My Awesome App
+Build a social feed application with posts, comments, and user profiles...
+EOF
+
+# 2. Generate user stories (using scrum-master agent)
+# Stories are automatically created with acceptance criteria
+
+# 3. Plan implementation (using orchestrator)
+# Dependencies are analyzed, parallel execution waves determined
+
+# 4. Implement stories in parallel
+# Multiple agents work simultaneously in isolated worktrees
+# - react-developer implements frontend stories
+# - backend-developer implements API stories
+# - qa-expert writes tests
+
+# 5. Automated code review
+# code-reviewer agent validates each implementation
+
+# 6. Merge completed stories
+# Conflict detection and resolution handled automatically
+```
+
+---
+
+## 🏗️ Architecture
+
+### Agent Types
+
+**Development Agents:**
+- `react-developer` - React/TypeScript frontend development
+- `nextjs-developer` - Next.js full-stack applications
+- `python-developer` - Python backend services
+- `golang-developer` - Go microservices
+- And 20+ more language specialists
+
+**Coordination Agents:**
+- `scrum-master` - Story creation and sprint planning
+- `product-manager` - PRD creation and feature planning
+- `software-architect` - System design and architecture
+- `code-reviewer` - Code quality and review
+
+**Specialized Agents:**
+- `frontend-design` - UI/UX design and prototyping
+- `qa-expert` - Test automation and quality assurance
+- `devops-engineer` - CI/CD and infrastructure
+- `security-engineer` - Security audits and hardening
+
+### Orchestration Flow
+
+```
+PRD → Stories → Dependencies → Parallel Execution → Review → Merge
+  ↓       ↓          ↓              ↓                ↓        ↓
+ PM    Scrum    Orchestrator    Dev Agents      Reviewer  Conflict
+Agent  Master                                    Agent    Resolver
+```
+
+---
+
+## 🛠️ Advanced Features
+
+### Git Worktree Integration
+Zipline uses git worktrees to enable true parallel development:
+- Each story gets its own isolated worktree
+- No branch switching or stashing required
+- Automatic conflict detection across worktrees
+- Clean merge strategies
+
+**Learn more:** [Git Worktree Multi-Agent Guide](docs/git-worktree-multi-agent-guide.md)
+
+### Intelligent Conflict Resolution
+Automatic detection and resolution of:
+- File-level conflicts (same file modified by multiple agents)
+- Dependency conflicts (shared code changes)
+- Configuration conflicts (package.json, etc.)
+
+### State Management
+Persistent state tracking for:
+- Story progress and completion
+- Agent assignments and workload
+- Dependency graphs and execution waves
+- Review status and feedback
+
+**Location:** `.agent-orchestration/`
+
+---
+
+## 📖 Examples
+
+### Example 1: Social Feed Application
+See [`examples/product-brief.md`](examples/product-brief.md) for a complete example of:
+- Product requirements document
+- User story breakdown
+- Implementation plan
+- Testing strategy
+
+### Example 2: Multi-Agent Parallel Development
+```bash
+# Implement 5 stories in parallel with 3 agents
+# - Stories 1-2: react-developer (frontend)
+# - Stories 3-4: python-developer (backend)
+# - Story 5: qa-expert (testing)
+
+# All work happens simultaneously in isolated worktrees
+# Automatic conflict detection and resolution
+# Coordinated merge when all stories complete
+```
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Here's how you can help:
+
+### Adding New Agents
+1. Create agent definition in `.claude/agents/`
+2. Follow the agent template structure
+3. Test with real-world scenarios
+4. Submit PR with documentation
+
+### Improving Documentation
+1. Identify gaps or unclear sections
+2. Add examples and use cases
+3. Update quick reference guides
+4. Submit PR
+
+### Reporting Issues
+- Use GitHub Issues for bug reports
+- Include reproduction steps
+- Provide agent logs and context
+- Tag with appropriate labels
+
+---
+
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE) for details
+
+---
+
+## 🔗 Resources
+
+- **[VoltAgent Framework](https://github.com/voltagent/voltagent)** - Underlying agent framework
+- **[Claude Code Documentation](https://docs.anthropic.com/claude-code)** - Official Claude Code docs
+- **[Community Discord](https://s.voltagent.dev/discord)** - Join the community
+
+---
+
+## 🙏 Acknowledgments
+
+Built with ❤️ by the VoltAgent community and contributors.
+
+Special thanks to:
+- Anthropic for Claude Code
+- The VoltAgent team for the agent framework
+- All contributors and early adopters
+
+---
+
+<p align="center">
+  <strong>Ready to supercharge your development workflow?</strong><br>
+  <a href="docs/orchestration-system.md">Get Started →</a>
+</p>
