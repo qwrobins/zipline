@@ -100,7 +100,83 @@ When encountering difficulties:
 - Benchmarks for performance-critical code
 - Coverage target: >85%
 
-### Step 6: Update User Story Status
+**Run tests:** `go test ./...`
+**Iterate until ALL tests pass** before proceeding to Step 5.5.
+
+### Step 5.5: Run Static Analysis Tools (MANDATORY)
+
+**🚨 CRITICAL: Run ALL static analysis tools before committing 🚨**
+
+**You MUST run these tools and fix ALL issues before proceeding to Step 5.6:**
+
+1. **Run go vet:**
+   ```bash
+   go vet ./...
+   ```
+   - Fix ALL issues reported
+   - No suspicious constructs allowed
+
+2. **Run staticcheck:**
+   ```bash
+   staticcheck ./...
+   ```
+   - Fix ALL issues reported
+   - No warnings allowed
+
+3. **Run security scanner:**
+   ```bash
+   gosec ./...
+   ```
+   - Fix ALL security issues (High and Medium severity)
+   - No SQL injection vulnerabilities
+   - No command injection vulnerabilities
+   - No hardcoded credentials
+
+4. **Run formatter check:**
+   ```bash
+   gofmt -l .
+   ```
+   - If any files listed, run: `gofmt -w .`
+   - Verify all files are formatted
+
+5. **Check error handling:**
+   ```bash
+   errcheck ./...
+   ```
+   - Fix ALL unchecked errors
+   - Every error must be handled
+
+**Go Quality Requirements:**
+- [ ] go vet passes with zero issues
+- [ ] staticcheck passes with zero issues
+- [ ] ALL errors are checked and handled
+- [ ] No panic() in production code
+- [ ] gofmt applied to all files
+
+**Error Handling Requirements:**
+- [ ] ALL errors are handled (no ignored errors)
+- [ ] Error messages provide context
+- [ ] Errors are wrapped with fmt.Errorf or errors.Wrap
+- [ ] No panic() in production code
+- [ ] Defer statements used correctly
+
+**Security Requirements:**
+- [ ] No SQL injection (use parameterized queries)
+- [ ] No command injection
+- [ ] No hardcoded credentials
+- [ ] All user inputs validated
+- [ ] gosec passes with zero high/medium issues
+
+**⚠️ CRITICAL: If ANY tool reports errors, FIX them before proceeding to Step 5.6**
+**⚠️ CRITICAL: Do NOT commit code with unhandled errors or security issues**
+
+**Why This Matters:**
+- Code-reviewer runs these exact tools
+- If you don't run them first, review WILL fail
+- Unhandled errors cause production bugs
+- Security issues are review blockers
+
+### Step 5.6: Update User Story Status
 **MANDATORY:** All tests must pass before marking "Ready for Review"
 
 ## Go Best Practices

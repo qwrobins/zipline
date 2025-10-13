@@ -400,6 +400,124 @@ interface ApiResponse<T> {
 type EventHandler<T = HTMLElement> = (event: React.SyntheticEvent<T>) => void;
 ```
 
+## 🚨 MANDATORY: Static Analysis and Pre-Commit Checks 🚨
+
+**CRITICAL: Run ALL static analysis tools BEFORE committing code**
+
+### Why This Matters
+- Code-reviewer runs these exact tools during review
+- If you don't run them first, review WILL fail
+- Fixing issues during implementation saves 40-60% of review iterations
+- Security issues are review blockers
+
+### Step 1: Run TypeScript Compiler (MANDATORY)
+
+```bash
+tsc --noEmit
+```
+
+**Requirements:**
+- [ ] Fix ALL type errors
+- [ ] No `any` types without explicit justification
+- [ ] All function parameters have explicit types
+- [ ] All return types are explicit
+- [ ] tsconfig.json has `"strict": true`
+
+**TypeScript Strict Mode Verification:**
+- [ ] No `any` types (use `unknown` with type guards instead)
+- [ ] All function parameters typed
+- [ ] All return types explicit
+- [ ] tsc --noEmit passes with zero errors
+
+### Step 2: Run ESLint (MANDATORY)
+
+```bash
+npm run lint
+# or
+pnpm lint
+# or
+yarn lint
+```
+
+**Requirements:**
+- [ ] Fix ALL linting errors
+- [ ] No warnings allowed
+- [ ] Follow project ESLint configuration
+- [ ] No disabled rules without justification
+
+### Step 3: Run Prettier Check (MANDATORY)
+
+```bash
+npm run format:check
+# or
+pnpm format:check
+```
+
+**If formatting needed:**
+```bash
+npm run format
+# or
+pnpm format
+```
+
+**Requirements:**
+- [ ] All files formatted consistently
+- [ ] No formatting errors
+- [ ] Prettier config followed
+
+### Step 4: Run Security Audit (MANDATORY)
+
+```bash
+npm audit
+# or
+pnpm audit
+```
+
+**Requirements:**
+- [ ] Fix ALL critical and high severity vulnerabilities
+- [ ] Document any vulnerabilities that cannot be fixed
+- [ ] Update dependencies to secure versions
+- [ ] No hardcoded secrets or API keys
+
+### Step 5: Run Tests with Coverage (MANDATORY)
+
+```bash
+npm test -- --coverage
+# or
+pnpm test --coverage
+```
+
+**Requirements:**
+- [ ] All tests passing
+- [ ] Test coverage > 90%
+- [ ] All acceptance criteria have tests
+- [ ] Edge cases tested
+- [ ] Error conditions tested
+
+### Security Requirements Checklist
+
+- [ ] No `dangerouslySetInnerHTML` without sanitization
+- [ ] All user inputs validated (use Zod or similar)
+- [ ] No `eval()` or `Function()` constructor
+- [ ] CSRF protection on state-changing operations
+- [ ] No hardcoded secrets or API keys
+- [ ] All API calls use HTTPS
+- [ ] Authentication tokens stored securely
+- [ ] XSS prevention implemented
+
+### ⚠️ CRITICAL: Pre-Commit Verification
+
+**Before committing, verify:**
+- [ ] `tsc --noEmit` passes with zero errors
+- [ ] `npm run lint` passes with zero errors
+- [ ] `npm run format:check` passes
+- [ ] `npm audit` shows no critical/high vulnerabilities
+- [ ] `npm test` passes with >90% coverage
+- [ ] All security requirements met
+
+**⚠️ If ANY check fails, FIX it before committing**
+**⚠️ Do NOT commit code with type errors, linter errors, or security vulnerabilities**
+
 ## Quality Standards
 
 ### Code Quality Checklist
