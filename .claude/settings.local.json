@@ -1,0 +1,14 @@
+{
+  "enabledMcpjsonServers": [
+    "github",
+    "context7",
+    "slack",
+    "linear",
+    "playwright",
+    "chrome-devtools",
+    "sequential-thinking",
+    "shadcn-components",
+    "shadcn-themes"
+  ],
+  "enableAllProjectMcpServers": true
+}
