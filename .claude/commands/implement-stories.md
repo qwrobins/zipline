@@ -86,6 +86,25 @@ When multiple agents work simultaneously, they MUST use isolated git worktrees t
 
 **See `.claude/agents/agent-guides/git-workflow.md` for complete workflow details.**
 
+## 🔧 QUICK REFERENCE: Post-Review Handoff
+
+**After code reviews are approved, BEFORE merge operations:**
+
+1. **Check if stories are ready for merge:**
+   ```bash
+   ./.claude/agents/lib/worktree-readiness-checker.sh check <story-ids>
+   ```
+
+2. **If NOT ready (uncommitted changes found):**
+   - Hand stories back to their original developer agents
+   - Agents commit all changes in their worktrees
+   - Re-run readiness check
+
+3. **If ready (all clean):**
+   - Proceed with sequential merge operations
+
+**See `docs/post-review-handoff-fix.md` for complete details.**
+
 ## CRITICAL REQUIREMENTS
 
 1. **ALWAYS use git worktrees** for agent isolation to prevent conflicts
@@ -583,27 +602,98 @@ cd "$WORKTREE_1_3"
 - ALL stories must be approved
 - NO stories can have pending issues
 - ALL fixes must be tested and verified
-- Only then proceed to merge and cleanup
+- Only then proceed to post-review handoff
+
+#### 4.4.2: Post-Review Handoff (CRITICAL FIX)
+
+**🚨 CRITICAL: After ALL stories in wave are approved, hand control back to developer agents to finalize changes 🚨**
+
+**This step is MANDATORY before any merge operations to prevent merge conflicts due to uncommitted changes.**
+
+**For EACH approved story in wave (in parallel):**
+
+1. **Identify the developer agent and worktree:**
+   - Read task state file: `.agent-orchestration/tasks/<story-id>-task.json`
+   - Extract `assigned_agent` field (e.g., "nextjs-developer", "python-developer")
+   - Extract `worktree_path` field (existing worktree location)
+
+2. **Hand story back to ORIGINAL developer agent for finalization:**
+   ```bash
+   # Switch to the existing worktree
+   cd <worktree_path>
+
+   # Invoke the SAME developer agent that did original implementation
+   # Pass finalization instructions to the agent
+   # Agent name from task state file (e.g., @nextjs-developer)
+   ```
+
+3. **Developer agent finalizes changes in EXISTING worktree:**
+   - Developer agent reviews their working directory status
+   - Commits ALL uncommitted changes (if any)
+   - Ensures clean working directory: `git status` shows "working tree clean"
+   - Updates story file with final implementation notes
+   - Marks story as "Ready for Merge" in story file
+
+4. **Verify clean working directory:**
+   ```bash
+   # Use the readiness checker to verify all worktrees in wave
+   ./.claude/agents/lib/worktree-readiness-checker.sh check <story-id1> <story-id2> <story-id3>
+   ```
+   - **If any uncommitted changes found:** STOP and report error
+   - **If all clean:** Proceed to merge operations
+
+5. **Track finalization progress:**
+   ```
+   📋 Wave [N] Post-Review Finalization:
+   - Story [id]: ✅ Finalized (clean working directory)
+   - Story [id]: ✅ Finalized (clean working directory)
+   - Story [id]: 🔄 Finalizing changes...
+   - Story [id]: ❌ Has uncommitted changes (fixing...)
+   ```
+
+**🚨 CRITICAL Requirements:**
+- ALL developer agents work in parallel in their existing worktrees
+- NO new worktrees created (use existing worktrees from implementation)
+- ALL working directories MUST be clean before proceeding to merge
+- Main agent MUST NOT attempt merge until ALL stories finalized
+
+**Error Handling:**
+- If any story has uncommitted changes after finalization attempt:
+  - STOP the entire wave merge process
+  - Report which stories have uncommitted changes
+  - Provide clear instructions for manual resolution
+  - Do NOT proceed to merge operations
+
+**Only after ALL stories in wave are finalized with clean working directories:**
+- Proceed to Sequential Merge and Cleanup (Step 4.5)
 
 #### 4.5: Sequential Merge and Cleanup (Wave-Based)
 
 **🚨 CRITICAL: Merge stories SEQUENTIALLY within each wave to prevent conflicts 🚨**
 
-**After ALL stories in wave are approved:**
+**After ALL stories in wave are approved AND finalized (Step 4.4.2 completed):**
 
 **Sequential Merge Process:**
 
-1. **Get repository root:**
+1. **Verify all stories are ready for merge:**
+   ```bash
+   # Check that all worktrees have clean working directories
+   ./.claude/agents/lib/worktree-readiness-checker.sh check <story-id1> <story-id2> <story-id3>
+   ```
+   - **If check fails:** STOP and complete post-review handoff (Step 4.4.2)
+   - **If check passes:** Proceed with merge operations
+
+2. **Get repository root:**
    ```bash
    REPO_ROOT=$(git rev-parse --show-toplevel)
    ```
 
-2. **Sort stories by ID** (1.1, 1.2, 1.3, etc.)
+3. **Sort stories by ID** (1.1, 1.2, 1.3, etc.)
    - Ensures consistent merge order
    - Prevents race conditions
    - Example: `1.1` → `1.2` → `1.3`
 
-3. **For EACH approved story in wave (in order):**
+4. **For EACH approved story in wave (in order):**
 
    a. **Merge changes:**
       ```bash

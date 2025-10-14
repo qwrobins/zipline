@@ -217,17 +217,22 @@ merge_worktree() {
     
     # Check if there are uncommitted changes in the worktree
     if ! git -C "$worktree_path" diff-index --quiet HEAD --; then
-        log_error "Worktree has uncommitted changes. Please commit all changes before merging."
+        log_error "CRITICAL: Worktree has uncommitted changes. Cannot merge until working directory is clean."
+        log_error ""
+        log_error "This indicates the post-review handoff step (Step 4.4.2) was not completed properly."
+        log_error "The developer agent should have committed all changes before merge operations."
         log_error ""
         log_error "Uncommitted files:"
         git -C "$worktree_path" status --short
         log_error ""
-        log_error "To fix:"
-        log_error "  cd $worktree_path"
-        log_error "  git add -A"
-        log_error "  git commit -m 'chore: commit pending changes'"
-        log_error "  cd -"
-        log_error "  $0 merge $worktree_path"
+        log_error "REQUIRED FIX - Hand back to developer agent:"
+        log_error "  1. Identify the developer agent from task state file"
+        log_error "  2. Invoke the agent in this worktree: cd $worktree_path"
+        log_error "  3. Agent must commit all changes: git add -A && git commit -m 'chore: finalize implementation'"
+        log_error "  4. Verify clean working directory: git status"
+        log_error "  5. Only then retry merge: $0 merge $worktree_path"
+        log_error ""
+        log_error "DO NOT manually commit changes - the developer agent must handle this."
         cd "$original_dir"
         return 1
     fi
