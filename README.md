@@ -312,8 +312,6 @@ MIT License - see [LICENSE](LICENSE) for details
 
 ## 🙏 Acknowledgments
 
-Built with ❤️ by the VoltAgent community and contributors.
-
 Special thanks to:
 - Anthropic for Claude Code
 - The VoltAgent team for the agent framework that was referenced during the creation of this project
