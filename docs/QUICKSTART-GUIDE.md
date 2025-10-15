@@ -110,7 +110,7 @@ Once you have an idea for your app, you can start the planning process:
 
 #### Option 1: With a Product Brief
 
-Use ChatGPT or another tool to write a product brief, then run:
+Use ChatGPT or another tool to write a product brief, then launch claude code and run:
 
 ```bash
 /automate-planning
