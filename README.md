@@ -59,55 +59,78 @@ Scripts and utilities to streamline your development process.
 
 ## 🎯 Quick Start
 
-> **📘 New to Zipline?** Check out our **[Quick Start Guide](docs/QUICKSTART-GUIDE.md)** for step-by-step setup instructions!
+> **📘 New to Zipline?** Check out our **[Quick Start Guide](docs/QUICKSTART-GUIDE.md)** for complete step-by-step setup instructions!
 
 ### Prerequisites
 - [Claude Code](https://claude.ai/code) installed
 - Git 2.25+ (for worktree support)
-- Node.js 18+ (for JavaScript/TypeScript projects)
 
-### Installation
+### Setup Overview
 
-1. **Clone the repository:**
+1. **Create your project directory:**
 ```bash
-git clone https://github.com/yourusername/zipline.git
-cd zipline
+mkdir my-project
+cd my-project
 ```
 
-2. **Copy agents to your project:**
+2. **Create directory structure:**
 ```bash
-# Copy all agents to your project
-cp -r .claude/agents /path/to/your/project/.claude/
-
-# Or copy specific agents
-cp .claude/agents/react-developer.md /path/to/your/project/.claude/agents/
+mkdir .cluade
+mkdir .cluade/agents
 ```
 
-3. **Start using agents:**
+3. **Copy core agent resources from Zipline:**
 ```bash
-# In Claude Code, agents are automatically detected
-# Just reference them in your conversations:
-"Have the react-developer agent implement this feature"
+# Copy agent guides, directives, and libraries
+cp -r /path-to-zipline/.claude/agents/agent-guides /path-to-your-project/.cluade/agents/
+cp -r /path-to-zipline/.claude/agents/directives /path-to-your-project/.cluade/agents/
+cp -r /path-to-zipline/.claude/agents/lib /path-to-your-project/.cluade/agents/
 ```
 
-**For detailed setup instructions, see the [Quick Start Guide](docs/QUICKSTART-GUIDE.md).**
-
-### Using the Orchestration System
-
-1. **Create a Product Requirements Document (PRD):**
+4. **Copy planning agents:**
 ```bash
-# See examples/product-brief.md for template
+# Copy product-manager, software-architect, planning-analyst, scrum-master, etc.
+cp /path-to-zipline/.claude/agents/product-manager.md /path-to-your-project/.cluade/agents/
+cp /path-to-zipline/.claude/agents/scrum-master.md /path-to-your-project/.cluade/agents/
+# ... (see Quick Start Guide for complete list)
 ```
 
-2. **Generate user stories:**
+5. **Copy development agents you need:**
 ```bash
-# Use the scrum-master agent to break down PRD into stories
+# Example: Next.js developer
+cp /path-to-zipline/.claude/agents/nextjs-developer.md /path-to-your-project/.cluade/agents/
 ```
 
-3. **Automate implementation:**
+6. **Copy configuration files:**
 ```bash
-# Use the orchestrator to implement stories in parallel
-# See docs/orchestrator-quick-reference.md
+cp /path-to-zipline/.claude/mcp.json /path-to-your-project/
+cp /path-to-zipline/.claude/settings.local.json /path-to-your-project/.cluade/
+cp -r /path-to-zipline/.claude/commands /path-to-your-project/
+```
+
+> **Note:** Add your GitHub PAT to the `.mcp.json` file and configure Context7 and Sequential Thinking servers.
+
+**📖 For complete setup instructions, see the [Quick Start Guide](docs/QUICKSTART-GUIDE.md).**
+
+---
+
+### Usage
+
+Once setup is complete, you can start building:
+
+#### 1. Automated Planning
+```bash
+# Run automated planning with a product brief
+/automate-planning
+
+# Or with a direct prompt
+/automate-planning docs/product-brief.md <your prompt>
+```
+
+#### 2. Implementation
+```bash
+# After planning is complete, implement the stories
+/implement-stories
 ```
 
 ---
