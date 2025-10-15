@@ -59,6 +59,8 @@ Scripts and utilities to streamline your development process.
 
 ## 🎯 Quick Start
 
+> **📘 New to Zipline?** Check out our **[Quick Start Guide](docs/QUICKSTART-GUIDE.md)** for step-by-step setup instructions!
+
 ### Prerequisites
 - [Claude Code](https://claude.ai/code) installed
 - Git 2.25+ (for worktree support)
@@ -88,6 +90,8 @@ cp .claude/agents/react-developer.md /path/to/your/project/.claude/agents/
 "Have the react-developer agent implement this feature"
 ```
 
+**For detailed setup instructions, see the [Quick Start Guide](docs/QUICKSTART-GUIDE.md).**
+
 ### Using the Orchestration System
 
 1. **Create a Product Requirements Document (PRD):**
@@ -111,6 +115,7 @@ cp .claude/agents/react-developer.md /path/to/your/project/.claude/agents/
 ## 📚 Documentation
 
 ### Getting Started
+- **[Quick Start Guide](docs/QUICKSTART-GUIDE.md)** - ⭐ Step-by-step setup and first steps
 - **[Orchestration System Overview](docs/orchestration-system.md)** - Understanding the multi-agent workflow
 - **[Git Worktree Quick Start](docs/git-worktree-quick-start.md)** - Setting up isolated development environments
 - **[Orchestrator Quick Reference](docs/orchestrator-quick-reference.md)** - Command reference and usage
