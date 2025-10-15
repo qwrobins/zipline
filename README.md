@@ -314,7 +314,7 @@ MIT License - see [LICENSE](LICENSE) for details
 
 Special thanks to:
 - Anthropic for Claude Code
-- The VoltAgent team for the agent framework that was referenced during the creation of this project
+- The [VoltAgent](https://github.com/VoltAgent/awesome-claude-code-subagents) team for the agent framework that was referenced during the creation of this project
 
 ---
 
