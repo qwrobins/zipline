@@ -36,6 +36,15 @@ Use the **sequential_thinking** tool to:
 - Uses kebab-case file naming based on section headings
 - Much faster and more reliable than manual splitting
 
+**Before running md-tree**:
+1. Check if md-tree is installed by running: `which md-tree`
+2. If md-tree is NOT found, attempt to install it:
+   ```bash
+   npm install -g @kayvan/markdown-tree-parser
+   ```
+3. If installation fails, report the error and stop (do not skip sharding)
+4. If installation succeeds, proceed with the md-tree command
+
 **Command syntax**:
 ```bash
 md-tree explode <input-file> <output-directory>
@@ -520,10 +529,18 @@ After running `md-tree explode`, verify:
 ## Common Issues and Solutions
 
 ### Issue: md-tree command not found
-**Solution**: The `@kayvan/markdown-tree-parser` package must be installed globally:
+**Solution**: The agent will automatically attempt to install the `@kayvan/markdown-tree-parser` package globally:
 ```bash
 npm install -g @kayvan/markdown-tree-parser
 ```
+
+**If automatic installation fails:**
+1. Check that npm is installed and working: `npm --version`
+2. Check your internet connection
+3. Try installing manually with the command above
+4. If manual installation also fails, check npm permissions or try with `sudo`
+
+**Important**: The agent will NOT skip sharding if md-tree is not installed. It will attempt installation and report any errors. Sharding will only be skipped if the installation attempt fails.
 
 ### Issue: Document doesn't use level 2 headings
 **Solution**: If the document uses level 1 (`#`) or level 3 (`###`) headings for major sections:

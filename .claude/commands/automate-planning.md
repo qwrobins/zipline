@@ -245,18 +245,24 @@ wc -l docs/design/frontend-design-spec.md
    - Verify sections are properly structured
    - Plan output directory structure
 
-2. **Shard PRD using md-tree:**
+2. **Check if md-tree is installed**:
+   - Run: `which md-tree`
+   - If NOT found, attempt to install: `npm install -g @kayvan/markdown-tree-parser`
+   - If installation fails, report error and stop (do not skip sharding)
+   - If installation succeeds, proceed to next step
+
+3. **Shard PRD using md-tree:**
    ```bash
    md-tree explode docs/requirements/prd.md docs/requirements/prd
    ```
 
-3. **Verify sharding results:**
+4. **Verify sharding results:**
    - Check `docs/requirements/prd/` directory created
    - Verify `index.md` exists with navigation links
    - Verify all sections extracted correctly
    - Ensure no content was lost
 
-4. **Expected structure:**
+5. **Expected structure:**
    ```
    docs/requirements/prd/
    ├── index.md                    # Navigation index
@@ -271,12 +277,18 @@ wc -l docs/design/frontend-design-spec.md
 
 **If Architecture > 500 lines:**
 
-1. **Shard architecture using md-tree:**
+1. **Check if md-tree is installed**:
+   - Run: `which md-tree`
+   - If NOT found, attempt to install: `npm install -g @kayvan/markdown-tree-parser`
+   - If installation fails, report error and stop (do not skip sharding)
+   - If installation succeeds, proceed to next step
+
+2. **Shard architecture using md-tree:**
    ```bash
    md-tree explode docs/architecture/architecture.md docs/architecture/
    ```
 
-2. **Expected structure:**
+3. **Expected structure:**
    ```
    docs/architecture/
    ├── index.md                    # Navigation index
@@ -291,12 +303,18 @@ wc -l docs/design/frontend-design-spec.md
 
 **If Design Spec > 500 lines:**
 
-1. **Shard design spec using md-tree:**
+1. **Check if md-tree is installed**:
+   - Run: `which md-tree`
+   - If NOT found, attempt to install: `npm install -g @kayvan/markdown-tree-parser`
+   - If installation fails, report error and stop (do not skip sharding)
+   - If installation succeeds, proceed to next step
+
+2. **Shard design spec using md-tree:**
    ```bash
    md-tree explode docs/design/frontend-design-spec.md docs/design/
    ```
 
-2. **Expected structure:**
+3. **Expected structure:**
    ```
    docs/design/
    ├── index.md                    # Navigation index
